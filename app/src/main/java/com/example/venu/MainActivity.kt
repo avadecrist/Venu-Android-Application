@@ -11,6 +11,9 @@ import com.example.venu.features.home.HomeScreen
 import com.example.venu.features.login.LoginScreen
 import com.example.venu.ui.theme.VenuTheme
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +35,27 @@ class MainActivity : ComponentActivity() {
                         HomeScreen()
                     }
                 }
+            }
+        }
+    }
+}
+
+// to preview UI
+@Preview(showBackground = true, name = "App Nav Preview")
+@Composable
+fun AppNavPreview() {
+    VenuTheme {
+        val navController = rememberNavController()
+
+        NavHost(
+            navController = navController,
+            startDestination = "login"
+        ) {
+            composable("login") {
+                LoginScreen(onLoginClick = { navController.navigate("home") })
+            }
+            composable("home") {
+                HomeScreen()
             }
         }
     }
