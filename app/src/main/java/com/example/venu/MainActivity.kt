@@ -28,11 +28,15 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable("login") {
                         LoginScreen(
-                            onLoginClick = { navController.navigate("home") }
+                            onLoginClick = {
+                                navController.navigate("app"){
+                                    popUpTo("login") { inclusive = true}
+                                }
+                            }
                         )
                     }
-                    composable("home") {
-                        HomeScreen()
+                    composable("app") {
+                        AppScaffold()
                     }
                 }
             }
