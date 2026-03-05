@@ -6,6 +6,8 @@ data class Event(
     val subtitle: String,          // Specific Event -- i.e. "Barca v Madrid Futbol Match" or "Study Jam"
     val category: Category,
     val locationName: String,      // Location/Host Name -- i.e. "Dubliners" or "Bernabéu Stadium"
+    val latitude: Double,
+    val longitude: Double,
     val distanceMiles: Double?,    // null if unknown for now
     val priceTier: PriceTier,
     val startTimeLabel: String,    // simple for now ("Tonight 8 PM")
