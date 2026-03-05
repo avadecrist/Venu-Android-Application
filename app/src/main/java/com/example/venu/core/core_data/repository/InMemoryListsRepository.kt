@@ -30,7 +30,7 @@ class InMemoryListsRepository(
         setFor(type).remove(eventId)
     }
 
-    override fun move(eventId: String, from: ListType, to: ListType) {
+    override fun moveEvent(eventId: String, from: ListType, to: ListType) {
         setFor(from).remove(eventId)
         setFor(to).add(eventId)
     }

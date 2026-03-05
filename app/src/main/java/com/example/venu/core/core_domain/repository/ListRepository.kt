@@ -13,7 +13,7 @@ interface ListsRepository {
     fun getList(type: ListType): List<Event>
     fun addToList(type: ListType, eventId: String)
     fun removeFromList(type: ListType, eventId: String)
-    fun move(eventId: String, from: ListType, to: ListType)
+    fun moveEvent(eventId: String, from: ListType, to: ListType)
 
     fun isInList(type: ListType, eventId: String): Boolean // so cards can show “saved” state
 
