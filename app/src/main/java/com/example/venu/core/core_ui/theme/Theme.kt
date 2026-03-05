@@ -1,6 +1,5 @@
-package com.example.venu.ui.theme
+package com.example.venu.core.core_ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
