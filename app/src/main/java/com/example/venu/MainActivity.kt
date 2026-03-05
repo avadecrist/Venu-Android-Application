@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.venu.features.home.HomeScreen
 import com.example.venu.features.login.LoginScreen
-import com.example.venu.ui.theme.VenuTheme
+import com.example.venu.core.core_ui.theme.VenuTheme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
