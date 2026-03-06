@@ -30,9 +30,21 @@ class InMemoryListsRepository(
         setFor(type).remove(eventId)
     }
 
-    override fun move(eventId: String, from: ListType, to: ListType) {
+    override fun moveEvent(eventId: String, from: ListType, to: ListType) {
         setFor(from).remove(eventId)
         setFor(to).add(eventId)
+    }
+
+    override fun isInList(type: ListType, eventId: String): Boolean {
+        return setFor(type).contains(eventId)
+    }
+
+    override fun toggleWantToGo(eventId: String) {
+        if (want.contains(eventId)) { // If it's already saved, unsave it
+            want.remove(eventId)
+        } else {
+            want.add(eventId) // else, save it
+        }
     }
 
     private fun setFor(type: ListType): MutableSet<String> {
