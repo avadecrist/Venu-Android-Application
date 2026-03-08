@@ -13,6 +13,7 @@ import com.example.venu.core.core_ui.theme.VenuTheme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.venu.features.explore.ExploreRoute
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

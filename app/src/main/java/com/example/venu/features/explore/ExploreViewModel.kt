@@ -4,14 +4,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.venu.core.core_data.repository.FakeEventRepository
+import com.example.venu.core.core_data.repository.InMemoryListsRepository
+import com.example.venu.core.core_domain.model.Event
+import com.example.venu.core.core_domain.repository.EventRepository
+import com.example.venu.core.core_domain.repository.ListsRepository
+import com.example.venu.features.explore.mappers.toPlaceUi
 
-class ExploreViewModel : ViewModel() {
-
-    private var allPlaces: List<PlaceUi> = MockExploreData.places
-
+class ExploreViewModel(
+    private val eventRepository: EventRepository,
+    private val listsRepository: ListsRepository
+): ViewModel() {
+    private val events: List<Event> = eventRepository.getTrendingEvents()
     var uiState by mutableStateOf(
         ExploreUiState(
-            places = allPlaces
+            places = events.map { it.toPlaceUi(listsRepository) }
         )
     )
         private set
@@ -33,9 +40,7 @@ class ExploreViewModel : ViewModel() {
             }
 
             is ExploreAction.ToggleSaved -> {
-                allPlaces = allPlaces.map { p ->
-                    if (p.id == action.id) p.copy(isSaved = !p.isSaved) else p
-                }
+                listsRepository.toggleWantToGo(action.id)
                 applyFilters()
             }
         }
@@ -45,19 +50,26 @@ class ExploreViewModel : ViewModel() {
         val q = uiState.query.trim().lowercase()
         val g = uiState.selectedGenre
 
-        val filtered = allPlaces.filter { p ->
+        val allPlaces: List<PlaceUi> = events.map { it.toPlaceUi(listsRepository) }
+
+        val filtered: List<PlaceUi> = allPlaces.filter { p ->
             val matchesQuery =
-                q.isBlank() || p.name.lowercase().contains(q) || p.subtitle.lowercase().contains(q)
-            val matchesGenre = (g == null) || (p.genre == g)
+                q.isBlank() ||
+                        p.name.lowercase().contains(q) ||
+                        p.subtitle.lowercase().contains(q)
+
+            val matchesGenre = g == null || p.genre == g
+
             matchesQuery && matchesGenre
         }
 
-        // keep selection if still visible, otherwise clear
-        val selectedStillVisible = uiState.selectedPlaceId?.let { id -> filtered.any { it.id == id } } == true
+        val selectedStillVisible =
+            uiState.selectedPlaceId?.let { id -> filtered.any { it.id == id } } == true
 
         uiState = uiState.copy(
             places = filtered,
             selectedPlaceId = if (selectedStillVisible) uiState.selectedPlaceId else null
         )
+
     }
 }

@@ -13,7 +13,8 @@ data class ListsTab(
 )
 
 val defaultListsTabs = listOf(
-    ListsTab("Want to Go", ListType.WANT_TO_GO),
-    ListsTab("Already Went", ListType.ALREADY_WENT),
-    ListsTab("To Review", ListType.TO_REVIEW)
+    ListsTab("Want to Go", ListType.WantToGo),
+    ListsTab("Already Went", ListType.AlreadyWent),
+    ListsTab("To Review", ListType.ToReview),
+    ListsTab("Add List", ListType.Custom("addlist","Add List"))
 )

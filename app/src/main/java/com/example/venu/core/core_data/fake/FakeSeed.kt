@@ -1,6 +1,6 @@
 package com.example.venu.core.core_data.fake
 
-import com.example.venu.core.core_domain.model.Category
+import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.PriceTier
 import com.example.venu.core.core_domain.model.Review
@@ -12,13 +12,13 @@ object FakeSeed {
 
         Event(
             id = "e1",
-            title = "Indie Night at Tupperware",
+            name = "Indie Night at Tupperware",
             subtitle = "Local DJs + indie dance floor",
-            category = Category.MUSIC,
+            genre = Genre.MUSIC,
             locationName = "Tupperware Club",
             latitude = 40.4251,
             longitude = -3.7047,
-            distanceMiles = 0.2,
+            distanceKm = 0.2,
             priceTier = PriceTier.UNDER_10,
             startTimeLabel = "Tonight 11 PM",
             credibilityScore = 91,
@@ -28,13 +28,13 @@ object FakeSeed {
 
         Event(
             id = "e2",
-            title = "Late Night Study Session",
+            name = "Late Night Study Session",
             subtitle = "Coffee + quiet tables",
-            category = Category.STUDY,
+            genre = Genre.STUDY,
             locationName = "HanSo Café",
             latitude = 40.4256,
             longitude = -3.7041,
-            distanceMiles = 0.1,
+            distanceKm = 0.1,
             priceTier = PriceTier.UNDER_10,
             startTimeLabel = "Tonight 9 PM",
             credibilityScore = 88,
@@ -44,13 +44,13 @@ object FakeSeed {
 
         Event(
             id = "e3",
-            title = "Open Mic Comedy",
+            name = "Open Mic Comedy",
             subtitle = "Student comedians + improv",
-            category = Category.MUSIC,
+            genre = Genre.MUSIC,
             locationName = "La Vía Láctea",
             latitude = 40.4257,
             longitude = -3.7056,
-            distanceMiles = 0.3,
+            distanceKm = 0.3,
             priceTier = PriceTier.UNDER_10,
             startTimeLabel = "Fri 10 PM",
             credibilityScore = 83,
@@ -60,13 +60,13 @@ object FakeSeed {
 
         Event(
             id = "e4",
-            title = "Tapas Crawl",
+            name = "Tapas Crawl",
             subtitle = "Student meet-up hopping tapas bars",
-            category = Category.FOOD,
+            genre = Genre.FOOD,
             locationName = "Plaza del Dos de Mayo",
             latitude = 40.4265,
             longitude = -3.7040,
-            distanceMiles = 0.2,
+            distanceKm = 0.2,
             priceTier = PriceTier.UNDER_20,
             startTimeLabel = "Tonight 8 PM",
             credibilityScore = 87,
@@ -76,13 +76,13 @@ object FakeSeed {
 
         Event(
             id = "e5",
-            title = "Pickup Fútbol",
+            name = "Pickup Fútbol",
             subtitle = "Casual street football",
-            category = Category.SPORTS,
+            genre = Genre.SPORTS,
             locationName = "Plaza del Dos de Mayo",
             latitude = 40.4266,
             longitude = -3.7038,
-            distanceMiles = 0.2,
+            distanceKm = 0.2,
             priceTier = PriceTier.FREE,
             startTimeLabel = "Tomorrow 6 PM",
             credibilityScore = 80,
@@ -92,13 +92,13 @@ object FakeSeed {
 
         Event(
             id = "e6",
-            title = "Coffee & Coding",
+            name = "Coffee & Coding",
             subtitle = "Students building side projects",
-            category = Category.STUDY,
+            genre = Genre.STUDY,
             locationName = "Ruda Café",
             latitude = 40.4246,
             longitude = -3.7039,
-            distanceMiles = 0.3,
+            distanceKm = 0.3,
             priceTier = PriceTier.UNDER_10,
             startTimeLabel = "Sat 10 AM",
             credibilityScore = 89,
@@ -108,21 +108,148 @@ object FakeSeed {
 
         Event(
             id = "e7",
-            title = "Underground DJ Set",
+            name = "Underground DJ Set",
             subtitle = "House + techno night",
-            category = Category.MUSIC,
+            genre = Genre.MUSIC,
             locationName = "Sala Maravillas",
             latitude = 40.4260,
             longitude = -3.7051,
-            distanceMiles = 0.3,
+            distanceKm = 0.3,
             priceTier = PriceTier.UNDER_20,
             startTimeLabel = "Sat 11 PM",
             credibilityScore = 84,
             reviewCount = 7,
             averageRating = 4.4
+        ),
+
+        Event(
+            id = "e8",
+            name = "Taco Corner",
+            subtitle = "Quick street tacos",
+            genre = Genre.FOOD,
+            locationName = "Taco Corner",
+            latitude = 40.4194,
+            longitude = -3.7032,
+            distanceKm = 1.0,
+            priceTier = PriceTier.UNDER_10,
+            startTimeLabel = "Open now",
+            credibilityScore = 83,
+            reviewCount = 70,
+            averageRating = 4.2
+        ),
+
+        Event(
+            id = "e9",
+            name = "North Library",
+            subtitle = "Quiet study environment",
+            genre = Genre.STUDY,
+            locationName = "North Library",
+            latitude = 40.4240,
+            longitude = -3.7021,
+            distanceKm = 0.9,
+            priceTier = PriceTier.FREE,
+            startTimeLabel = "Open until 10 PM",
+            credibilityScore = 87,
+            reviewCount = 140,
+            averageRating = 4.8
+        ),
+
+        Event(
+            id = "e10",
+            name = "Vinyl Room",
+            subtitle = "Live DJs and music sets",
+            genre = Genre.MUSIC,
+            locationName = "Vinyl Room",
+            latitude = 40.4211,
+            longitude = -3.7075,
+            distanceKm = 1.8,
+            priceTier = PriceTier.UNDER_10,
+            startTimeLabel = "Tonight 10 PM",
+            credibilityScore = 89,
+            reviewCount = 63,
+            averageRating = 4.5
+        ),
+
+        Event(
+            id = "e11",
+            name = "Bar Atlas",
+            subtitle = "Cocktails and nightlife",
+            genre = Genre.NIGHTLIFE,
+            locationName = "Bar Atlas",
+            latitude = 40.4202,
+            longitude = -3.7061,
+            distanceKm = 2.4,
+            priceTier = PriceTier.FREE,
+            startTimeLabel = "Tonight 9 PM",
+            credibilityScore = 80,
+            reviewCount = 85,
+            averageRating = 4.4
+        ),
+
+        Event(
+            id = "e12",
+            name = "Sushi Miko",
+            subtitle = "Fresh Japanese cuisine",
+            genre = Genre.FOOD,
+            locationName = "Sushi Miko",
+            latitude = 40.4175,
+            longitude = -3.7050,
+            distanceKm = 1.2,
+            priceTier = PriceTier.UNDER_10,
+            startTimeLabel = "Dinner hours",
+            credibilityScore = 95,
+            reviewCount = 210,
+            averageRating = 4.7
+        ),
+
+        Event(
+            id = "e13",
+            name = "Blue Bottle Corner",
+            subtitle = "Espresso and pour-over",
+            genre = Genre.COFFEE,
+            locationName = "Blue Bottle",
+            latitude = 40.4162,
+            longitude = -3.7044,
+            distanceKm = 0.4,
+            priceTier = PriceTier.UNDER_10,
+            startTimeLabel = "Open now",
+            credibilityScore = 90,
+            reviewCount = 165,
+            averageRating = 4.6
+        ),
+
+        Event(
+            id = "e14",
+            name = "Neon Basement",
+            subtitle = "EDM dance floor",
+            genre = Genre.NIGHTLIFE,
+            locationName = "Neon Basement",
+            latitude = 40.4226,
+            longitude = -3.7068,
+            distanceKm = 2.9,
+            priceTier = PriceTier.UNDER_20,
+            startTimeLabel = "Tonight 11 PM",
+            credibilityScore = 88,
+            reviewCount = 76,
+            averageRating = 4.1
+        ),
+
+        Event(
+            id = "e15",
+            name = "Park Study Pods",
+            subtitle = "Outdoor study tables with Wi-Fi",
+            genre = Genre.STUDY,
+            locationName = "City Park",
+            latitude = 40.4235,
+            longitude = -3.7010,
+            distanceKm = 1.6,
+            priceTier = PriceTier.FREE,
+            startTimeLabel = "Open now",
+            credibilityScore = 82,
+            reviewCount = 54,
+            averageRating = 4.0
         )
     )
-
 
     val reviews = listOf(
 
