@@ -1,4 +1,4 @@
-package com.example.venu.features.explore
+package com.example.venu.features.explore.model
 
 sealed interface ExploreAction {
     data class QueryChanged(val text: String) : ExploreAction

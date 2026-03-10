@@ -8,9 +8,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.venu.features.home.model.HomeAction
+import com.example.venu.features.home.model.HomeUiState
+
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    state: HomeUiState,
+    onAction: (HomeAction) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -25,10 +31,10 @@ fun HomeScreen() {
         Spacer(Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = "",
-            onValueChange = { /* fake for now */ },
+            value = state.query,
+            onValueChange = { onAction(HomeAction.QueryChanged(it)) },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Search venues") },
+            label = { Text("Search Venues") },
             singleLine = true
         )
 
@@ -47,9 +53,13 @@ fun HomeScreen() {
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            FeaturedCard(title = "Cafe Luna", subtitle = "Cozy • Coffee")
-            FeaturedCard(title = "Sushi Miko", subtitle = "Fresh • Japanese")
-            FeaturedCard(title = "Bar Atlas", subtitle = "Cocktails • Night")
+            // maps fake seed data to each feature card
+            state.featured.forEach { venue ->
+                FeaturedCard(
+                    title = venue.title,
+                    subtitle = venue.subtitle
+                )
+            }
         }
 
         Spacer(Modifier.height(24.dp))
@@ -61,10 +71,23 @@ fun HomeScreen() {
 
         Spacer(Modifier.height(12.dp))
 
-        VenueCard(name = "Pasta House", details = "Italian • 12 min")
-        VenueCard(name = "Honest Greens", details = "Healthy • 8 min")
-        VenueCard(name = "Burger Bar", details = "Burgers • 15 min")
-        VenueCard(name = "Taco Time", details = "Mexican • 10 min")
+        // maps fake seed data to each venue card
+        state.nearYou.forEach { venue ->
+            VenueCard(
+                name = venue.title,
+                details = buildString {
+                    append(venue.subtitle)
+                    venue.distanceLabel?.let {
+                        append(" • ")
+                        append(it)
+                    }
+                    venue.ratingLabel?.let {
+                        append(" • ")
+                        append(it)
+                    }
+                }
+            )
+        }
 
         Spacer(Modifier.height(24.dp))
     }

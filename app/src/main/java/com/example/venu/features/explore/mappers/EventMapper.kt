@@ -4,7 +4,7 @@ package com.example.venu.features.explore.mappers
 
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.ListsRepository
-import com.example.venu.features.explore.PlaceUi
+import com.example.venu.features.explore.model.PlaceUi
 
 fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
     return PlaceUi(
