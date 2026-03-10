@@ -9,6 +9,9 @@ gen/
 out/
 build/
 
+# Google Services
+google-services.json
+
 # Gradle
 .gradle/
 **/.gradle/
