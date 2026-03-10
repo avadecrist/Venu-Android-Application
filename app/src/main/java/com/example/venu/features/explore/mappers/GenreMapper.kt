@@ -1,7 +1,7 @@
 package com.example.venu.features.explore.mappers
 
 import com.example.venu.core.core_domain.model.Genre
-import com.example.venu.features.explore.ExploreGenre
+import com.example.venu.features.explore.model.ExploreGenre
 
 fun Genre.toExploreGenre(): ExploreGenre = when (this) {
     Genre.FOOD -> ExploreGenre.Food

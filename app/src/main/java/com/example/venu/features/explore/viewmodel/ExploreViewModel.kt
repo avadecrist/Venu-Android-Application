@@ -1,15 +1,16 @@
-package com.example.venu.features.explore
+package com.example.venu.features.explore.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.venu.core.core_data.repository.FakeEventRepository
-import com.example.venu.core.core_data.repository.InMemoryListsRepository
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListsRepository
 import com.example.venu.features.explore.mappers.toPlaceUi
+import com.example.venu.features.explore.model.ExploreAction
+import com.example.venu.features.explore.model.ExploreUiState
+import com.example.venu.features.explore.model.PlaceUi
 
 class ExploreViewModel(
     private val eventRepository: EventRepository,
