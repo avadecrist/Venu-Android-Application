@@ -1,7 +1,7 @@
 package com.example.venu.core.core_data.repository
 
 import com.example.venu.core.core_data.fake.FakeSeed
-import com.example.venu.core.core_domain.model.Category
+import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.EventRepository
 
@@ -26,12 +26,12 @@ class FakeEventRepository : EventRepository {
     */
     override fun getNearbyEvents(): List<Event> {
         // Explore's default list
-        val hasAnyDistance = events.any { it.distanceMiles != null } // true if distanceMiles has a value
+        val hasAnyDistance = events.any { it.distanceKm != null } // true if distanceMiles has a value
 
         return if (hasAnyDistance) {
             events
                 .sortedWith(
-                compareBy<Event> { it.distanceMiles ?: Double.MAX_VALUE } // sort by distance
+                compareBy<Event> { it.distanceKm ?: Double.MAX_VALUE } // sort by distance
                     .thenByDescending { it.credibilityScore } // if same distance, then sort by credibility
                 )
                 .take(20) // displays first 20 events
@@ -41,20 +41,20 @@ class FakeEventRepository : EventRepository {
         }
     }
 
-    override fun getEventsByCategory(category: Category): List<Event> {
-        return events.filter { it.category == category }
+    override fun getEventsByCategory(genre: Genre): List<Event> {
+        return events.filter { it.genre == genre }
     }
 
-    override fun searchEvents(query: String, categories: Set<Category>): List<Event> {
+    override fun searchEvents(query: String, categories: Set<Genre>): List<Event> {
         val q = query.trim().lowercase()
 
         return events.filter { e ->
             val matchesQuery = q.isBlank() ||
-                    e.title.lowercase().contains(q) ||
+                    e.name.lowercase().contains(q) ||
                     e.subtitle.lowercase().contains(q) ||
                     e.locationName.lowercase().contains(q)
 
-            val matchesCategory = categories.isEmpty() || categories.contains(e.category)
+            val matchesCategory = categories.isEmpty() || categories.contains(e.genre)
 
             matchesQuery && matchesCategory
         }

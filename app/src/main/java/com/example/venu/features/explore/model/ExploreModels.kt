@@ -1,19 +1,23 @@
-package com.example.venu.features.explore
+package com.example.venu.features.explore.model
+
 
 enum class ExploreGenre(val label: String) {
-    Coffee("Coffee"),
     Food("Food"),
-    Nightlife("Nightlife"),
-    Music("Music"),
     Study("Study"),
-    Outdoors("Outdoors")
+    Music("Music"),
+    Sports("Sports"),
+    Museums("Museums"),
+    Coffee("Coffee"),
+    Nightlife("Nightlife"),
+    Outdoors("Outdoors"),
+
 }
 
 data class PlaceUi(
     val id: String,
     val name: String,
     val subtitle: String,
-    val distanceKm: Double,
+    val distanceKm: Double?,
     val rating: Double,
     val genre: ExploreGenre,
     val isVerified: Boolean,

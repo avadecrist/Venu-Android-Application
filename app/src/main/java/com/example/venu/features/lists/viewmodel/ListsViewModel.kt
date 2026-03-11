@@ -17,7 +17,7 @@ class ListsViewModel : ViewModel() {
     val state = _state.asStateFlow()
 
     init {
-        loadList(ListType.WANT_TO_GO)
+        loadList(ListType.WantToGo)
     }
 
     fun onEvent(event: ListsUiEvent) {
@@ -31,8 +31,8 @@ class ListsViewModel : ViewModel() {
 
             is ListsUiEvent.ToggleWantToGo -> {
                 listsRepo.toggleWantToGo(event.eventId)
-                if (_state.value.selectedTab == ListType.WANT_TO_GO) { // only reload if currently in Want to Go tab
-                    loadList(ListType.WANT_TO_GO)
+                if (_state.value.selectedTab == ListType.WantToGo) { // only reload if currently in Want to Go tab
+                    loadList(ListType.WantToGo)
                 }
             }
 

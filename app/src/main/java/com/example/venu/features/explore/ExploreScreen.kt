@@ -20,6 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.venu.features.explore.model.ExploreAction
+import com.example.venu.features.explore.model.ExploreGenre
+import com.example.venu.features.explore.model.ExploreUiState
 
 @Composable
 fun ExploreScreen(
@@ -113,10 +116,7 @@ private fun GenreChipsRow(
 @Composable
 private fun ExploreScreenPreview() {
     ExploreScreen(
-        state = ExploreUiState(
-            places = MockExploreData.places,
-            selectedGenre = ExploreGenre.Coffee
-        ),
+        state = ExploreUiState(), // hard code in a List of PlaceUi events to see in preview
         onAction = {}
     )
 }

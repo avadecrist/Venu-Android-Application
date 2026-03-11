@@ -7,12 +7,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.venu.features.home.HomeScreen
 import com.example.venu.features.login.LoginScreen
 import com.example.venu.core.core_ui.theme.VenuTheme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.venu.features.home.HomeRoute
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +59,7 @@ fun AppNavPreview() {
                 LoginScreen(onLoginClick = { navController.navigate("home") })
             }
             composable("home") {
-                HomeScreen()
+                HomeRoute()
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.example.venu.features.explore
+package com.example.venu.features.explore.model
 
 data class ExploreUiState(
     val query: String = "",
