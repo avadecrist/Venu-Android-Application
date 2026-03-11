@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import com.example.venu.features.home.HomeScreen
+import com.example.venu.features.explore.ExploreRoute
 
 @Composable
 fun AppScaffold() {
@@ -84,7 +85,7 @@ fun AppScaffold() {
             modifier = Modifier.padding(padding)
         ) {
             composable("home") { HomeScreen() }
-            composable("explore") { PlaceholderScreen("Explore") }
+            composable("explore") { ExploreRoute() }
             composable("lists") { PlaceholderScreen("Lists") }
             composable("profile") { PlaceholderScreen("profile") }
         }
