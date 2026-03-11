@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "719899327421",
+    "project_id": "uc3m-it-2026-16504-g14-97",
+    "storage_bucket": "uc3m-it-2026-16504-g14-97.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719899327421:android:89120ca8b93747290f30d4",
+        "android_client_info": {
+          "package_name": "com.example.venu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC39K_nCaywcxaTC8j-hUM1mLRGTt6UI5E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
