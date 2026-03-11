@@ -101,7 +101,7 @@ private fun ListEventCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = event.title,
+                text = event.name,
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -119,7 +119,7 @@ private fun ListEventCard(
                 style = MaterialTheme.typography.bodySmall
             )
 
-            event.distanceMiles?.let { miles ->
+            event.distanceKm?.let { miles ->
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "${miles} mi away",
@@ -130,7 +130,7 @@ private fun ListEventCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Category: ${event.category} • Price: ${event.priceTier}",
+                text = "Category: ${event.genre} • Price: ${event.priceTier}",
                 style = MaterialTheme.typography.bodySmall
             )
 
@@ -158,14 +158,14 @@ private fun ActionRow(
         horizontalArrangement = Arrangement.End
     ) {
         when (selectedTab) {
-            ListType.WANT_TO_GO -> {
+            ListType.WantToGo -> {
                 TextButton(
                     onClick = {
                         onEvent(
                             ListsUiEvent.MoveEvent(
                                 eventId = event.id,
-                                from = ListType.WANT_TO_GO,
-                                to = ListType.ALREADY_WENT
+                                from = ListType.WantToGo,
+                                to = ListType.AlreadyWent
                             )
                         )
                     }
@@ -184,14 +184,14 @@ private fun ActionRow(
                 }
             }
 
-            ListType.ALREADY_WENT -> {
+            ListType.AlreadyWent -> {
                 TextButton(
                     onClick = {
                         onEvent(
                             ListsUiEvent.MoveEvent(
                                 eventId = event.id,
-                                from = ListType.ALREADY_WENT,
-                                to = ListType.TO_REVIEW
+                                from = ListType.AlreadyWent,
+                                to = ListType.ToReview
                             )
                         )
                     }
@@ -205,7 +205,7 @@ private fun ActionRow(
                     onClick = {
                         onEvent(
                             ListsUiEvent.RemoveFromList(
-                                tab = ListType.ALREADY_WENT,
+                                tab = ListType.AlreadyWent,
                                 eventId = event.id
                             )
                         )
@@ -215,18 +215,34 @@ private fun ActionRow(
                 }
             }
 
-            ListType.TO_REVIEW -> {
+            ListType.ToReview -> {
                 TextButton(
                     onClick = {
                         onEvent(
                             ListsUiEvent.RemoveFromList(
-                                tab = ListType.TO_REVIEW,
+                                tab = ListType.ToReview,
                                 eventId = event.id
                             )
                         )
                     }
                 ) {
                     Text("Remove")
+                }
+            }
+
+            is ListType.Custom -> {
+                val customListName = selectedTab.name
+                TextButton(
+                    onClick = {
+                        onEvent(
+                            ListsUiEvent.RemoveFromList(
+                                tab = selectedTab, // this is the Custom list instance
+                                eventId = event.id
+                            )
+                        )
+                    }
+                ) {
+                    Text("Remove $customListName")
                 }
             }
         }
@@ -235,8 +251,9 @@ private fun ActionRow(
 
 private fun emptyMessageFor(selectedTab: ListType): String {
     return when (selectedTab) {
-        ListType.WANT_TO_GO -> "You have no events in Want to Go yet."
-        ListType.ALREADY_WENT -> "You have no events in Already Went yet."
-        ListType.TO_REVIEW -> "You have no events in To Review yet."
+        ListType.WantToGo -> "You have no events in Want to Go yet."
+        ListType.AlreadyWent -> "You have no events in Already Went yet."
+        ListType.ToReview -> "You have no events in To Review yet."
+        else -> "You have no events in this list yet."
     }
 }
