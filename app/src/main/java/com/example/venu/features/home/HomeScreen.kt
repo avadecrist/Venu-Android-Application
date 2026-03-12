@@ -24,21 +24,18 @@ fun HomeScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "Venu",
+            text = "Welcome, Explorer",
             style = MaterialTheme.typography.headlineLarge
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(6.dp))
 
-        OutlinedTextField(
-            value = state.query,
-            onValueChange = { onAction(HomeAction.QueryChanged(it)) },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Search Venues") },
-            singleLine = true
+        Text(
+            text = "Find something good near you today",
+            style = MaterialTheme.typography.bodyLarge
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(24.dp))
 
         Text(
             text = "Featured",
@@ -65,7 +62,7 @@ fun HomeScreen(
         Spacer(Modifier.height(24.dp))
 
         Text(
-            text = "Near you",
+            text = "Near You",
             style = MaterialTheme.typography.titleLarge
         )
 
@@ -98,7 +95,7 @@ private fun FeaturedCard(title: String, subtitle: String) {
     Card(
         modifier = Modifier
             .width(220.dp)
-            .height(120.dp)
+            .height(140.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = title, style = MaterialTheme.typography.titleMedium)
