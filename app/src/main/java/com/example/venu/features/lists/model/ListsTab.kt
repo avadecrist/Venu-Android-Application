@@ -16,5 +16,6 @@ val defaultListsTabs = listOf(
     ListsTab("Want to Go", ListType.WantToGo),
     ListsTab("Already Went", ListType.AlreadyWent),
     ListsTab("To Review", ListType.ToReview),
-    ListsTab("Custom List", ListType.Custom("customlist","Custom List"))
 )
+
+/* No longer need this now that backend for ListType is defined */
