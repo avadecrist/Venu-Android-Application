@@ -40,7 +40,7 @@ class ExploreViewModel(
                 uiState = uiState.copy(selectedPlaceId = action.id)
             }
 
-            is ExploreAction.ToggleSaved -> {
+            is ExploreAction.ToggleWantToGo -> {
                 listsRepository.toggleWantToGo(action.id)
                 applyFilters()
             }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -19,7 +20,7 @@ fun PlaceCard(
     place: PlaceUi,
     selected: Boolean,
     onClick: () -> Unit,
-    onToggleSaved: () -> Unit
+    onSaveClick: () -> Unit
 ) {
     val border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
 
@@ -50,16 +51,25 @@ fun PlaceCard(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Tag(label = place.genre.label)
                 if (place.isVerified) Tag(label = "Verified")
-                if (place.isSaved) Tag(label = "Saved")
+                if (place.savedLabel != null) Tag(label = "Saved")
             }
 
             Spacer(Modifier.height(10.dp))
 
-            OutlinedButton(
-                onClick = onToggleSaved,
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-            ) {
-                Text(if (place.isSaved) "Unsave" else "Save")
+            if (place.savedLabel == null) {
+                OutlinedButton(
+                    onClick = onSaveClick,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text("Save")
+                }
+            } else {
+                FilledTonalButton(
+                    onClick = onSaveClick,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text("Saved • ${place.savedLabel}")
+                }
             }
         }
     }
