@@ -7,14 +7,16 @@ import androidx.lifecycle.ViewModel
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListsRepository
+import com.example.venu.core.core_common.AppGraph
 import com.example.venu.features.explore.mappers.toPlaceUi
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.PlaceUi
 
 class ExploreViewModel(
-    private val eventRepository: EventRepository,
-    private val listsRepository: ListsRepository
+    private val eventRepository: EventRepository = AppGraph.eventRepo,
+    private val listsRepository: ListsRepository = AppGraph.listsRepo
+
 ): ViewModel() {
     private val events: List<Event> = eventRepository.getTrendingEvents()
     var uiState by mutableStateOf(
@@ -41,7 +43,7 @@ class ExploreViewModel(
             }
 
             is ExploreAction.ToggleWantToGo -> {
-                listsRepository.toggleWantToGo(action.id)
+                listsRepository.toggleWantToGo(action.id) // adds to 'want' val in InMemoryListsRepository
                 applyFilters()
             }
         }

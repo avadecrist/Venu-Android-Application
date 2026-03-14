@@ -3,16 +3,15 @@ package com.example.venu.features.lists.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_domain.repository.ListType
+import com.example.venu.core.core_domain.repository.ListsRepository
 import com.example.venu.features.lists.model.ListsUiEvent
 import com.example.venu.features.lists.model.ListsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 // will include: fun onEvent(event: ListsUiEvent) { ... }
-class ListsViewModel : ViewModel() {
-
+class ListsViewModel(): ViewModel() {
     private val listsRepo = AppGraph.listsRepo
-
     private val _state = MutableStateFlow(ListsUiState())
     val state = _state.asStateFlow()
 
@@ -31,9 +30,7 @@ class ListsViewModel : ViewModel() {
 
             is ListsUiEvent.ToggleWantToGo -> {
                 listsRepo.toggleWantToGo(event.eventId)
-                if (_state.value.selectedTab == ListType.WantToGo) { // only reload if currently in Want to Go tab
-                    loadList(ListType.WantToGo)
-                }
+                refreshCurrentTab()
             }
 
             is ListsUiEvent.RemoveFromList -> {
@@ -41,18 +38,27 @@ class ListsViewModel : ViewModel() {
                     _state.value.selectedTab,
                     event.eventId
                 )
-                loadList(_state.value.selectedTab)
+                refreshCurrentTab()
             }
 
             is ListsUiEvent.MoveEvent -> {
                 listsRepo.moveEvent(event.eventId, event.from, event.to)
-                loadList(_state.value.selectedTab)
+                refreshCurrentTab()
+            }
+
+            ListsUiEvent.Refresh -> {
+                refreshCurrentTab()
             }
         }
     }
 
+    private fun refreshCurrentTab() {
+        loadList(_state.value.selectedTab)
+    }
+
     private fun loadList(type: ListType) {
         val events = listsRepo.getList(type)
+        println("LOAD LIST: $type -> ${events.map { it.id }}")
 
         _state.value = _state.value.copy(
             selectedTab = type,
