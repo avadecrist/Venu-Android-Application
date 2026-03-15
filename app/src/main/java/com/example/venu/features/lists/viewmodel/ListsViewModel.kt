@@ -8,16 +8,13 @@ import com.example.venu.features.lists.model.ListsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-// will include: fun onEvent(event: ListsUiEvent) { ... }
-class ListsViewModel : ViewModel() {
-
+class ListsViewModel(): ViewModel() {
     private val listsRepo = AppGraph.listsRepo
-
     private val _state = MutableStateFlow(ListsUiState())
     val state = _state.asStateFlow()
 
     init {
-        loadList(ListType.WantToGo)
+        refresh(ListType.WantToGo)
     }
 
     fun onEvent(event: ListsUiEvent) {
@@ -25,55 +22,52 @@ class ListsViewModel : ViewModel() {
 
             is ListsUiEvent.SelectTab -> {
                 if (event.tab != _state.value.selectedTab) {
-                    loadList(event.tab) // only reloads if tab changed
+                    refresh(event.tab) // only reloads if tab changed
                 }
             }
 
             is ListsUiEvent.ToggleWantToGo -> {
                 listsRepo.toggleWantToGo(event.eventId)
-                if (_state.value.selectedTab == ListType.WantToGo) { // only reload if currently in Want to Go tab
-                    loadList(ListType.WantToGo)
-                }
+                refresh()
             }
 
             is ListsUiEvent.RemoveFromList -> {
-                listsRepo.removeFromList(
-                    _state.value.selectedTab,
-                    event.eventId
-                )
-                loadList(_state.value.selectedTab)
+                listsRepo.removeFromList(event.tab, event.eventId)
+                refresh(event.tab)
             }
 
             is ListsUiEvent.MoveEvent -> {
                 listsRepo.moveEvent(event.eventId, event.from, event.to)
-                loadList(_state.value.selectedTab)
+                refresh(event.to)
+            }
+
+            is ListsUiEvent.CreateCustomList -> {
+                if (event.name.isNotBlank()) {
+                    val newList = listsRepo.createCustomList(event.name.trim())
+
+                    refresh(newList)
+                }
+                return
             }
         }
     }
 
-    private fun loadList(type: ListType) {
-        val events = listsRepo.getList(type)
+    private fun refresh(selected: ListType = _state.value.selectedTab) {
+
+        val tabs = listsRepo.getAllLists()
+
+        val safeTab = tabs.find { tab ->
+            when {
+                tab is ListType.Custom && selected is ListType.Custom ->
+                    tab.id == selected.id
+                else -> tab == selected
+            }
+        } ?: tabs.first()
 
         _state.value = _state.value.copy(
-            selectedTab = type,
-            events = events
+            tabs = tabs,
+            selectedTab = safeTab,
+            events = listsRepo.getList(safeTab)
         )
     }
 }
-
-/* How UI would call this:
-
-1)
-    val viewModel: ListsViewModel = viewModel()
-    val state by viewModel.state.collectAsState()
-
-2)
-    Button(
-        onClick = {
-            viewModel.onEvent(
-                ListsUiEvent.ToggleWantToGo(event.id)
-            )
-        }
-    )
-
- */

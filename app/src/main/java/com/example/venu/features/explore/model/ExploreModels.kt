@@ -21,5 +21,6 @@ data class PlaceUi(
     val rating: Double,
     val genre: ExploreGenre,
     val isVerified: Boolean,
-    val isSaved: Boolean
+    val isSaved: Boolean,
+    val savedLabel: String? = null
 )

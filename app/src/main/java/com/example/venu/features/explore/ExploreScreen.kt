@@ -80,7 +80,7 @@ fun ExploreScreen(
                     place = place,
                     selected = place.id == state.selectedPlaceId,
                     onClick = { onAction(ExploreAction.PlaceClicked(place.id)) },
-                    onToggleSaved = { onAction(ExploreAction.ToggleSaved(place.id)) }
+                    onSaveClick = { onAction(ExploreAction.ToggleWantToGo(place.id)) }
                 )
             }
         }
