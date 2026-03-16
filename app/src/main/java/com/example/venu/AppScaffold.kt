@@ -19,7 +19,7 @@ import com.example.venu.features.lists.ListsRoute
 import com.example.venu.features.profile.ProfileRoute
 
 @Composable
-fun AppScaffold() {
+fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit) {
     val navController = rememberNavController()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -90,7 +90,12 @@ fun AppScaffold() {
             composable("home") { HomeRoute() }
             composable("explore") { ExploreRoute() }
             composable("lists") { ListsRoute() }
-            composable("profile") { ProfileRoute() }
+            composable("profile") {
+                ProfileRoute(
+                    isSignedIn = isSignedIn,
+                    onSignInClick = onSignInClick
+                )
+            }
         }
     }
 }
