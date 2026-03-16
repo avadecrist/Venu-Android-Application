@@ -21,7 +21,8 @@ class ExploreViewModel(
     private val events: List<Event> = eventRepository.getTrendingEvents()
     var uiState by mutableStateOf(
         ExploreUiState(
-            places = events.map { it.toPlaceUi(listsRepository) }
+            places = buildPlaces(),
+            availableLists = listsRepository.getAllLists(),
         )
     )
         private set
@@ -46,10 +47,69 @@ class ExploreViewModel(
                 listsRepository.toggleWantToGo(action.id) // adds to 'want' val in InMemoryListsRepository
                 applyFilters()
             }
+
+            is ExploreAction.SaveClicked -> {
+                uiState = uiState.copy(
+                    showSaveSheet = true,
+                    pendingSaveEventId = action.id,
+                    availableLists = listsRepository.getAllLists()
+                )
+            }
+
+            is ExploreAction.SaveToList -> {
+                listsRepository.addToList(action.listType, action.eventId)
+
+                uiState = uiState.copy(
+                    showSaveSheet = false,
+                    pendingSaveEventId = null,
+                    availableLists = listsRepository.getAllLists()
+                )
+
+                applyFilters()
+            }
+
         }
     }
 
+    fun dismissSaveSheet() {
+        uiState = uiState.copy(
+            showSaveSheet = false,
+            pendingSaveEventId = null
+        )
+    }
+
+    private fun buildPlaces(): List<PlaceUi> {
+        return events.map { it.toPlaceUi(listsRepository) }
+    }
+
     private fun applyFilters() {
+        val q = uiState.query.trim().lowercase()
+        val g = uiState.selectedGenre
+
+        val allPlaces = buildPlaces()
+
+        val filtered = allPlaces.filter { place ->
+            val matchesQuery =
+                q.isBlank() ||
+                        place.name.lowercase().contains(q) ||
+                        place.subtitle.lowercase().contains(q)
+
+            val matchesGenre = g == null || place.genre == g
+
+            matchesQuery && matchesGenre
+        }
+
+        val selectedStillVisible =
+            uiState.selectedPlaceId?.let { id -> filtered.any { it.id == id } } == true
+
+        uiState = uiState.copy(
+            places = filtered,
+            selectedPlaceId = if (selectedStillVisible) uiState.selectedPlaceId else null,
+            availableLists = listsRepository.getAllLists()
+        )
+    }
+
+    /*private fun applyFilters() {
         val q = uiState.query.trim().lowercase()
         val g = uiState.selectedGenre
 
@@ -74,5 +134,5 @@ class ExploreViewModel(
             selectedPlaceId = if (selectedStillVisible) uiState.selectedPlaceId else null
         )
 
-    }
+    } */
 }

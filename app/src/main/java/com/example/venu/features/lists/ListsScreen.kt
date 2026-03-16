@@ -347,7 +347,7 @@ private fun emptyMessageFor(selectedTab: ListType): String {
     }
 }
 
-private fun tabLabel(tab: ListType): String {
+fun tabLabel(tab: ListType): String {
     return when (tab) {
         ListType.WantToGo -> "Want To Go"
         ListType.AlreadyWent -> "Already Went"

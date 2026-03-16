@@ -16,6 +16,7 @@ fun ExploreRoute(
 
     ExploreScreen(
         state = viewModel.uiState,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onDismissSaveSheet = viewModel::dismissSaveSheet,
     )
 }
