@@ -21,7 +21,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(onLoginClick: () -> Unit) {
+fun LoginScreen(
+    onLoginClick: () -> Unit,
+    onContinueAsGuestClick: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -73,6 +75,17 @@ fun LoginScreen(onLoginClick: () -> Unit) {
                 .height(52.dp)
         ) {
             Text("Log in")
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = onContinueAsGuestClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+        ) {
+            Text("Continue without account")
         }
     }
 }

@@ -28,7 +28,8 @@ import com.example.venu.features.profile.model.ProfileUiState
 
 @Composable
 fun ProfileScreen(
-    state: ProfileUiState
+    state: ProfileUiState,
+    onSignInClick : () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -37,11 +38,15 @@ fun ProfileScreen(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        ProfileHeader(state = state)
+        ProfileHeader(
+            state = state,
+            onSignInClick = onSignInClick
+        )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        StatsRow(state = state)
+        if (state.isSignedIn) {
+            Spacer(modifier = Modifier.height(24.dp))
+            StatsRow(state = state)
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -51,7 +56,8 @@ fun ProfileScreen(
 
 @Composable
 private fun ProfileHeader(
-    state: ProfileUiState
+    state: ProfileUiState,
+    onSignInClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -98,8 +104,10 @@ private fun ProfileHeader(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { }) {
-            Text(if (state.isSignedIn) "Manage Account" else "Sign In")
+        if (!state.isSignedIn) {
+            Button(onClick = onSignInClick) {
+                Text("Sign In")
+            }
         }
     }
 }
@@ -146,7 +154,7 @@ private fun MenuSection(
         MenuRow(
             leading = "(bookmark)",
             title = "Saved Events",
-            trailingText = state.eventsCount.toString()
+            trailingText = if (state.isSignedIn) state.eventsCount.toString() else null
         )
 
         HorizontalDivider()
@@ -154,7 +162,7 @@ private fun MenuSection(
         MenuRow(
             leading = "(star)",
             title = "My Reviews",
-            trailingText = state.reviewsCount.toString()
+            trailingText = if (state.isSignedIn) state.reviewsCount.toString() else null
         )
 
         HorizontalDivider()
@@ -162,7 +170,7 @@ private fun MenuSection(
         MenuRow(
             leading = "(pin)",
             title = "Attended",
-            trailingText = state.eventsCount.toString()
+            trailingText = if (state.isSignedIn) state.eventsCount.toString() else null
         )
 
         HorizontalDivider()
