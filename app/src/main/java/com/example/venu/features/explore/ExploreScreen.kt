@@ -39,7 +39,8 @@ import com.example.venu.features.lists.tabLabel
 fun ExploreScreen(
     state: ExploreUiState,
     onAction: (ExploreAction) -> Unit,
-    onDismissSaveSheet: () -> Unit
+    onDismissSaveSheet: () -> Unit,
+    hasLocationPermission: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -68,17 +69,11 @@ fun ExploreScreen(
 
         // Map placeholder (Sprint 1)
         Card(modifier = Modifier.fillMaxWidth()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(170.dp)
-                    .padding(14.dp)
-            ) {
-                Text(
-                    text = "Map coming soon (Sprint 2+)",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
+            ExploreMap(
+                places = state.places,
+                selectedPlaceId = state.selectedPlaceId,
+                onMarkerSelected = { id -> onAction(ExploreAction.PlaceClicked(id)) }
+            )
         }
 
         Spacer(Modifier.height(12.dp))
@@ -178,6 +173,7 @@ private fun ExploreScreenPreview() {
     ExploreScreen(
         state = ExploreUiState(), // hard code in a List of PlaceUi events to see in preview
         onAction = {},
-        onDismissSaveSheet = {}
+        onDismissSaveSheet = {},
+        hasLocationPermission = false
     )
 }

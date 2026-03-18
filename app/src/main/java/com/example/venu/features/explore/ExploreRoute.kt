@@ -10,6 +10,7 @@ import com.example.venu.features.explore.viewmodel.ExploreViewModel
 
 @Composable
 fun ExploreRoute(
+    hasLocationPermission: Boolean
 ) {
     // use keyword 'remember' to persist repos!
     val viewModel = remember { ExploreViewModel() }
@@ -18,5 +19,6 @@ fun ExploreRoute(
         state = viewModel.uiState,
         onAction = viewModel::onAction,
         onDismissSaveSheet = viewModel::dismissSaveSheet,
+        hasLocationPermission = hasLocationPermission
     )
 }

@@ -17,6 +17,14 @@ import com.example.venu.features.explore.ExploreRoute
 import com.example.venu.features.home.HomeRoute
 import com.example.venu.features.lists.ListsRoute
 import com.example.venu.features.profile.ProfileRoute
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.core.content.ContextCompat
 
 @Composable
 fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit) {
@@ -24,7 +32,46 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    val context = LocalContext.current
+    val isInspection = LocalInspectionMode.current
 
+    fun hasLocationPermissionNow(): Boolean {
+        val fineGranted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val coarseGranted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        return fineGranted || coarseGranted
+    }
+
+    var hasLocationPermission by rememberSaveable { mutableStateOf(hasLocationPermissionNow()) }
+    var askedForLocationPermission by rememberSaveable { mutableStateOf(false) }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        hasLocationPermission =
+            (result[Manifest.permission.ACCESS_FINE_LOCATION] == true) ||
+                    (result[Manifest.permission.ACCESS_COARSE_LOCATION] == true)
+    }
+
+    LaunchedEffect(Unit) {
+        // Request once automatically; do not spam on recomposition, and don't run in Preview.
+        if (!isInspection && !askedForLocationPermission && !hasLocationPermission) {
+            askedForLocationPermission = true
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -88,7 +135,7 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit) {
             modifier = Modifier.padding(padding)
         ) {
             composable("home") { HomeRoute() }
-            composable("explore") { ExploreRoute() }
+            composable("explore") { ExploreRoute(hasLocationPermission = hasLocationPermission) }
             composable("lists") { ListsRoute() }
             composable("profile") {
                 ProfileRoute(

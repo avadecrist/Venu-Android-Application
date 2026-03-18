@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services") // Add the Google services Gradle plugin
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -65,4 +66,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
+    // Maps SDK (Play services)
+    implementation("com.google.android.gms:play-services-maps:20.0.0")
+    // Maps Compose UI
+    implementation("com.google.maps.android:maps-compose:6.12.0")
 }

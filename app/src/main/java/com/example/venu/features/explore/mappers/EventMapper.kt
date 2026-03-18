@@ -28,6 +28,8 @@ fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
         id = id,
         name = name,
         subtitle = subtitle,
+        latitude = latitude,
+        longitude = longitude,
         distanceKm = distanceKm,
         rating = averageRating,
         genre = genre.toExploreGenre(),
