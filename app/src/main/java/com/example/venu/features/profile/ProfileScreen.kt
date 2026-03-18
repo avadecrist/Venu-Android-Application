@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +26,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.venu.features.profile.model.ProfileUiState
+import androidx.compose.material.icons.filled.Collections
+import androidx.compose.material.icons.filled.PinDrop
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.List
 
 @Composable
 fun ProfileScreen(
@@ -152,7 +162,7 @@ private fun MenuSection(
         modifier = Modifier.fillMaxWidth()
     ) {
         MenuRow(
-            leading = "(bookmark)",
+            leading = Icons.AutoMirrored.Filled.List,
             title = "Saved Events",
             trailingText = if (state.isSignedIn) state.eventsCount.toString() else null
         )
@@ -160,7 +170,7 @@ private fun MenuSection(
         HorizontalDivider()
 
         MenuRow(
-            leading = "(star)",
+            leading = Icons.Filled.Star,
             title = "My Reviews",
             trailingText = if (state.isSignedIn) state.reviewsCount.toString() else null
         )
@@ -168,7 +178,7 @@ private fun MenuSection(
         HorizontalDivider()
 
         MenuRow(
-            leading = "(pin)",
+            leading = Icons.Filled.PinDrop,
             title = "Attended",
             trailingText = if (state.isSignedIn) state.eventsCount.toString() else null
         )
@@ -176,7 +186,7 @@ private fun MenuSection(
         HorizontalDivider()
 
         MenuRow(
-            leading = "⚙",
+            leading = Icons.Filled.Settings,
             title = "Settings"
         )
     }
@@ -184,7 +194,7 @@ private fun MenuSection(
 
 @Composable
 private fun MenuRow(
-    leading: String,
+    leading: ImageVector,
     title: String,
     trailingText: String? = null
 ) {
@@ -195,9 +205,10 @@ private fun MenuRow(
             .padding(vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = leading,
-            style = MaterialTheme.typography.bodyLarge
+        Icon(
+            imageVector = leading,
+            contentDescription = title,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.size(16.dp))
@@ -217,9 +228,11 @@ private fun MenuRow(
             Spacer(modifier = Modifier.size(8.dp))
         }
 
-        Text(
-            text = ">",
-            style = MaterialTheme.typography.bodyLarge
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
