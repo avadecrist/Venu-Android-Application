@@ -4,5 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.secrets.gradle) apply false // For secret API key
     id("com.google.gms.google-services") version "4.4.4" apply false // Add the dependency for the Google services Gradle plugin
-
+    // for ksp with Room
+    id("com.google.devtools.ksp") version "2.3.4" apply false
 }

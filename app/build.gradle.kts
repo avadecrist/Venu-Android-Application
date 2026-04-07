@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.secrets.gradle) // For Google Maps
     id("com.google.gms.google-services") // Add the Google services Gradle plugin
-    //id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    // For Room
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -79,4 +80,8 @@ dependencies {
     implementation(libs.places)
     // For Google Directions
     implementation(libs.google.google.maps.services)
+    // To use ROOM local database
+    implementation("androidx.room:room-runtime:2.8.4") // Room core
+    implementation("androidx.room:room-ktx:2.8.4") // Kotlin extensions (coroutines support)
+    ksp("androidx.room:room-compiler:2.8.4") // Annotation processor (REQUIRED)
 }
