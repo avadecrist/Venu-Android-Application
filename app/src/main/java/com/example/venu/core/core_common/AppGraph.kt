@@ -30,6 +30,7 @@ object AppGraph {
         database = VenuLocalDatabase.getDatabase(context)
 
         val roomEventRepository = RoomEventRepository(database.eventDao())
+        // database.clearAllTables() //uncomment if we want to test reseeding again
         roomEventRepository.seedIfEmpty()
 
         // Temp test to confirm Room is initialized

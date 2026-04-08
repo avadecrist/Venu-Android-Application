@@ -16,6 +16,8 @@ class RoomEventRepository(
         if (eventDao.getCount() == 0) {
             val seedEvents = FakeSeed.events.map { it.toEntity() }
             eventDao.insertEvents(seedEvents)
+        } else {
+            println("Skipping seed — already populated")
         }
         // log to confirm Room is being used
         val countAfter = eventDao.getCount()
