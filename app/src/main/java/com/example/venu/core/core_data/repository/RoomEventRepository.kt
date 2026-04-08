@@ -17,10 +17,19 @@ class RoomEventRepository(
             val seedEvents = FakeSeed.events.map { it.toEntity() }
             eventDao.insertEvents(seedEvents)
         }
+        // log to confirm Room is being used
+        val countAfter = eventDao.getCount()
+        println("Room event AFTER seed: $countAfter")
     }
 
+    // Use for development only
     suspend fun getAllEvents(): List<Event> {
-        return eventDao.getAllEvents().map { it.toDomain() }
+        val events = eventDao.getAllEvents().map { it.toDomain() }
+
+        // log to confirm Room is being read
+        println("Loaded ${events.size} events from Room")
+
+        return events
     }
 
     override suspend fun getTrendingEvents(): List<Event> {

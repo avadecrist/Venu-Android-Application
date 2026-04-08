@@ -1,12 +1,14 @@
 package com.example.venu.features.lists.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.features.lists.model.ListsUiEvent
 import com.example.venu.features.lists.model.ListsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class ListsViewModel(): ViewModel() {
     private val listsRepo = AppGraph.listsRepo
@@ -53,21 +55,23 @@ class ListsViewModel(): ViewModel() {
     }
 
     private fun refresh(selected: ListType = _state.value.selectedTab) {
+        viewModelScope.launch {
+            val tabs = listsRepo.getAllLists()
 
-        val tabs = listsRepo.getAllLists()
+            val safeTab = tabs.find { tab ->
+                when {
+                    tab is ListType.Custom && selected is ListType.Custom ->
+                        tab.id == selected.id
 
-        val safeTab = tabs.find { tab ->
-            when {
-                tab is ListType.Custom && selected is ListType.Custom ->
-                    tab.id == selected.id
-                else -> tab == selected
-            }
-        } ?: tabs.first()
+                    else -> tab == selected
+                }
+            } ?: tabs.first()
 
-        _state.value = _state.value.copy(
-            tabs = tabs,
-            selectedTab = safeTab,
-            events = listsRepo.getList(safeTab)
-        )
+            _state.value = _state.value.copy(
+                tabs = tabs,
+                selectedTab = safeTab,
+                events = listsRepo.getList(safeTab)
+            )
+        }
     }
 }

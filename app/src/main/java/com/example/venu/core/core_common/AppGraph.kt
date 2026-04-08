@@ -32,6 +32,10 @@ object AppGraph {
         val roomEventRepository = RoomEventRepository(database.eventDao())
         roomEventRepository.seedIfEmpty()
 
+        // Temp test to confirm Room is initialized
+        val events = roomEventRepository.getAllEvents()
+        println("AppGraph init: Loaded ${events.size} events from Room")
+
         eventRepo = roomEventRepository
         listsRepo = InMemoryListsRepository(eventRepo)
     }

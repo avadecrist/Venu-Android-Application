@@ -7,10 +7,9 @@ import com.example.venu.core.core_domain.repository.EventRepository
 
 class FakeEventRepository : EventRepository {
 
-    // private val events = FakeSeed.events
-    private val events = eventDao.getAllEvents()
+     private val events = FakeSeed.events
 
-    override fun getTrendingEvents(): List<Event> {
+    override suspend fun getTrendingEvents(): List<Event> {
         return events
             .sortedWith(
                 compareByDescending<Event> { it.credibilityScore } // sort based on credibilityScore
@@ -25,7 +24,7 @@ class FakeEventRepository : EventRepository {
     *   ex. declaration: fun getNearbyEvents(userLat: Double, userLng: Double): List<Event>
     *   3. Compute distance(userLocation, eventLocation) with Location.distanceBetween()
     */
-    override fun getNearbyEvents(): List<Event> {
+    override suspend fun getNearbyEvents(): List<Event> {
         // Explore's default list
         val hasAnyDistance = events.any { it.distanceKm != null } // true if distanceMiles has a value
 
@@ -42,11 +41,11 @@ class FakeEventRepository : EventRepository {
         }
     }
 
-    override fun getEventsByCategory(genre: Genre): List<Event> {
+    override suspend fun getEventsByCategory(genre: Genre): List<Event> {
         return events.filter { it.genre == genre }
     }
 
-    override fun searchEvents(query: String, categories: Set<Genre>): List<Event> {
+    override suspend fun searchEvents(query: String, categories: Set<Genre>): List<Event> {
         val q = query.trim().lowercase()
 
         return events.filter { e ->
@@ -66,7 +65,7 @@ class FakeEventRepository : EventRepository {
             )
     }
 
-    override fun getEventById(id: String): Event? {
+    override suspend fun getEventById(id: String): Event? {
         return events.find { it.id == id }
     }
 }

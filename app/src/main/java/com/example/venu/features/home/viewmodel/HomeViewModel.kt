@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.ListType
@@ -11,6 +12,7 @@ import com.example.venu.features.home.model.HomeAction
 import com.example.venu.features.home.model.HomeUiState
 import com.example.venu.features.home.model.HomeVenueUi
 import kotlin.math.round
+import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
 
@@ -43,15 +45,17 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun loadHome() {
-        allFeatured = eventRepo
-            .getTrendingEvents()
-            .map { it.toHomeVenueUi() }
+        viewModelScope.launch {
+            allFeatured = eventRepo
+                .getTrendingEvents()
+                .map { it.toHomeVenueUi() }
 
-        allNearYou = eventRepo
-            .getNearbyEvents()
-            .map { it.toHomeVenueUi() }
+            allNearYou = eventRepo
+                .getNearbyEvents()
+                .map { it.toHomeVenueUi() }
 
-        applyFilters()
+            applyFilters()
+        }
     }
 
     private fun applyFilters() {
@@ -75,7 +79,7 @@ class HomeViewModel : ViewModel() {
         )
     }
 
-    private fun Event.toHomeVenueUi(): HomeVenueUi {
+    private suspend fun Event.toHomeVenueUi(): HomeVenueUi {
         val summary = reviewRepo.getRatingSummary(id)
 
         return HomeVenueUi(
@@ -88,7 +92,7 @@ class HomeViewModel : ViewModel() {
                 null
             },
             distanceLabel = distanceKm?.let {
-                "${it.roundTo1Decimal()} mi"
+                "${it.roundTo1Decimal()} km"
             },
             isSaved = listsRepo.isInList(ListType.WantToGo, id)
         )
