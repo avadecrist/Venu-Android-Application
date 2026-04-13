@@ -18,7 +18,7 @@ class InMemoryListsRepository(
     // for UI to display which custom list a card is saved to
     private val customListNames = linkedMapOf<String, String>()
 
-    override fun getList(type: ListType): List<Event> {
+    override suspend fun getList(type: ListType): List<Event> {
         val ids = when (type) {
             ListType.WantToGo -> want
             ListType.AlreadyWent -> went

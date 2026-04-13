@@ -11,11 +11,11 @@ class FakeReviewRepository : ReviewRepository {
     private val reviews = FakeSeed.reviews.toMutableList()
     private val currentUserId = "user_1" // fake logged-in user
 
-    override fun getReviewsForEvent(eventId: String): List<Review> {
+    override suspend fun getReviewsForEvent(eventId: String): List<Review> {
         return reviews.filter { it.eventId == eventId }
     }
 
-    override fun getRatingSummary(eventId: String): RatingSummary {
+    override suspend fun getRatingSummary(eventId: String): RatingSummary {
         val eventReviews = reviews.filter { it.eventId == eventId }
 
         val count = eventReviews.size
@@ -32,7 +32,7 @@ class FakeReviewRepository : ReviewRepository {
         )
     }
 
-    override fun addReview(eventId: String, rating: Int, comment: String) {
+    override suspend fun addReview(eventId: String, rating: Int, comment: String) {
 
         // prevent duplicate review
         if (hasUserReviewed(eventId, currentUserId)) return
@@ -50,13 +50,13 @@ class FakeReviewRepository : ReviewRepository {
         )
     }
 
-    override fun hasUserReviewed(eventId: String, userId: String): Boolean {
+    override suspend fun hasUserReviewed(eventId: String, userId: String): Boolean {
         return reviews.any {
             it.eventId == eventId && it.userId == currentUserId
         }
     }
 
-    override fun getUserReviewForEvent(eventId: String): Review? {
+    override suspend fun getUserReviewForEvent(eventId: String): Review? {
         return reviews.find { review ->
             review.eventId == eventId && review.userId == currentUserId
         }
