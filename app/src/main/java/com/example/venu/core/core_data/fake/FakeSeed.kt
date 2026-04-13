@@ -6,6 +6,13 @@ import com.example.venu.core.core_domain.model.PriceTier
 import com.example.venu.core.core_domain.model.Review
 
 // Temporary Database
+/* ???
+    suspend fun seedIfEmpty() {
+        if (eventDao.getCount() == 0) {
+            eventDao.insertEvents(FakeSeed.events.map { it.toEntity() })
+        }
+    }
+ */
 object FakeSeed {
 
     val events = listOf(

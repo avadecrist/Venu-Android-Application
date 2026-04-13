@@ -18,7 +18,7 @@ sealed class ListType {
 
 
 interface ListsRepository {
-    fun getList(type: ListType): List<Event>
+    suspend fun getList(type: ListType): List<Event>
     fun addToList(type: ListType, eventId: String)
     fun removeFromList(type: ListType, eventId: String)
     fun moveEvent(eventId: String, from: ListType, to: ListType)

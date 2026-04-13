@@ -12,20 +12,38 @@ import com.example.venu.features.explore.mappers.toPlaceUi
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.PlaceUi
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class ExploreViewModel(
     private val eventRepository: EventRepository = AppGraph.eventRepo,
     private val listsRepository: ListsRepository = AppGraph.listsRepo
 
 ): ViewModel() {
-    private val events: List<Event> = eventRepository.getTrendingEvents()
+//    private val events: List<Event> = eventRepository.getTrendingEvents()
+    private var events: List<Event> = emptyList()
     var uiState by mutableStateOf(
         ExploreUiState(
-            places = buildPlaces(),
+            places = emptyList(),
             availableLists = listsRepository.getAllLists(),
         )
     )
         private set
+
+    init {
+        loadInitialEvents()
+    }
+
+    private fun loadInitialEvents() {
+        viewModelScope.launch {
+            events = eventRepository.getTrendingEvents()
+            uiState = uiState.copy(
+                places = buildPlaces(),
+                availableLists = listsRepository.getAllLists()
+            )
+        }
+    }
+
 
     fun onAction(action: ExploreAction) {
         when (action) {
@@ -108,31 +126,4 @@ class ExploreViewModel(
             availableLists = listsRepository.getAllLists()
         )
     }
-
-    /*private fun applyFilters() {
-        val q = uiState.query.trim().lowercase()
-        val g = uiState.selectedGenre
-
-        val allPlaces: List<PlaceUi> = events.map { it.toPlaceUi(listsRepository) }
-
-        val filtered: List<PlaceUi> = allPlaces.filter { p ->
-            val matchesQuery =
-                q.isBlank() ||
-                        p.name.lowercase().contains(q) ||
-                        p.subtitle.lowercase().contains(q)
-
-            val matchesGenre = g == null || p.genre == g
-
-            matchesQuery && matchesGenre
-        }
-
-        val selectedStillVisible =
-            uiState.selectedPlaceId?.let { id -> filtered.any { it.id == id } } == true
-
-        uiState = uiState.copy(
-            places = filtered,
-            selectedPlaceId = if (selectedStillVisible) uiState.selectedPlaceId else null
-        )
-
-    } */
 }
