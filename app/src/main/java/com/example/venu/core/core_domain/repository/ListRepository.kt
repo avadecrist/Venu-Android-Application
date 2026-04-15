@@ -31,6 +31,6 @@ interface ListsRepository {
     // to edit custom lists:
     fun createCustomList(name: String): ListType.Custom
     fun deleteCustomList(listId: String)
-    fun getAllLists(): List<ListType>
+    fun getAllLists(): List<ListType> // doesn't need to be suspend yet bc it's not reading from Room
 }
 

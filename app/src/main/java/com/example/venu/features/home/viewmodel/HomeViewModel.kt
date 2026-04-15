@@ -45,6 +45,7 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun loadHome() {
+
         viewModelScope.launch {
             allFeatured = eventRepo
                 .getTrendingEvents()

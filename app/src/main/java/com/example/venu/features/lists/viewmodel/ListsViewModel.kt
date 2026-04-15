@@ -19,6 +19,7 @@ class ListsViewModel(): ViewModel() {
         refresh(ListType.WantToGo)
     }
 
+
     fun onEvent(event: ListsUiEvent) {
         when (event) {
 
@@ -55,6 +56,7 @@ class ListsViewModel(): ViewModel() {
     }
 
     private fun refresh(selected: ListType = _state.value.selectedTab) {
+
         viewModelScope.launch {
             val tabs = listsRepo.getAllLists()
 
@@ -72,6 +74,7 @@ class ListsViewModel(): ViewModel() {
                 selectedTab = safeTab,
                 events = listsRepo.getList(safeTab)
             )
+
         }
     }
 }
