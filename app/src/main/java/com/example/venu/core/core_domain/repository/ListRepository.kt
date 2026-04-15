@@ -18,7 +18,7 @@ sealed class ListType {
 
 
 interface ListsRepository {
-    fun getList(type: ListType): List<Event>
+    suspend fun getList(type: ListType): List<Event>
     fun addToList(type: ListType, eventId: String)
     fun removeFromList(type: ListType, eventId: String)
     fun moveEvent(eventId: String, from: ListType, to: ListType)
@@ -31,6 +31,6 @@ interface ListsRepository {
     // to edit custom lists:
     fun createCustomList(name: String): ListType.Custom
     fun deleteCustomList(listId: String)
-    fun getAllLists(): List<ListType>
+    fun getAllLists(): List<ListType> // doesn't need to be suspend yet bc it's not reading from Room
 }
 

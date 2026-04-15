@@ -3,24 +3,41 @@ package com.example.venu.core.core_common
 // tiny TEMPORARY dependency container so screens can access repos
 // use this in ViewModels!
 
-import com.example.venu.core.core_data.repository.FakeEventRepository
+import android.content.Context
+import com.example.venu.core.core_data.local.db.VenuLocalDatabase
 import com.example.venu.core.core_data.repository.FakeReviewRepository
 import com.example.venu.core.core_data.repository.InMemoryListsRepository
+import com.example.venu.core.core_data.repository.RoomEventRepository
 import com.example.venu.core.core_domain.repository.EventRepository
-import com.example.venu.core.core_domain.repository.ReviewRepository
 import com.example.venu.core.core_domain.repository.ListsRepository
+import com.example.venu.core.core_domain.repository.ReviewRepository
 
 object AppGraph {
 
-    val eventRepo: EventRepository by lazy {
-        FakeEventRepository() // swap for real Repo later
-    }
+    private lateinit var database: VenuLocalDatabase
+
+    lateinit var eventRepo: EventRepository
+        private set
+
+    lateinit var listsRepo: ListsRepository
+        private set
 
     val reviewRepo: ReviewRepository by lazy {
-        FakeReviewRepository() // swap for real Repo later
+        FakeReviewRepository()
     }
 
-    val listsRepo: ListsRepository by lazy {
-        InMemoryListsRepository(eventRepo) // swap for real Repo later
+    suspend fun initialize(context: Context) {
+        database = VenuLocalDatabase.getDatabase(context)
+
+        val roomEventRepository = RoomEventRepository(database.eventDao())
+        // database.clearAllTables() //uncomment if we want to test reseeding again
+        roomEventRepository.seedIfEmpty()
+
+        // Temp test to confirm Room is initialized
+        val events = roomEventRepository.getAllEvents()
+        println("AppGraph init: Loaded ${events.size} events from Room")
+
+        eventRepo = roomEventRepository
+        listsRepo = InMemoryListsRepository(eventRepo)
     }
 }
