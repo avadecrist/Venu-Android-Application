@@ -12,7 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
-import com.example.venu.features.home.HomeScreen
+import com.example.venu.features.profile.menu.SettingsScreen
 import com.example.venu.features.explore.ExploreRoute
 import com.example.venu.features.home.HomeRoute
 import com.example.venu.features.lists.ListsRoute
@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.core.content.ContextCompat
 
 @Composable
-fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit) {
+fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick: () -> Unit) {
     val navController = rememberNavController()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -140,16 +140,18 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit) {
             composable("profile") {
                 ProfileRoute(
                     isSignedIn = isSignedIn,
-                    onSignInClick = onSignInClick
+                    onSignInClick = onSignInClick,
+                    onSettingsClick = {
+                        navController.navigate("settings")
+                    }
+                )
+            }
+            composable("settings") {
+                SettingsScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onSignOutClick = onSignOutClick
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun PlaceholderScreen(title: String) {
-    Surface {
-        Text(title)
     }
 }
