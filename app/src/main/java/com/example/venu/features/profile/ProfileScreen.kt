@@ -9,65 +9,73 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.venu.features.profile.model.ProfileUiState
-import androidx.compose.material.icons.filled.Collections
-import androidx.compose.material.icons.filled.PinDrop
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.material3.Icon
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.List
 
 @Composable
 fun ProfileScreen(
     state: ProfileUiState,
-    onSignInClick : () -> Unit
+    onSignInClick: () -> Unit,
+    onEditProfileClick: () -> Unit = {},
+    onMyReviewsClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         ProfileHeader(
             state = state,
-            onSignInClick = onSignInClick
+            onSignInClick = onSignInClick,
+            onEditProfileClick = onEditProfileClick
         )
 
         if (state.isSignedIn) {
             Spacer(modifier = Modifier.height(24.dp))
-            StatsRow(state = state)
+            ActivityCard(state = state)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        MenuSection(state = state)
+        MenuSection(
+            state = state,
+            onMyReviewsClick = onMyReviewsClick,
+            onSettingsClick = onSettingsClick
+        )
     }
 }
 
 @Composable
 private fun ProfileHeader(
     state: ProfileUiState,
-    onSignInClick: () -> Unit
+    onSignInClick: () -> Unit,
+    onEditProfileClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -75,7 +83,7 @@ private fun ProfileHeader(
     ) {
         Surface(
             modifier = Modifier
-                .size(88.dp)
+                .size(92.dp)
                 .clip(CircleShape),
             tonalElevation = 2.dp,
             shape = CircleShape
@@ -96,7 +104,7 @@ private fun ProfileHeader(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Welcome, ${state.displayName}!",
+            text = if (state.isSignedIn) state.displayName else "Profile",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold
         )
@@ -105,16 +113,27 @@ private fun ProfileHeader(
 
         Text(
             text = if (state.isSignedIn) {
-                "Your profile activity and stats"
+                "Your activity and account"
             } else {
                 "Sign in to save events and leave reviews"
             },
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (!state.isSignedIn) {
+        if (state.isSignedIn) {
+            OutlinedButton(onClick = onEditProfileClick) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text("Edit Profile")
+            }
+        } else {
             Button(onClick = onSignInClick) {
                 Text("Sign In")
             }
@@ -123,56 +142,112 @@ private fun ProfileHeader(
 }
 
 @Composable
-private fun StatsRow(
+private fun ActivityCard(
     state: ProfileUiState
 ) {
-    Row(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        shape = RoundedCornerShape(20.dp),
+        tonalElevation = 2.dp
     ) {
-        StatItem(value = state.eventsCount.toString(), label = "Events")
-        StatItem(value = state.reviewsCount.toString(), label = "Reviews")
-        StatItem(value = state.streakCount.toString(), label = "Streak")
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp)
+        ) {
+            Text(
+                text = "Your Activity",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                StatItem(
+                    value = state.eventsCount.toString(),
+                    label = "Events",
+                    modifier = Modifier.weight(1f)
+                )
+                StatItem(
+                    value = state.reviewsCount.toString(),
+                    label = "Reviews",
+                    modifier = Modifier.weight(1f)
+                )
+                StatItem(
+                    value = state.streakCount.toString(),
+                    label = "Streak",
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
     }
 }
 
 @Composable
 private fun StatItem(
     value: String,
-    label: String
+    label: String,
+    modifier: Modifier = Modifier
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = value,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
 
 @Composable
 private fun MenuSection(
-    state: ProfileUiState
+    state: ProfileUiState,
+    onMyReviewsClick: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        MenuRow(
-            leading = Icons.Filled.Star,
-            title = "My Reviews",
-            trailingText = if (state.isSignedIn) state.reviewsCount.toString() else null
+        Text(
+            text = "Account",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
         )
 
-        HorizontalDivider()
+        Spacer(modifier = Modifier.height(12.dp))
 
-        MenuRow(
-            leading = Icons.Filled.Settings,
-            title = "Settings"
-        )
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            tonalElevation = 2.dp
+        ) {
+            Column {
+                MenuRow(
+                    leading = Icons.Filled.Star,
+                    title = "My Reviews",
+                    trailingText = if (state.isSignedIn) state.reviewsCount.toString() else null,
+                    onClick = onMyReviewsClick
+                )
+
+                HorizontalDivider()
+
+                MenuRow(
+                    leading = Icons.Filled.Settings,
+                    title = "Settings",
+                    onClick = onSettingsClick
+                )
+            }
+        }
     }
 }
 
@@ -180,13 +255,14 @@ private fun MenuSection(
 private fun MenuRow(
     leading: ImageVector,
     title: String,
-    trailingText: String? = null
+    trailingText: String? = null,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
-            .padding(vertical = 18.dp),
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -206,7 +282,8 @@ private fun MenuRow(
         if (trailingText != null) {
             Text(
                 text = trailingText,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.size(8.dp))
