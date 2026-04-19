@@ -162,25 +162,9 @@ private fun MenuSection(
         modifier = Modifier.fillMaxWidth()
     ) {
         MenuRow(
-            leading = Icons.AutoMirrored.Filled.List,
-            title = "Saved Events",
-            trailingText = if (state.isSignedIn) state.eventsCount.toString() else null
-        )
-
-        HorizontalDivider()
-
-        MenuRow(
             leading = Icons.Filled.Star,
             title = "My Reviews",
             trailingText = if (state.isSignedIn) state.reviewsCount.toString() else null
-        )
-
-        HorizontalDivider()
-
-        MenuRow(
-            leading = Icons.Filled.PinDrop,
-            title = "Attended",
-            trailingText = if (state.isSignedIn) state.eventsCount.toString() else null
         )
 
         HorizontalDivider()
