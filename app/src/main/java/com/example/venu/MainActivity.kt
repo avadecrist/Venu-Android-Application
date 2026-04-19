@@ -50,8 +50,16 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("app") {
-                        AppScaffold(isSignedIn = isSignedIn,
+                        AppScaffold(
+                            isSignedIn = isSignedIn,
                             onSignInClick = {
+                                navController.navigate("login") {
+                                    popUpTo("app") { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                            },
+                            onSignOutClick = {
+                                isSignedIn = false
                                 navController.navigate("login") {
                                     popUpTo("app") { inclusive = true }
                                     launchSingleTop = true

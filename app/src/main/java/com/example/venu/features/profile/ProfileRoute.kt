@@ -4,11 +4,16 @@ import androidx.compose.runtime.Composable
 import com.example.venu.features.profile.model.ProfileUiState
 
 @Composable
-fun ProfileRoute(isSignedIn : Boolean, onSignInClick : () -> Unit) {
+fun ProfileRoute(
+    isSignedIn: Boolean,
+    onSignInClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
     ProfileScreen(
         state = ProfileUiState(
             isSignedIn = isSignedIn
         ),
-        onSignInClick = onSignInClick
+        onSignInClick = onSignInClick,
+        onSettingsClick = onSettingsClick
     )
 }
