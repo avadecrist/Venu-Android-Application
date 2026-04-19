@@ -70,6 +70,7 @@ import com.example.venu.core.core_domain.model.Genre
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.graphics.graphicsLayer
+import com.example.venu.core.core_domain.model.CrowdLevel
 
 
 data class ReviewUi(
@@ -98,6 +99,7 @@ data class EventDetailsUi(
     val googleRating: Double,
     val userRating: Double,
     val attendeeCount: Int,
+    val crowdLevel: CrowdLevel,
     val reviews: List<ReviewUi>,
     val isSaved: Boolean = false
 )
@@ -159,9 +161,9 @@ fun EventDetailsSheet(
                 onViewOnMapClick = onViewOnMapClick,
                 onGetDirectionsClick = onGetDirectionsClick
             )
-        }
 
-        item {
+            Spacer(modifier = Modifier.height(22.dp))
+
             RatingSummarySection(
                 credibilityScore = event.credibilityScore,
                 averageRating = event.averageRating,
@@ -169,6 +171,8 @@ fun EventDetailsSheet(
                 userRating = event.userRating,
                 reviewCount = event.reviewCount
             )
+
+            Spacer(modifier = Modifier.height(6.dp))
         }
 
         item {
@@ -176,7 +180,8 @@ fun EventDetailsSheet(
                 genre = event.genre,
                 locationName = event.locationName,
                 startTimeLabel = event.startTimeLabel,
-                attendeeCount = event.attendeeCount
+                attendeeCount = event.attendeeCount,
+                crowdLevel = event.crowdLevel
             )
         }
 
@@ -560,7 +565,8 @@ private fun InfoGridSection(
     genre: Genre,
     locationName: String,
     startTimeLabel: String,
-    attendeeCount: Int
+    attendeeCount: Int,
+    crowdLevel: CrowdLevel
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -596,11 +602,133 @@ private fun InfoGridSection(
                 icon = Icons.Outlined.Schedule
             )
 
-            DetailInfoCard(
+            AttendeesInfoCard(
                 modifier = Modifier.weight(1f),
-                label = "Attendees",
-                value = "$attendeeCount going",
-                icon = Icons.Outlined.Group
+                attendeeCount = attendeeCount,
+                crowdLevel = crowdLevel
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun AttendeesInfoCard(
+    attendeeCount: Int,
+    crowdLevel: CrowdLevel,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(22.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, VenuColors.Border)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Group,
+                    contentDescription = null,
+                    tint = VenuColors.TextMuted,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Attendees",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = VenuColors.TextSecondary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            CrowdLevelIndicator(crowdLevel = crowdLevel)
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = crowdLevelLabel(crowdLevel),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = VenuColors.TextMuted,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = "•",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = VenuColors.TextMuted.copy(alpha = 0.6f)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = "$attendeeCount going",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = VenuColors.TextMuted,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CrowdLevelIndicator(
+    crowdLevel: CrowdLevel,
+    modifier: Modifier = Modifier
+) {
+    val filledBars = when (crowdLevel) {
+        CrowdLevel.QUIET -> 1
+        CrowdLevel.LIGHT -> 2
+        CrowdLevel.BUSY -> 3
+        CrowdLevel.PACKED -> 4
+        CrowdLevel.UNKNOWN -> 0
+    }
+
+    val activeColor = when (crowdLevel) {
+        CrowdLevel.QUIET -> Color(0xFF60A5FA)
+        CrowdLevel.LIGHT -> Color(0xFF34D399)
+        CrowdLevel.BUSY -> Color(0xFFF59E0B)
+        CrowdLevel.PACKED -> Color(0xFFEF4444)
+        CrowdLevel.UNKNOWN -> VenuColors.BorderDark
+    }
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        repeat(4) { index ->
+            val barHeight = when (index) {
+                0 -> 10.dp
+                1 -> 14.dp
+                2 -> 18.dp
+                else -> 22.dp
+            }
+
+            Box(
+                modifier = Modifier
+                    .width(10.dp)
+                    .height(barHeight)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(
+                        if (index < filledBars) activeColor else VenuColors.Border
+                    )
             )
         }
     }
@@ -957,6 +1085,16 @@ private fun genreChipText(genre: Genre): String {
     }
 }
 
+private fun crowdLevelLabel(crowdLevel: CrowdLevel): String {
+    return when (crowdLevel) {
+        CrowdLevel.QUIET -> "Quiet"
+        CrowdLevel.LIGHT -> "Light"
+        CrowdLevel.BUSY -> "Busy"
+        CrowdLevel.PACKED -> "Packed"
+        CrowdLevel.UNKNOWN -> "Unknown"
+    }
+}
+
 private object VenuColors {
     val Background = Color(0xFFFFFFFF)
     val SurfaceMuted = Color(0xFFF5F5F7)
@@ -1003,6 +1141,7 @@ private val PreviewEvent = EventDetailsUi(
     googleRating = 5.0,
     userRating = 4.9,
     attendeeCount = 95,
+    crowdLevel = CrowdLevel.BUSY,
     isSaved = false,
     reviews = listOf(
         ReviewUi(
@@ -1052,6 +1191,42 @@ private fun EventDetailsSheetPreview() {
             onSubmitReview = { _, _ -> }
         )
     }
+}
+
+@Preview(name = "Quiet Event", showBackground = true)
+@Composable
+fun PreviewQuiet() {
+    EventDetailsSheet(
+        event = PreviewEvent.copy(
+            name = "Late Night Study",
+            attendeeCount = 12,
+            crowdLevel = CrowdLevel.QUIET
+        ),
+        showDirectionsButton = true,
+        onBack = {},
+        onSaveClick = {},
+        onViewOnMapClick = {},
+        onGetDirectionsClick = {},
+        onSubmitReview = { _, _ -> }
+    )
+}
+
+@Preview(name = "Packed Event", showBackground = true)
+@Composable
+fun PreviewPacked() {
+    EventDetailsSheet(
+        event = PreviewEvent.copy(
+            name = "Campus Festival",
+            attendeeCount = 240,
+            crowdLevel = CrowdLevel.PACKED
+        ),
+        showDirectionsButton = true,
+        onBack = {},
+        onSaveClick = {},
+        onViewOnMapClick = {},
+        onGetDirectionsClick = {},
+        onSubmitReview = { _, _ -> }
+    )
 }
 
 @Preview(showBackground = true)

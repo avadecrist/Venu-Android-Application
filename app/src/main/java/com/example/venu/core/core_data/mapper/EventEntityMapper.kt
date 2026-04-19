@@ -1,6 +1,7 @@
 package com.example.venu.core.core_data.mapper
 
 import com.example.venu.core.core_data.local.db.entity.EventEntity
+import com.example.venu.core.core_domain.model.CrowdLevel
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.PriceTier
@@ -21,7 +22,9 @@ fun Event.toEntity(): EventEntity {
         credibilityScore = credibilityScore,
         reviewCount = reviewCount,
         isVerifiedVenue = isVerifiedVenue,
-        averageRating = averageRating
+        averageRating = averageRating,
+//        attendeeCount = attendeeCount,
+//        crowdLevel = crowdLevel.name,
     )
 }
 
@@ -41,6 +44,9 @@ fun EventEntity.toDomain(): Event {
         credibilityScore = credibilityScore,
         reviewCount = reviewCount,
         isVerifiedVenue = isVerifiedVenue,
-        averageRating = averageRating
+        averageRating = averageRating,
+        // temp fixed values
+        attendeeCount = 0,
+        crowdLevel = CrowdLevel.UNKNOWN // CrowdLevel.valueOf(crowdLevel),
     )
 }

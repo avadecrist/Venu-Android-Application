@@ -76,7 +76,7 @@ data class Event(
 // - build trust (like Airbnb/Instagram)
 // DO NOT remove — this is a scaling feature
 
-    val averageRating: Double = 0.0
+    val averageRating: Double = 0.0,
 // displayed as stars (ex: ⭐ 4.3)
 // Calculation:
 // Option A (better UX clarity):
@@ -86,6 +86,10 @@ data class Event(
 // Option B (simpler):
 // - weighted average (70% Google, 30% VENU early on)
 // because early-stage = low user reviews
+    val attendeeCount: Int = 0,
+    val crowdLevel: CrowdLevel = CrowdLevel.UNKNOWN,
+//    val metrics: EventMetrics = EventMetrics()
+    // will use this later to establish crowd level
 )
 
 enum class Genre {
@@ -104,3 +108,19 @@ enum class PriceTier {
     UNDER_10,
     UNDER_20
 }
+
+enum class CrowdLevel {
+    QUIET,
+    LIGHT,
+    BUSY,
+    PACKED,
+    UNKNOWN
+}
+
+data class EventMetrics(
+    val goingCount: Int? = null,
+    val saveCount: Int? = null,
+    val viewCount: Int? = null,
+    val checkInCount: Int? = null,
+    val estimatedCapacity: Int? = null
+)
