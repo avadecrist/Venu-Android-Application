@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.core.content.ContextCompat
+import com.example.venu.features.profile.menu.MyReviewsScreen
 
 @Composable
 fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick: () -> Unit) {
@@ -141,6 +142,9 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick:
                 ProfileRoute(
                     isSignedIn = isSignedIn,
                     onSignInClick = onSignInClick,
+                    onMyReviewsClick = {
+                        navController.navigate("my_reviews")
+                    },
                     onSettingsClick = {
                         navController.navigate("settings")
                     }
@@ -150,6 +154,12 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick:
                 SettingsScreen(
                     onBackClick = { navController.popBackStack() },
                     onSignOutClick = onSignOutClick
+                )
+            }
+
+            composable("my_reviews") {
+                MyReviewsScreen(
+                    onBackClick = { navController.popBackStack() }
                 )
             }
         }

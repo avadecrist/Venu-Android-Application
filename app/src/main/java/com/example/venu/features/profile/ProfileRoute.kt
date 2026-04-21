@@ -7,6 +7,7 @@ import com.example.venu.features.profile.model.ProfileUiState
 fun ProfileRoute(
     isSignedIn: Boolean,
     onSignInClick: () -> Unit,
+    onMyReviewsClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
     ProfileScreen(
@@ -14,6 +15,7 @@ fun ProfileRoute(
             isSignedIn = isSignedIn
         ),
         onSignInClick = onSignInClick,
+        onMyReviewsClick = onMyReviewsClick,
         onSettingsClick = onSettingsClick
     )
 }
