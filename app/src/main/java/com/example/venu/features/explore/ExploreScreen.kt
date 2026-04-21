@@ -1,5 +1,6 @@
 package com.example.venu.features.explore
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,20 +14,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,6 +41,10 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,7 +58,15 @@ import com.example.venu.features.lists.tabLabel
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
 
+private enum class ExploreSortOption(val label: String) {
+    FEATURED("Featured"),
+    DISTANCE("Distance"),
+    RATING("Rating"),
+    NAME("Name")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("UNUSED_PARAMETER")
 @Composable
 fun ExploreScreen(
     state: ExploreUiState,
@@ -55,6 +74,39 @@ fun ExploreScreen(
     onDismissSaveSheet: () -> Unit,
     hasLocationPermission: Boolean
 ) {
+    var showFilterSortDialog by remember { mutableStateOf(false) }
+    var selectedGenres by remember { mutableStateOf(setOf<ExploreGenre>()) }
+    var verifiedOnly by remember { mutableStateOf(false) }
+    var savedOnly by remember { mutableStateOf(false) }
+    var sortOption by remember { mutableStateOf(ExploreSortOption.FEATURED) }
+
+    val displayedPlaces = remember(
+        state.places,
+        selectedGenres,
+        verifiedOnly,
+        savedOnly,
+        sortOption
+    ) {
+        val filtered = state.places.filter { place ->
+            val genreMatches = selectedGenres.isEmpty() || place.genre in selectedGenres
+            val verifiedMatches = !verifiedOnly || place.isVerified
+            val savedMatches = !savedOnly || place.isSaved || place.savedLabel != null
+
+            genreMatches && verifiedMatches && savedMatches
+        }
+
+        when (sortOption) {
+            ExploreSortOption.FEATURED -> filtered
+            ExploreSortOption.DISTANCE -> filtered.sortedBy { it.distanceKm ?: Double.MAX_VALUE }
+            ExploreSortOption.RATING -> filtered.sortedByDescending { it.rating }
+            ExploreSortOption.NAME -> filtered.sortedBy { it.name.lowercase() }
+        }
+    }
+
+    val activeFilterCount = selectedGenres.size +
+            if (verifiedOnly) 1 else 0 +
+                    if (savedOnly) 1 else 0
+
     val bottomSheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.PartiallyExpanded,
         skipHiddenState = true
@@ -68,11 +120,10 @@ fun ExploreScreen(
         modifier = Modifier.fillMaxSize(),
         sheetPeekHeight = ExploreSheetPeekHeight,
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        sheetContainerColor = MaterialTheme.colorScheme.surface,
         sheetDragHandle = { BottomSheetDefaults.DragHandle() },
         sheetContent = {
             ExploreResultsSheet(
-                places = state.places,
+                places = displayedPlaces,
                 selectedPlaceId = state.selectedPlaceId,
                 onPlaceClicked = { id ->
                     onAction(ExploreAction.PlaceClicked(id))
@@ -91,7 +142,7 @@ fun ExploreScreen(
         ) {
             ExploreMap(
                 modifier = Modifier.fillMaxSize(),
-                places = state.places,
+                places = displayedPlaces,
                 selectedPlaceId = state.selectedPlaceId,
                 onMarkerSelected = { id ->
                     onAction(ExploreAction.PlaceClicked(id))
@@ -100,15 +151,33 @@ fun ExploreScreen(
 
             ExploreTopControls(
                 query = state.query,
-                selectedGenre = state.selectedGenre,
                 onQueryChange = { onAction(ExploreAction.QueryChanged(it)) },
-                onGenreSelected = { onAction(ExploreAction.GenreSelected(it)) },
+                onOpenFilterSort = { showFilterSortDialog = true },
+                activeFilterCount = activeFilterCount,
+                sortOption = sortOption,
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             )
         }
+    }
+
+    if (showFilterSortDialog) {
+        ExploreFilterSortDialog(
+            currentGenres = selectedGenres,
+            currentVerifiedOnly = verifiedOnly,
+            currentSavedOnly = savedOnly,
+            currentSortOption = sortOption,
+            onDismiss = { showFilterSortDialog = false },
+            onApply = { genres, verified, saved, sort ->
+                selectedGenres = genres
+                verifiedOnly = verified
+                savedOnly = saved
+                sortOption = sort
+                showFilterSortDialog = false
+            }
+        )
     }
 
     if (state.showSaveSheet && state.pendingSaveEventId != null) {
@@ -161,21 +230,35 @@ fun ExploreScreen(
 @Composable
 private fun ExploreTopControls(
     query: String,
-    selectedGenre: ExploreGenre?,
     onQueryChange: (String) -> Unit,
-    onGenreSelected: (ExploreGenre?) -> Unit,
+    onOpenFilterSort: () -> Unit,
+    activeFilterCount: Int,
+    sortOption: ExploreSortOption,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = "Explore",
-            style = MaterialTheme.typography.headlineLarge
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Explore",
+                style = MaterialTheme.typography.headlineLarge
+            )
 
-        Card(shape = RoundedCornerShape(24.dp)) {
+            FilledTonalIconButton(onClick = onOpenFilterSort) {
+                Icon(
+                    imageVector = Icons.Default.FilterList,
+                    contentDescription = "Open filter and sort"
+                )
+            }
+        }
+
+        Card {
             OutlinedTextField(
                 value = query,
                 onValueChange = onQueryChange,
@@ -187,14 +270,18 @@ private fun ExploreTopControls(
             )
         }
 
-        Card(shape = RoundedCornerShape(24.dp)) {
-            GenreChipsRow(
-                selected = selectedGenre,
-                onSelected = onGenreSelected,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 14.dp)
-            )
+        if (activeFilterCount > 0 || sortOption != ExploreSortOption.FEATURED) {
+            Card {
+                Text(
+                    text = buildString {
+                        append("$activeFilterCount active filter")
+                        if (activeFilterCount != 1) append("s")
+                        append(" • Sort: ${sortOption.label}")
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -223,7 +310,7 @@ private fun ExploreResultsSheet(
 
             Text(
                 text = if (places.isEmpty()) {
-                    "Try changing your search or genre filters."
+                    "Try changing your search, filters, or sort."
                 } else {
                     "${places.size} places on the map"
                 },
@@ -241,7 +328,7 @@ private fun ExploreResultsSheet(
                     .padding(horizontal = 20.dp, vertical = 12.dp)
             ) {
                 Text(
-                    text = "Swipe the sheet down or change filters to explore a different area.",
+                    text = "Open the filter/sort button in the top-right to adjust what you see.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -271,30 +358,164 @@ private fun ExploreResultsSheet(
 }
 
 @Composable
-private fun GenreChipsRow(
-    selected: ExploreGenre?,
-    onSelected: (ExploreGenre?) -> Unit,
-    modifier: Modifier = Modifier
+private fun ExploreFilterSortDialog(
+    currentGenres: Set<ExploreGenre>,
+    currentVerifiedOnly: Boolean,
+    currentSavedOnly: Boolean,
+    currentSortOption: ExploreSortOption,
+    onDismiss: () -> Unit,
+    onApply: (
+        genres: Set<ExploreGenre>,
+        verifiedOnly: Boolean,
+        savedOnly: Boolean,
+        sortOption: ExploreSortOption
+    ) -> Unit
 ) {
-    LazyRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            FilterChip(
-                selected = selected == null,
-                onClick = { onSelected(null) },
-                label = { Text("All") }
-            )
-        }
+    var tempGenres by remember(currentGenres) { mutableStateOf(currentGenres) }
+    var tempVerifiedOnly by remember(currentVerifiedOnly) { mutableStateOf(currentVerifiedOnly) }
+    var tempSavedOnly by remember(currentSavedOnly) { mutableStateOf(currentSavedOnly) }
+    var tempSortOption by remember(currentSortOption) { mutableStateOf(currentSortOption) }
 
-        items(ExploreGenre.entries) { genre ->
-            FilterChip(
-                selected = selected == genre,
-                onClick = { onSelected(genre) },
-                label = { Text(genre.label) }
-            )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Filter & sort")
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Filters",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                DialogCheckboxRow(
+                    label = "Verified only",
+                    checked = tempVerifiedOnly,
+                    onCheckedChange = { tempVerifiedOnly = it }
+                )
+
+                DialogCheckboxRow(
+                    label = "Saved only",
+                    checked = tempSavedOnly,
+                    onCheckedChange = { tempSavedOnly = it }
+                )
+
+                Text(
+                    text = "Genres",
+                    style = MaterialTheme.typography.titleSmall
+                )
+
+                ExploreGenre.entries.forEach { genre ->
+                    DialogCheckboxRow(
+                        label = genre.label,
+                        checked = genre in tempGenres,
+                        onCheckedChange = { checked ->
+                            tempGenres = if (checked) {
+                                tempGenres + genre
+                            } else {
+                                tempGenres - genre
+                            }
+                        }
+                    )
+                }
+
+                HorizontalDivider()
+
+                Text(
+                    text = "Sort by",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                ExploreSortOption.entries.forEach { option ->
+                    DialogRadioRow(
+                        label = option.label,
+                        selected = tempSortOption == option,
+                        onClick = { tempSortOption = option }
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onApply(
+                        tempGenres,
+                        tempVerifiedOnly,
+                        tempSavedOnly,
+                        tempSortOption
+                    )
+                }
+            ) {
+                Text("Apply")
+            }
+        },
+        dismissButton = {
+            Row {
+                TextButton(
+                    onClick = {
+                        tempGenres = emptySet()
+                        tempVerifiedOnly = false
+                        tempSavedOnly = false
+                        tempSortOption = ExploreSortOption.FEATURED
+                    }
+                ) {
+                    Text("Reset")
+                }
+
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+            }
         }
+    )
+}
+
+@Composable
+private fun DialogCheckboxRow(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) }
+            .padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(label)
+    }
+}
+
+@Composable
+private fun DialogRadioRow(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(label)
     }
 }
 
