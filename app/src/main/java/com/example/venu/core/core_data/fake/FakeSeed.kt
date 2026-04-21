@@ -4,6 +4,7 @@ import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.PriceTier
 import com.example.venu.core.core_domain.model.Review
+import com.example.venu.core.core_domain.model.CrowdLevel
 
 // Temporary Database
 /* ???
@@ -13,6 +14,7 @@ import com.example.venu.core.core_domain.model.Review
         }
     }
  */
+
 object FakeSeed {
 
     val events = listOf(
@@ -30,7 +32,9 @@ object FakeSeed {
             startTimeLabel = "Tonight 11 PM",
             credibilityScore = 91,
             reviewCount = 6,
-            averageRating = 4.6
+            averageRating = 4.6,
+            crowdLevel = CrowdLevel.PACKED,
+            attendeeCount = 180
         ),
 
         Event(
@@ -46,7 +50,9 @@ object FakeSeed {
             startTimeLabel = "Tonight 9 PM",
             credibilityScore = 88,
             reviewCount = 5,
-            averageRating = 4.5
+            averageRating = 4.5,
+            crowdLevel = CrowdLevel.LIGHT,
+            attendeeCount = 18
         ),
 
         Event(
@@ -62,7 +68,9 @@ object FakeSeed {
             startTimeLabel = "Fri 10 PM",
             credibilityScore = 83,
             reviewCount = 7,
-            averageRating = 4.3
+            averageRating = 4.3,
+            crowdLevel = CrowdLevel.BUSY,
+            attendeeCount = 75
         ),
 
         Event(
@@ -78,7 +86,9 @@ object FakeSeed {
             startTimeLabel = "Tonight 8 PM",
             credibilityScore = 87,
             reviewCount = 6,
-            averageRating = 4.5
+            averageRating = 4.5,
+            crowdLevel = CrowdLevel.BUSY,
+            attendeeCount = 95
         ),
 
         Event(
@@ -94,7 +104,9 @@ object FakeSeed {
             startTimeLabel = "Tomorrow 6 PM",
             credibilityScore = 80,
             reviewCount = 5,
-            averageRating = 4.2
+            averageRating = 4.2,
+            crowdLevel = CrowdLevel.LIGHT,
+            attendeeCount = 22
         ),
 
         Event(
@@ -110,7 +122,9 @@ object FakeSeed {
             startTimeLabel = "Sat 10 AM",
             credibilityScore = 89,
             reviewCount = 6,
-            averageRating = 4.6
+            averageRating = 4.6,
+            crowdLevel = CrowdLevel.LIGHT,
+            attendeeCount = 15
         ),
 
         Event(
@@ -126,7 +140,9 @@ object FakeSeed {
             startTimeLabel = "Sat 11 PM",
             credibilityScore = 84,
             reviewCount = 7,
-            averageRating = 4.4
+            averageRating = 4.4,
+            crowdLevel = CrowdLevel.PACKED,
+            attendeeCount = 210
         ),
 
         Event(
@@ -142,7 +158,9 @@ object FakeSeed {
             startTimeLabel = "Open now",
             credibilityScore = 83,
             reviewCount = 70,
-            averageRating = 4.2
+            averageRating = 4.2,
+            crowdLevel = CrowdLevel.BUSY,
+            attendeeCount = 65
         ),
 
         Event(
@@ -158,7 +176,9 @@ object FakeSeed {
             startTimeLabel = "Open until 10 PM",
             credibilityScore = 87,
             reviewCount = 140,
-            averageRating = 4.8
+            averageRating = 4.8,
+            crowdLevel = CrowdLevel.LIGHT,
+            attendeeCount = 40
         ),
 
         Event(
@@ -174,7 +194,9 @@ object FakeSeed {
             startTimeLabel = "Tonight 10 PM",
             credibilityScore = 89,
             reviewCount = 63,
-            averageRating = 4.5
+            averageRating = 4.5,
+            crowdLevel = CrowdLevel.BUSY,
+            attendeeCount = 120
         ),
 
         Event(
@@ -190,7 +212,9 @@ object FakeSeed {
             startTimeLabel = "Tonight 9 PM",
             credibilityScore = 80,
             reviewCount = 85,
-            averageRating = 4.4
+            averageRating = 4.4,
+            crowdLevel = CrowdLevel.BUSY,
+            attendeeCount = 140
         ),
 
         Event(
@@ -206,7 +230,9 @@ object FakeSeed {
             startTimeLabel = "Dinner hours",
             credibilityScore = 95,
             reviewCount = 210,
-            averageRating = 4.7
+            averageRating = 4.7,
+            crowdLevel = CrowdLevel.PACKED,
+            attendeeCount = 180
         ),
 
         Event(
@@ -222,7 +248,9 @@ object FakeSeed {
             startTimeLabel = "Open now",
             credibilityScore = 90,
             reviewCount = 165,
-            averageRating = 4.6
+            averageRating = 4.6,
+            crowdLevel = CrowdLevel.BUSY,
+            attendeeCount = 85
         ),
 
         Event(
@@ -238,7 +266,9 @@ object FakeSeed {
             startTimeLabel = "Tonight 11 PM",
             credibilityScore = 88,
             reviewCount = 76,
-            averageRating = 4.1
+            averageRating = 4.1,
+            crowdLevel = CrowdLevel.PACKED,
+            attendeeCount = 230
         ),
 
         Event(
@@ -254,55 +284,18 @@ object FakeSeed {
             startTimeLabel = "Open now",
             credibilityScore = 82,
             reviewCount = 54,
-            averageRating = 4.0
+            averageRating = 4.0,
+            crowdLevel = CrowdLevel.LIGHT,
+            attendeeCount = 28
         )
     )
 
     val reviews = listOf(
-
         Review("r1","e1","user_2","Alex",5,"Great DJ set.","2d ago"),
         Review("r2","e1","user_3","Jordan",4,"Fun crowd.","3d ago"),
         Review("r3","e1","user_4","Maya",5,"One of the best nights out.","4d ago"),
         Review("r4","e1","user_5","Chris",4,"Packed but worth it.","5d ago"),
         Review("r5","e1","user_6","Sam",5,"Love this place.","1w ago"),
-        Review("r6","e1","user_7","Taylor",4,"Great indie music.","1w ago"),
-
-        Review("r7","e2","user_2","Alex",5,"Perfect study spot.","2d ago"),
-        Review("r8","e2","user_3","Jordan",4,"Good coffee.","3d ago"),
-        Review("r9","e2","user_4","Maya",5,"Very productive night.","5d ago"),
-        Review("r10","e2","user_5","Chris",4,"Good vibe.","6d ago"),
-        Review("r11","e2","user_6","Sam",5,"Quiet enough to focus.","1w ago"),
-
-        Review("r12","e3","user_3","Jordan",4,"Comedy was hilarious.","2d ago"),
-        Review("r13","e3","user_5","Chris",5,"Amazing crowd.","3d ago"),
-        Review("r14","e3","user_6","Sam",4,"Good performers.","4d ago"),
-        Review("r15","e3","user_7","Taylor",4,"Fun event.","5d ago"),
-        Review("r16","e3","user_8","Riley",5,"Loved it.","6d ago"),
-        Review("r17","e3","user_9","Drew",4,"Would go again.","1w ago"),
-
-        Review("r18","e4","user_2","Alex",5,"Best tapas night.","2d ago"),
-        Review("r19","e4","user_3","Jordan",4,"Great social event.","3d ago"),
-        Review("r20","e4","user_4","Maya",5,"Met lots of people.","5d ago"),
-        Review("r21","e4","user_5","Chris",4,"Fun bar hopping.","6d ago"),
-        Review("r22","e4","user_6","Sam",5,"Amazing vibe.","1w ago"),
-
-        Review("r23","e5","user_3","Jordan",4,"Great game.","2d ago"),
-        Review("r24","e5","user_4","Maya",5,"Super fun.","3d ago"),
-        Review("r25","e5","user_6","Sam",4,"Good players.","5d ago"),
-        Review("r26","e5","user_7","Taylor",4,"Would play again.","6d ago"),
-        Review("r27","e5","user_8","Riley",4,"Nice atmosphere.","1w ago"),
-
-        Review("r28","e6","user_4","Maya",5,"Great place to code.","2d ago"),
-        Review("r29","e6","user_5","Chris",4,"Nice dev crowd.","3d ago"),
-        Review("r30","e6","user_6","Sam",5,"Very productive.","5d ago"),
-        Review("r31","e6","user_7","Taylor",4,"Good wifi.","6d ago"),
-        Review("r32","e6","user_8","Riley",5,"Great coffee too.","1w ago"),
-
-        Review("r33","e7","user_2","Alex",5,"Amazing DJ.","2d ago"),
-        Review("r34","e7","user_3","Jordan",4,"Loved the music.","3d ago"),
-        Review("r35","e7","user_4","Maya",5,"Great crowd.","4d ago"),
-        Review("r36","e7","user_6","Sam",4,"Fun night.","5d ago"),
-        Review("r37","e7","user_8","Riley",4,"Would go again.","6d ago"),
-        Review("r38","e7","user_9","Drew",5,"Best techno night.","1w ago")
+        Review("r6","e1","user_7","Taylor",4,"Great indie music.","1w ago")
     )
 }
