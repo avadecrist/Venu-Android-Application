@@ -20,5 +20,7 @@ data class EventEntity(
     val credibilityScore: Int,
     val reviewCount: Int,
     val isVerifiedVenue: Boolean,
-    val averageRating: Double
+    val averageRating: Double,
+//    val attendeeCount: Int,
+//    val crowdLevel: String,
 )
