@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreGenre
 import com.example.venu.features.explore.model.ExploreUiState
@@ -87,21 +88,16 @@ fun ExploreScreen(
         savedOnly,
         sortOption
     ) {
-        val filtered = state.places.filter { place ->
-            val genreMatches = selectedGenres.isEmpty() || place.genre in selectedGenres
-            val verifiedMatches = !verifiedOnly || place.isVerified
-            val savedMatches = !savedOnly || place.isSaved || place.savedLabel != null
-
-            genreMatches && verifiedMatches && savedMatches
-        }
-
-        when (sortOption) {
-            ExploreSortOption.FEATURED -> filtered
-            ExploreSortOption.DISTANCE -> filtered.sortedBy { it.distanceKm ?: Double.MAX_VALUE }
-            ExploreSortOption.RATING -> filtered.sortedByDescending { it.rating }
-            ExploreSortOption.NAME -> filtered.sortedBy { it.name.lowercase() }
-        }
+        filterAndSortPlaces(
+            places = state.places,
+            selectedGenres = selectedGenres,
+            verifiedOnly = verifiedOnly,
+            savedOnly = savedOnly,
+            sortOption = sortOption
+        )
     }
+
+
 
     val activeFilterCount = selectedGenres.size +
             if (verifiedOnly) 1 else 0 +
@@ -135,32 +131,17 @@ fun ExploreScreen(
             )
         }
     ) { innerPadding ->
-        Box(
+        ExploreMapContent(
+            state = state,
+            displayedPlaces = displayedPlaces,
+            activeFilterCount = activeFilterCount,
+            sortOption = sortOption,
+            onAction = onAction,
+            onOpenFilterSort = { showFilterSortDialog = true },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ) {
-            ExploreMap(
-                modifier = Modifier.fillMaxSize(),
-                places = displayedPlaces,
-                selectedPlaceId = state.selectedPlaceId,
-                onMarkerSelected = { id ->
-                    onAction(ExploreAction.PlaceClicked(id))
-                }
-            )
-
-            ExploreTopControls(
-                query = state.query,
-                onQueryChange = { onAction(ExploreAction.QueryChanged(it)) },
-                onOpenFilterSort = { showFilterSortDialog = true },
-                activeFilterCount = activeFilterCount,
-                sortOption = sortOption,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopCenter)
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-            )
-        }
+        )
     }
 
     if (showFilterSortDialog) {
@@ -181,49 +162,46 @@ fun ExploreScreen(
     }
 
     if (state.showSaveSheet && state.pendingSaveEventId != null) {
-        val sheetState = rememberModalBottomSheetState()
+        SaveToListSheet(
+            pendingSaveEventId = state.pendingSaveEventId,
+            availableLists = state.availableLists,
+            onAction = onAction,
+            onDismiss = onDismissSaveSheet
+        )
+    }
+}
 
-        ModalBottomSheet(
-            onDismissRequest = onDismissSaveSheet,
-            sheetState = sheetState
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = "Save to list",
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                state.availableLists.forEach { listType ->
-                    TextButton(
-                        onClick = {
-                            onAction(
-                                ExploreAction.SaveToList(
-                                    eventId = state.pendingSaveEventId,
-                                    listType = listType
-                                )
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start
-                        ) {
-                            Icon(Icons.Default.Bookmark, contentDescription = null)
-                            Spacer(Modifier.width(12.dp))
-                            Text(tabLabel(listType))
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(8.dp))
+@Composable
+private fun ExploreMapContent(
+    state: ExploreUiState,
+    displayedPlaces: List<PlaceUi>,
+    activeFilterCount: Int,
+    sortOption: ExploreSortOption,
+    onAction: (ExploreAction) -> Unit,
+    onOpenFilterSort: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        ExploreMap(
+            modifier = Modifier.fillMaxSize(),
+            places = displayedPlaces,
+            selectedPlaceId = state.selectedPlaceId,
+            onMarkerSelected = { id ->
+                onAction(ExploreAction.PlaceClicked(id))
             }
-        }
+        )
+
+        ExploreTopControls(
+            query = state.query,
+            onQueryChange = { onAction(ExploreAction.QueryChanged(it)) },
+            onOpenFilterSort = onOpenFilterSort,
+            activeFilterCount = activeFilterCount,
+            sortOption = sortOption,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
+        )
     }
 }
 
@@ -516,6 +494,82 @@ private fun DialogRadioRow(
         )
         Spacer(Modifier.width(8.dp))
         Text(label)
+    }
+}
+
+private fun filterAndSortPlaces(
+    places: List<PlaceUi>,
+    selectedGenres: Set<ExploreGenre>,
+    verifiedOnly: Boolean,
+    savedOnly: Boolean,
+    sortOption: ExploreSortOption
+): List<PlaceUi> {
+    val filtered = places.filter { place ->
+        val genreMatches = selectedGenres.isEmpty() || place.genre in selectedGenres
+        val verifiedMatches = !verifiedOnly || place.isVerified
+        val savedMatches = !savedOnly || place.isSaved || place.savedLabel != null
+
+        genreMatches && verifiedMatches && savedMatches
+    }
+
+    return when (sortOption) {
+        ExploreSortOption.FEATURED -> filtered
+        ExploreSortOption.DISTANCE -> filtered.sortedBy { it.distanceKm ?: Double.MAX_VALUE }
+        ExploreSortOption.RATING -> filtered.sortedByDescending { it.rating }
+        ExploreSortOption.NAME -> filtered.sortedBy { it.name.lowercase() }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SaveToListSheet(
+    pendingSaveEventId: String,
+    availableLists: List<ListType>,
+    onAction: (ExploreAction) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "Save to list",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            availableLists.forEach { listType ->
+                TextButton(
+                    onClick = {
+                        onAction(
+                            ExploreAction.SaveToList(
+                                eventId = pendingSaveEventId,
+                                listType = listType
+                            )
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Icon(Icons.Default.Bookmark, contentDescription = null)
+                        Spacer(Modifier.width(12.dp))
+                        Text(tabLabel(listType))
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+        }
     }
 }
 
