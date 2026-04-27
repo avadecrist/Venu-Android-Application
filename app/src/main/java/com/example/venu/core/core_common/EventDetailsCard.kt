@@ -128,9 +128,6 @@ fun EventDetailsSheet(
         ),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item {
-            SheetHandle()
-        }
 
         item {
             TopBar(
@@ -208,22 +205,6 @@ fun EventDetailsSheet(
         item {
             Spacer(modifier = Modifier.height(12.dp))
         }
-    }
-}
-
-@Composable
-private fun SheetHandle() {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .width(48.dp)
-                .height(5.dp)
-                .clip(RoundedCornerShape(100))
-                .background(VenuColors.Handle)
-        )
     }
 }
 
@@ -577,7 +558,7 @@ private fun InfoGridSection(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             DetailInfoCard(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).height(130.dp),
                 label = "Genre",
                 value = genreLabel(genre),
                 icon = Icons.Outlined.Sell,
@@ -585,7 +566,7 @@ private fun InfoGridSection(
             )
 
             DetailInfoCard(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).height(130.dp),
                 label = "Location",
                 value = locationName,
                 icon = Icons.Outlined.LocationOn
@@ -597,14 +578,14 @@ private fun InfoGridSection(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             DetailInfoCard(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).height(130.dp),
                 label = "Start Time",
                 value = startTimeLabel,
                 icon = Icons.Outlined.Schedule
             )
 
             AttendeesInfoCard(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).height(130.dp),
                 attendeeCount = attendeeCount,
                 crowdLevel = crowdLevel
             )
@@ -744,7 +725,7 @@ private fun DetailInfoCard(
     accentChip: String? = null
 ) {
     Surface(
-        modifier = modifier,
+        modifier = modifier.height(130.dp),
         shape = RoundedCornerShape(22.dp),
         color = Color.White,
         border = BorderStroke(1.dp, VenuColors.Border)

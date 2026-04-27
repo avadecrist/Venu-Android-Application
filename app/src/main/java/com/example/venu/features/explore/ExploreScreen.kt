@@ -55,8 +55,12 @@ import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.PlaceUi
 import com.example.venu.features.lists.tabLabel
 import com.example.venu.core.core_common.EventDetailsSheet
+import com.example.venu.core.core_common.EventDetailsUi
+import com.example.venu.core.core_data.mapper.toEventDetailsUi
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.label
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
@@ -82,6 +86,10 @@ fun ExploreScreen(
     var verifiedOnly by remember { mutableStateOf(false) }
     var savedOnly by remember { mutableStateOf(false) }
     var sortOption by remember { mutableStateOf(ExploreSortOption.FEATURED) }
+    var detailsVisible by remember { mutableStateOf(false) }
+
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
 
     val displayedPlaces = remember(
         state.places,
@@ -103,6 +111,8 @@ fun ExploreScreen(
     val selectedPlace = displayedPlaces.firstOrNull { place ->
         place.id == state.selectedPlaceId
     }
+
+    val selectedEventDetails = selectedPlace?.toEventDetailsUi()
 
     val activeFilterCount = selectedGenres.size +
             if (verifiedOnly) 1 else 0 +
@@ -175,23 +185,31 @@ fun ExploreScreen(
         )
     }
 
-//    if (selectedPlace != null) {
-//        ModalBottomSheet(
-//            onDismissRequest = {
-//                onAction(ExploreAction.PlaceDetailsDismissed)
-//            }
-//        ) {
-//            EventDetailsSheet(
-//                place = selectedPlace,
-//                onSaveClick = {
-//                    onAction(ExploreAction.SaveClicked(selectedPlace.id))
-//                },
-//                onCloseClick = {
-//                    onAction(ExploreAction.PlaceDetailsDismissed)
-//                }
-//            )
-//        }
-//    }
+    if (selectedEventDetails != null) {
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = {
+                onAction(ExploreAction.PlaceDetailsDismissed)
+            }
+        ) {
+            EventDetailsSheet(
+                event = selectedEventDetails,
+                showDirectionsButton = false,
+                onBack = {
+                    scope.launch {
+                        sheetState.hide()
+                        onAction(ExploreAction.PlaceDetailsDismissed)
+                    }
+                },
+                onSaveClick = {
+                    onAction(ExploreAction.SaveClicked(selectedEventDetails.id))
+                },
+                onViewOnMapClick = {},
+                onGetDirectionsClick = {},
+                onSubmitReview = { _, _ -> }
+            )
+        }
+    }
 }
 
 @Composable
