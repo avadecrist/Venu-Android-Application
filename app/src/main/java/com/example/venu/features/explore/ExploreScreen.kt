@@ -51,10 +51,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.features.explore.model.ExploreAction
-import com.example.venu.features.explore.model.ExploreGenre
 import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.PlaceUi
 import com.example.venu.features.lists.tabLabel
+import com.example.venu.core.core_common.EventDetailsSheet
+import com.example.venu.core.core_domain.model.Genre
+import com.example.venu.core.core_domain.model.label
 
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
@@ -76,7 +78,7 @@ fun ExploreScreen(
     hasLocationPermission: Boolean
 ) {
     var showFilterSortDialog by remember { mutableStateOf(false) }
-    var selectedGenres by remember { mutableStateOf(setOf<ExploreGenre>()) }
+    var selectedGenres by remember { mutableStateOf(setOf<Genre>()) }
     var verifiedOnly by remember { mutableStateOf(false) }
     var savedOnly by remember { mutableStateOf(false) }
     var sortOption by remember { mutableStateOf(ExploreSortOption.FEATURED) }
@@ -97,7 +99,10 @@ fun ExploreScreen(
         )
     }
 
-
+    // new variable for event details card
+    val selectedPlace = displayedPlaces.firstOrNull { place ->
+        place.id == state.selectedPlaceId
+    }
 
     val activeFilterCount = selectedGenres.size +
             if (verifiedOnly) 1 else 0 +
@@ -169,6 +174,24 @@ fun ExploreScreen(
             onDismiss = onDismissSaveSheet
         )
     }
+
+//    if (selectedPlace != null) {
+//        ModalBottomSheet(
+//            onDismissRequest = {
+//                onAction(ExploreAction.PlaceDetailsDismissed)
+//            }
+//        ) {
+//            EventDetailsSheet(
+//                place = selectedPlace,
+//                onSaveClick = {
+//                    onAction(ExploreAction.SaveClicked(selectedPlace.id))
+//                },
+//                onCloseClick = {
+//                    onAction(ExploreAction.PlaceDetailsDismissed)
+//                }
+//            )
+//        }
+//    }
 }
 
 @Composable
@@ -337,13 +360,13 @@ private fun ExploreResultsSheet(
 
 @Composable
 private fun ExploreFilterSortDialog(
-    currentGenres: Set<ExploreGenre>,
+    currentGenres: Set<Genre>,
     currentVerifiedOnly: Boolean,
     currentSavedOnly: Boolean,
     currentSortOption: ExploreSortOption,
     onDismiss: () -> Unit,
     onApply: (
-        genres: Set<ExploreGenre>,
+        genres: Set<Genre>,
         verifiedOnly: Boolean,
         savedOnly: Boolean,
         sortOption: ExploreSortOption
@@ -388,7 +411,7 @@ private fun ExploreFilterSortDialog(
                     style = MaterialTheme.typography.titleSmall
                 )
 
-                ExploreGenre.entries.forEach { genre ->
+                Genre.entries.forEach { genre ->
                     DialogCheckboxRow(
                         label = genre.label,
                         checked = genre in tempGenres,
@@ -499,7 +522,7 @@ private fun DialogRadioRow(
 
 private fun filterAndSortPlaces(
     places: List<PlaceUi>,
-    selectedGenres: Set<ExploreGenre>,
+    selectedGenres: Set<Genre>,
     verifiedOnly: Boolean,
     savedOnly: Boolean,
     sortOption: ExploreSortOption

@@ -1,10 +1,11 @@
 package com.example.venu.features.explore.model
 
+import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.repository.ListType
 
 data class ExploreUiState(
     val query: String = "",
-    val selectedGenre: ExploreGenre? = null,
+    val selectedGenre: Genre? = null,
     val places: List<PlaceUi> = emptyList(),
     val selectedPlaceId: String? = null,
     val showSaveSheet: Boolean = false,
