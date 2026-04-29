@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
-import com.example.venu.features.explore.model.PlaceUi
+import com.example.venu.core.core_presentation.PlaceUi
 import com.example.venu.features.lists.tabLabel
 import com.example.venu.core.core_common.eventdetails.EventDetailsSheet
 import com.example.venu.core.core_presentation.toEventDetailsUi

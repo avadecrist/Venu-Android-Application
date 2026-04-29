@@ -1,7 +1,6 @@
 package com.example.venu.core.core_presentation
 
 import com.example.venu.core.core_domain.model.CrowdLevel
-import com.example.venu.features.explore.model.PlaceUi
 
 fun PlaceUi.toEventDetailsUi(): EventDetailsUi {
     return EventDetailsUi(

@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_domain.model.label
-import com.example.venu.features.explore.model.PlaceUi
+import com.example.venu.core.core_presentation.PlaceUi
 
 @Composable
 fun PlaceCard(
