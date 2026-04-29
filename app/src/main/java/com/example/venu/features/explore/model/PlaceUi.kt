@@ -2,8 +2,6 @@ package com.example.venu.features.explore.model
 
 import com.example.venu.core.core_domain.model.Genre
 
-//move this to core common eventually
-
 data class PlaceUi(
     val id: String,
     val name: String,

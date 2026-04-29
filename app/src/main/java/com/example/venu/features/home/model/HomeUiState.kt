@@ -1,16 +1,14 @@
 package com.example.venu.features.home.model
 
-data class HomeVenueUi(
-    val id: String,
-    val title: String,
-    val subtitle: String,
-    val ratingLabel: String? = null,
-    val distanceLabel: String? = null,
-    val isSaved: Boolean = false
-)
+import com.example.venu.core.core_domain.repository.ListType
 
 data class HomeUiState(
     val query: String = "",
     val featured: List<HomeVenueUi> = emptyList(),
-    val nearYou: List<HomeVenueUi> = emptyList()
+    val nearYou: List<HomeVenueUi> = emptyList(),
+
+    // mimics explore page
+    val showSaveSheet: Boolean = false,
+    val pendingSaveEventId: String? = null,
+    val availableLists: List<ListType> = emptyList()
 )

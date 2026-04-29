@@ -37,9 +37,31 @@ class HomeViewModel : ViewModel() {
                 applyFilters()
             }
 
-            is HomeAction.ToggleSaved -> {
-                listsRepo.toggleWantToGo(action.eventId)
-                loadHome()
+            is HomeAction.SaveClicked -> {
+                uiState = uiState.copy(
+                    showSaveSheet = true,
+                    pendingSaveEventId = action.eventId,
+                    availableLists = listsRepo.getAllLists()
+                )
+            }
+
+            is HomeAction.SaveToList -> {
+                listsRepo.addToList(action.listType, action.eventId)
+
+                uiState = uiState.copy(
+                    showSaveSheet = false,
+                    pendingSaveEventId = null,
+                    availableLists = listsRepo.getAllLists()
+                )
+
+                loadHome() // or applyFilters()
+            }
+
+            is HomeAction.DismissSaveSheet -> {
+                uiState = uiState.copy(
+                    showSaveSheet = false,
+                    pendingSaveEventId = null
+                )
             }
         }
     }
