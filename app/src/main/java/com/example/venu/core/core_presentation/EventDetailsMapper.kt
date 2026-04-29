@@ -1,6 +1,5 @@
-package com.example.venu.core.core_data.mapper
+package com.example.venu.core.core_presentation
 
-import com.example.venu.core.core_common.EventDetailsUi
 import com.example.venu.core.core_domain.model.CrowdLevel
 import com.example.venu.features.explore.model.PlaceUi
 

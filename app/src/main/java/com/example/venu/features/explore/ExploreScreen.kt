@@ -54,8 +54,8 @@ import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.PlaceUi
 import com.example.venu.features.lists.tabLabel
-import com.example.venu.core.core_common.EventDetailsSheet
-import com.example.venu.core.core_data.mapper.toEventDetailsUi
+import com.example.venu.core.core_common.eventdetails.EventDetailsSheet
+import com.example.venu.core.core_presentation.toEventDetailsUi
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.label
 import androidx.compose.runtime.rememberCoroutineScope

@@ -1,4 +1,4 @@
-package com.example.venu.core.core_common
+package com.example.venu.core.core_common.eventdetails
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -30,23 +30,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
-import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Sell
 import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,40 +56,16 @@ import com.example.venu.core.core_domain.model.Genre
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.graphics.graphicsLayer
+import com.example.venu.core.core_common.core_ui.components.LeaveReviewCard
+import com.example.venu.core.core_common.core_ui.components.ReviewCard
+import com.example.venu.core.core_common.core_ui.components.ReviewsCountHeader
+import com.example.venu.core.core_common.core_ui.theme.VenuColors
+import com.example.venu.core.core_common.util.formatDistance
+import com.example.venu.core.core_common.util.formatOneDecimal
 import com.example.venu.core.core_domain.model.CrowdLevel
+import com.example.venu.core.core_presentation.EventDetailsUi
+import com.example.venu.core.core_presentation.ReviewUi
 
-
-
-data class ReviewUi(
-    val id: String,
-    val authorName: String,
-    val authorInitial: String,
-    val rating: Int,
-    val comment: String,
-    val timeAgo: String
-)
-
-data class EventDetailsUi(
-    val id: String,
-    val name: String,
-    val subtitle: String,
-    val genre: Genre,
-    val locationName: String,
-    val distanceKm: Double?,
-    val priceText: String,
-    val startTimeLabel: String,
-    val imageUrl: String? = null,
-    val credibilityScore: Int,
-    val reviewCount: Int,
-    val isVerifiedVenue: Boolean,
-    val averageRating: Double,
-    val googleRating: Double,
-    val userRating: Double,
-    val attendeeCount: Int,
-    val crowdLevel: CrowdLevel,
-    val reviews: List<ReviewUi>,
-    val isSaved: Boolean = false
-)
 
 @Composable
 fun EventDetailsSheet(
@@ -183,7 +153,7 @@ fun EventDetailsSheet(
         }
 
         item {
-            ReviewsHeader(reviewCount = event.reviewCount)
+            ReviewsCountHeader(reviewCount = event.reviewCount)
         }
 
         item {
@@ -585,190 +555,6 @@ private fun InfoGridSection(
     }
 }
 
-
-@Composable
-private fun AttendeesInfoCard(
-    attendeeCount: Int,
-    crowdLevel: CrowdLevel,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(22.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, VenuColors.Border)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(18.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Group,
-                    contentDescription = null,
-                    tint = VenuColors.TextMuted,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Attendees",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = VenuColors.TextSecondary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            CrowdLevelIndicator(crowdLevel = crowdLevel)
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = crowdLevelLabel(crowdLevel),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = VenuColors.TextMuted,
-                    fontWeight = FontWeight.Medium
-                )
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Text(
-                    text = "•",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = VenuColors.TextMuted.copy(alpha = 0.6f)
-                )
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Text(
-                    text = "$attendeeCount going",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = VenuColors.TextMuted,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CrowdLevelIndicator(
-    crowdLevel: CrowdLevel,
-    modifier: Modifier = Modifier
-) {
-    val filledBars = when (crowdLevel) {
-        CrowdLevel.QUIET -> 1
-        CrowdLevel.LIGHT -> 2
-        CrowdLevel.BUSY -> 3
-        CrowdLevel.PACKED -> 4
-        CrowdLevel.UNKNOWN -> 0
-    }
-
-    val activeColor = when (crowdLevel) {
-        CrowdLevel.QUIET -> Color(0xFF60A5FA)
-        CrowdLevel.LIGHT -> Color(0xFF34D399)
-        CrowdLevel.BUSY -> Color(0xFFF59E0B)
-        CrowdLevel.PACKED -> Color(0xFFEF4444)
-        CrowdLevel.UNKNOWN -> VenuColors.BorderDark
-    }
-
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.Bottom
-    ) {
-        repeat(4) { index ->
-            val barHeight = when (index) {
-                0 -> 10.dp
-                1 -> 14.dp
-                2 -> 18.dp
-                else -> 22.dp
-            }
-
-            Box(
-                modifier = Modifier
-                    .width(10.dp)
-                    .height(barHeight)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(
-                        if (index < filledBars) activeColor else VenuColors.Border
-                    )
-            )
-        }
-    }
-}
-
-@Composable
-private fun DetailInfoCard(
-    label: String,
-    value: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    modifier: Modifier = Modifier,
-    accentChip: String? = null
-) {
-    Surface(
-        modifier = modifier.height(130.dp),
-        shape = RoundedCornerShape(22.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, VenuColors.Border)
-    ) {
-        Column(
-            modifier = Modifier.padding(18.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = VenuColors.TextMuted,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = VenuColors.TextSecondary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (accentChip != null) {
-                Surface(
-                    shape = RoundedCornerShape(999.dp),
-                    color = VenuColors.GenreChipBg
-                ) {
-                    Text(
-                        text = accentChip,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = VenuColors.GenreChipText,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            } else {
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = VenuColors.TextPrimary,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-    }
-}
-
 @Composable
 private fun PriceAndVerifiedCard(
     priceText: String,
@@ -831,272 +617,6 @@ private fun PriceAndVerifiedCard(
     }
 }
 
-@Composable
-private fun ReviewsHeader(reviewCount: Int) {
-    Text(
-        text = "Reviews ($reviewCount)",
-        style = MaterialTheme.typography.headlineSmall,
-        fontWeight = FontWeight.Bold,
-        color = VenuColors.TextPrimary
-    )
-}
-
-@Composable
-private fun LeaveReviewCard(
-    onSubmitReview: (Int, String) -> Unit
-) {
-    var selectedRating by remember { mutableIntStateOf(0) }
-    var reviewText by remember { mutableStateOf("") }
-
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, VenuColors.Border)
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
-            Text(
-                text = "Leave a review",
-                style = MaterialTheme.typography.titleLarge,
-                color = VenuColors.TextSecondary,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                repeat(5) { index ->
-                    val filled = index < selectedRating
-                    TextButton(
-                        onClick = { selectedRating = index + 1 },
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Text(
-                            text = if (filled) "★" else "☆",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = if (filled) VenuColors.Star else VenuColors.BorderDark
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = reviewText,
-                    onValueChange = { reviewText = it },
-                    modifier = Modifier.weight(1f),
-                    placeholder = {
-                        Text("Share your experience...")
-                    },
-                    shape = RoundedCornerShape(18.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        disabledContainerColor = Color.White,
-                        focusedIndicatorColor = VenuColors.Border,
-                        unfocusedIndicatorColor = VenuColors.Border,
-                        focusedTextColor = VenuColors.TextPrimary,
-                        unfocusedTextColor = VenuColors.TextPrimary,
-                        focusedPlaceholderColor = VenuColors.TextMuted,
-                        unfocusedPlaceholderColor = VenuColors.TextMuted
-                    ),
-                    singleLine = false,
-                    maxLines = 3
-                )
-
-                Surface(
-                    onClick = {
-                        if (selectedRating > 0 && reviewText.isNotBlank()) {
-                            onSubmitReview(selectedRating, reviewText.trim())
-                            selectedRating = 0
-                            reviewText = ""
-                        }
-                    },
-                    shape = RoundedCornerShape(18.dp),
-                    color = VenuColors.SendButtonBg
-                ) {
-                    Box(
-                        modifier = Modifier.size(56.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.Send,
-                            contentDescription = "Submit review",
-                            tint = Color.White
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ReviewCard(
-    review: ReviewUi
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, VenuColors.Border)
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
-            ) {
-                ReviewerAvatar(initial = review.authorInitial)
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = review.authorName,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = VenuColors.TextPrimary
-                    )
-                }
-
-                Text(
-                    text = review.timeAgo,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = VenuColors.TextMuted
-                )
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Text(
-                text = buildStarString(review.rating),
-                style = MaterialTheme.typography.headlineSmall,
-                color = VenuColors.Star
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = review.comment,
-                style = MaterialTheme.typography.bodyLarge,
-                color = VenuColors.TextSecondary
-            )
-        }
-    }
-}
-
-@Composable
-private fun ReviewerAvatar(initial: String) {
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(VenuColors.AvatarBg),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = initial,
-            style = MaterialTheme.typography.titleLarge,
-            color = VenuColors.AccentBlue,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-private fun formatDistance(distanceKm: Double): String {
-    return if (distanceKm < 1.0) {
-        "${(distanceKm * 1000).toInt()} m away"
-    } else {
-        "${String.format("%.1f", distanceKm)} km away"
-    }
-}
-
-private fun formatOneDecimal(value: Double): String {
-    return String.format("%.1f", value)
-}
-
-private fun buildStarString(rating: Int): String {
-    return "★".repeat(rating.coerceIn(0, 5)) + "☆".repeat((5 - rating).coerceIn(0, 5))
-}
-
-private fun genreLabel(genre: Genre): String {
-    return when (genre) {
-        Genre.FOOD -> "Food"
-        Genre.STUDY -> "Study"
-        Genre.MUSIC -> "Music"
-        Genre.SPORTS -> "Sports"
-        Genre.MUSEUMS -> "Museums"
-        Genre.COFFEE -> "Coffee"
-        Genre.NIGHTLIFE -> "Nightlife"
-        Genre.OUTDOORS -> "Outdoors"
-    }
-}
-
-private fun genreChipText(genre: Genre): String {
-    return when (genre) {
-        Genre.FOOD -> "🍔 Food"
-        Genre.STUDY -> "📚 Study"
-        Genre.MUSIC -> "🎵 Music"
-        Genre.SPORTS -> "🏀 Sports"
-        Genre.MUSEUMS -> "🖼️ Museums"
-        Genre.COFFEE -> "☕ Coffee"
-        Genre.NIGHTLIFE -> "🌙 Nightlife"
-        Genre.OUTDOORS -> "🌿 Outdoors"
-    }
-}
-
-private fun crowdLevelLabel(crowdLevel: CrowdLevel): String {
-    return when (crowdLevel) {
-        CrowdLevel.QUIET -> "Quiet"
-        CrowdLevel.LIGHT -> "Light"
-        CrowdLevel.BUSY -> "Busy"
-        CrowdLevel.PACKED -> "Packed"
-        CrowdLevel.UNKNOWN -> "Unknown"
-    }
-}
-
-private object VenuColors {
-    val Background = Color(0xFFFFFFFF)
-    val SurfaceMuted = Color(0xFFF5F5F7)
-    val Border = Color(0xFFE7E7EC)
-    val BorderDark = Color(0xFFCFCFD7)
-    val Handle = Color(0xFFE6E6EA)
-
-    val TextPrimary = Color(0xFF1F2430)
-    val TextSecondary = Color(0xFF6B7280)
-    val TextMuted = Color(0xFF9CA3AF)
-
-    val AccentBlue = Color(0xFF3B82F6)
-    val AccentBlueBorder = Color(0xFFCFE0FF)
-    val SendButtonBg = Color(0xFFAFC7F7)
-
-    val GenreChipBg = Color(0xFFFFE9DB)
-    val GenreChipText = Color(0xFFF97316)
-
-    val VerifiedBg = Color(0xFFE8F7EE)
-    val VerifiedText = Color(0xFF27AE60)
-
-    val ScoreHigh = Color(0xFF22C55E)
-    val ScoreMedium = Color(0xFFF59E0B)
-    val ScoreLow = Color(0xFFEF4444)
-
-    val Star = Color(0xFFF5A623)
-    val AvatarBg = Color(0xFFEAEFFD)
-}
 
 private val PreviewEvent = EventDetailsUi(
     id = "ramen-popup-001",
