@@ -86,6 +86,12 @@ class ExploreViewModel(
                 applyFilters()
             }
 
+            ExploreAction.PlaceDetailsDismissed -> {
+                uiState = uiState.copy(
+                    selectedPlaceId = null
+                )
+            }
+
         }
     }
 

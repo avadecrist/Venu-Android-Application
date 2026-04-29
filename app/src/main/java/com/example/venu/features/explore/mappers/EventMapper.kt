@@ -32,7 +32,7 @@ fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
         longitude = longitude,
         distanceKm = distanceKm,
         rating = averageRating,
-        genre = genre.toExploreGenre(),
+        genre = genre,
         isVerified = isVerifiedVenue,
         isSaved = listsRepository.isSaved(id),
         savedLabel = savedLabel

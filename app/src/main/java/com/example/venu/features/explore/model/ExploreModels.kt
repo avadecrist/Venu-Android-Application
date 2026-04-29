@@ -1,17 +1,8 @@
 package com.example.venu.features.explore.model
 
+import com.example.venu.core.core_domain.model.Genre
 
-enum class ExploreGenre(val label: String) {
-    Food("Food"),
-    Study("Study"),
-    Music("Music"),
-    Sports("Sports"),
-    Museums("Museums"),
-    Coffee("Coffee"),
-    Nightlife("Nightlife"),
-    Outdoors("Outdoors"),
-
-}
+//move this to core common eventually
 
 data class PlaceUi(
     val id: String,
@@ -21,7 +12,7 @@ data class PlaceUi(
     val longitude: Double = 0.0,
     val distanceKm: Double?,
     val rating: Double,
-    val genre: ExploreGenre,
+    val genre: Genre,
     val isVerified: Boolean,
     val isSaved: Boolean,
     val savedLabel: String? = null
