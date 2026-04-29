@@ -1,5 +1,6 @@
 package com.example.venu.features.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,14 +10,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -30,9 +32,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.features.profile.model.ProfileUiState
 
 @Composable
@@ -46,9 +50,9 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 22.dp, vertical = 22.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         ProfileHeader(
             state = state,
@@ -57,11 +61,11 @@ fun ProfileScreen(
         )
 
         if (state.isSignedIn) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             ActivityCard(state = state)
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
         MenuSection(
             state = state,
@@ -81,32 +85,28 @@ private fun ProfileHeader(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Surface(
+        Box(
             modifier = Modifier
-                .size(92.dp)
-                .clip(CircleShape),
-            tonalElevation = 2.dp,
-            shape = CircleShape
+                .size(96.dp)
+                .clip(CircleShape)
+                .background(VenuColors.AvatarBg),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "👤",
-                    style = MaterialTheme.typography.headlineMedium
-                )
-            }
+            Icon(
+                imageVector = Icons.Filled.Person,
+                contentDescription = null,
+                modifier = Modifier.size(44.dp),
+                tint = VenuColors.AccentBlue
+            )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Text(
             text = if (state.isSignedIn) state.displayName else "Profile",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.SemiBold
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = VenuColors.TextPrimary
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -117,11 +117,12 @@ private fun ProfileHeader(
             } else {
                 "Sign in to save events and leave reviews"
             },
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            color = VenuColors.TextSecondary
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         if (state.isSignedIn) {
             OutlinedButton(onClick = onEditProfileClick) {
@@ -130,12 +131,22 @@ private fun ProfileHeader(
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
+
                 Spacer(modifier = Modifier.size(8.dp))
-                Text("Edit Profile")
+
+                Text(
+                    text = "Edit Profile",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium
+                )
             }
         } else {
             Button(onClick = onSignInClick) {
-                Text("Sign In")
+                Text(
+                    text = "Sign In",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }
@@ -145,21 +156,18 @@ private fun ProfileHeader(
 private fun ActivityCard(
     state: ProfileUiState
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        tonalElevation = 2.dp
-    ) {
+    SettingsLikeCard {
         Column(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp)
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
             Text(
                 text = "Your Activity",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = VenuColors.TextPrimary
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -170,11 +178,13 @@ private fun ActivityCard(
                     label = "Events",
                     modifier = Modifier.weight(1f)
                 )
+
                 StatItem(
                     value = state.reviewsCount.toString(),
                     label = "Reviews",
                     modifier = Modifier.weight(1f)
                 )
+
                 StatItem(
                     value = state.streakCount.toString(),
                     label = "Streak",
@@ -197,14 +207,17 @@ private fun StatItem(
     ) {
         Text(
             text = value,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = VenuColors.TextPrimary
         )
+
         Spacer(modifier = Modifier.height(4.dp))
+
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            style = MaterialTheme.typography.bodyLarge,
+            color = VenuColors.TextSecondary
         )
     }
 }
@@ -220,17 +233,14 @@ private fun MenuSection(
     ) {
         Text(
             text = "Account",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = VenuColors.TextPrimary
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            tonalElevation = 2.dp
-        ) {
+        SettingsLikeCard {
             Column {
                 MenuRow(
                     leading = Icons.Filled.Star,
@@ -239,7 +249,7 @@ private fun MenuSection(
                     onClick = onMyReviewsClick
                 )
 
-                HorizontalDivider()
+                HorizontalDivider(color = VenuColors.Border)
 
                 MenuRow(
                     leading = Icons.Filled.Settings,
@@ -248,6 +258,20 @@ private fun MenuSection(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SettingsLikeCard(
+    content: @Composable () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, VenuColors.Border)
+    ) {
+        content()
     }
 }
 
@@ -262,38 +286,42 @@ private fun MenuRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 18.dp),
+            .padding(horizontal = 20.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = leading,
             contentDescription = title,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            modifier = Modifier.size(22.dp),
+            tint = VenuColors.TextSecondary
         )
 
-        Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(18.dp))
 
         Text(
             text = title,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            color = VenuColors.TextPrimary,
             modifier = Modifier.weight(1f)
         )
 
         if (trailingText != null) {
             Text(
                 text = trailingText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium,
+                color = VenuColors.TextSecondary
             )
 
-            Spacer(modifier = Modifier.size(8.dp))
+            Spacer(modifier = Modifier.size(10.dp))
         }
 
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            modifier = Modifier.size(22.dp),
+            tint = VenuColors.TextSecondary
         )
     }
 }
