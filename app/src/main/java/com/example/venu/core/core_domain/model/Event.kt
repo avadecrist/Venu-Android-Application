@@ -92,43 +92,6 @@ data class Event(
     // will use this later to establish crowd level
 )
 
-enum class Genre {
-    FOOD,
-    STUDY,
-    MUSIC,
-    SPORTS,
-    MUSEUMS,
-    COFFEE,
-    NIGHTLIFE,
-    OUTDOORS
-}
-
-val Genre.label: String
-    get() = when (this) {
-        Genre.FOOD -> "Food"
-        Genre.STUDY -> "Study"
-        Genre.MUSIC -> "Music"
-        Genre.SPORTS -> "Sports"
-        Genre.MUSEUMS -> "Museums"
-        Genre.COFFEE -> "Coffee"
-        Genre.NIGHTLIFE -> "Nightlife"
-        Genre.OUTDOORS -> "Outdoors"
-    }
-
-enum class PriceTier {
-    FREE,
-    UNDER_10,
-    UNDER_20
-}
-
-enum class CrowdLevel {
-    QUIET,
-    LIGHT,
-    BUSY,
-    PACKED,
-    UNKNOWN
-}
-
 data class EventMetrics(
     val goingCount: Int? = null,
     val saveCount: Int? = null,

@@ -1,4 +1,4 @@
-package com.example.venu.core.core_ui.theme
+package com.example.venu.core.core_common.core_ui.theme
 
 import androidx.compose.ui.graphics.Color
 
