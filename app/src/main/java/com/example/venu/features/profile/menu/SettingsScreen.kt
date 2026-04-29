@@ -1,6 +1,10 @@
 package com.example.venu.features.profile.menu
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -40,8 +44,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.venu.core.core_common.core_ui.theme.VenuColors
+
+private const val VENU_NOTIFICATION_CHANNEL_ID = "venu_test_notifications_v2"
 
 @Composable
 fun SettingsScreen(
@@ -62,6 +70,10 @@ fun SettingsScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         notificationsEnabled = isGranted
+
+        if (isGranted) {
+            sendTestNotification(context)
+        }
     }
 
     fun onPushNotificationsChanged(checked: Boolean) {
@@ -81,6 +93,7 @@ fun SettingsScreen(
 
         if (permissionGranted) {
             notificationsEnabled = true
+            sendTestNotification(context)
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             notificationPermissionLauncher.launch(
                 Manifest.permission.POST_NOTIFICATIONS
@@ -185,6 +198,66 @@ fun SettingsScreen(
                 }
             }
         )
+    }
+}
+
+@SuppressLint("MissingPermission")
+private fun sendTestNotification(context: Context) {
+    createVenuNotificationChannel(context)
+
+    val permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    } else {
+        true
+    }
+
+    val systemNotificationsEnabled =
+        NotificationManagerCompat.from(context).areNotificationsEnabled()
+
+    if (!permissionGranted || !systemNotificationsEnabled) {
+        return
+    }
+
+    val notificationId = System.currentTimeMillis().toInt()
+
+    val notification = NotificationCompat.Builder(
+        context,
+        VENU_NOTIFICATION_CHANNEL_ID
+    )
+        .setSmallIcon(android.R.drawable.ic_dialog_info)
+        .setContentTitle("Venu notifications are on")
+        .setContentText("This is a fresh test notification from Venu.")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setCategory(NotificationCompat.CATEGORY_STATUS)
+        .setDefaults(NotificationCompat.DEFAULT_ALL)
+        .setAutoCancel(true)
+        .build()
+
+    NotificationManagerCompat.from(context).notify(
+        notificationId,
+        notification
+    )
+}
+
+private fun createVenuNotificationChannel(context: Context) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(
+            VENU_NOTIFICATION_CHANNEL_ID,
+            "Venu Test Notifications",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Test notifications from Venu"
+            enableVibration(true)
+        }
+
+        val notificationManager = context.getSystemService(
+            NotificationManager::class.java
+        )
+
+        notificationManager.createNotificationChannel(channel)
     }
 }
 
