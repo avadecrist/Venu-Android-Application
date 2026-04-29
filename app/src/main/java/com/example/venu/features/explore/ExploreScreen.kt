@@ -41,6 +41,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -86,9 +87,11 @@ fun ExploreScreen(
     var verifiedOnly by remember { mutableStateOf(false) }
     var savedOnly by remember { mutableStateOf(false) }
     var sortOption by remember { mutableStateOf(ExploreSortOption.FEATURED) }
-    var detailsVisible by remember { mutableStateOf(false) }
+    var showDirectionsButton by remember { mutableStateOf(false) }
 
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
     val scope = rememberCoroutineScope()
 
     val displayedPlaces = remember(
@@ -125,6 +128,10 @@ fun ExploreScreen(
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = bottomSheetState
     )
+
+    LaunchedEffect(selectedEventDetails?.id) {
+        showDirectionsButton = false
+    }
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
@@ -196,12 +203,15 @@ fun ExploreScreen(
         ModalBottomSheet(
             sheetState = sheetState,
             onDismissRequest = {
-                onAction(ExploreAction.PlaceDetailsDismissed)
+                scope.launch {
+                    sheetState.hide()
+                    onAction(ExploreAction.PlaceDetailsDismissed)
+                }
             }
         ) {
             EventDetailsSheet(
                 event = selectedEventDetails,
-                showDirectionsButton = false,
+                showDirectionsButton = showDirectionsButton,
                 onBack = {
                     scope.launch {
                         sheetState.hide()
@@ -211,8 +221,15 @@ fun ExploreScreen(
                 onSaveClick = {
                     onAction(ExploreAction.SaveClicked(selectedEventDetails.id))
                 },
-                onViewOnMapClick = {},
-                onGetDirectionsClick = {},
+                onViewOnMapClick = {
+                    showDirectionsButton = true
+
+                    scope.launch {
+                        bottomSheetState.partialExpand()
+                        sheetState.partialExpand()
+                    }
+                },
+                onGetDirectionsClick = { /* TODO: open Google Maps directions */ },
                 onSubmitReview = { _, _ -> }
             )
         }

@@ -54,14 +54,7 @@ fun PlaceCard(
 
             Spacer(Modifier.height(10.dp))
 
-            if (place.savedLabel == null) {
-                OutlinedButton(
-                    onClick = onSaveClick,
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text("Save")
-                }
-            } else {
+            if (place.savedLabel != null) {
                 FilledTonalButton(
                     onClick = onSaveClick,
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)

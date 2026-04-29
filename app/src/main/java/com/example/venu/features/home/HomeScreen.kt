@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -31,8 +32,15 @@ fun HomeScreen(
 ) {
     var selectedEvent by remember { mutableStateOf<EventDetailsUi?>(null) }
 
-    val sheetState = rememberModalBottomSheetState()
+    var showDirectionsButton by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(selectedEvent?.id) {
+        showDirectionsButton = false
+    }
 
     Column(
         modifier = Modifier
@@ -68,13 +76,6 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // maps fake seed data to each feature card
-//            state.featured.forEach { venue ->
-//                FeaturedCard(
-//                    title = venue.title,
-//                    subtitle = venue.subtitle,
-//                    onClick = { selectedEvent = venue.toEventDetailsUi() }
-//                )
-//            }
             state.featured.forEach { venue ->
                 FeaturedCard(
                     title = venue.title,
@@ -95,20 +96,6 @@ fun HomeScreen(
 
         // maps fake seed data to each venue card
         state.nearYou.forEach { venue ->
-//            VenueCard(
-//                name = venue.title,
-//                details = buildString {
-//                    append(venue.subtitle)
-//                    venue.distanceLabel?.let {
-//                        append(" • ")
-//                        append(it)
-//                    }
-//                    venue.ratingLabel?.let {
-//                        append(" • ")
-//                        append(it)
-//                    }
-//                }
-//            )
             VenueCard(
                 name = venue.title,
                 details = buildString {
@@ -153,20 +140,30 @@ fun HomeScreen(
         ModalBottomSheet(
             sheetState = sheetState,
             onDismissRequest = {
-                selectedEvent = null
+                scope.launch {
+                    sheetState.hide()
+                    selectedEvent = null
+                }
             }
         ) {
             EventDetailsSheet(
                 event = event,
-                showDirectionsButton = false,
+                showDirectionsButton = showDirectionsButton,
                 onBack = {
                     scope.launch {
                         sheetState.hide()
-                        selectedEvent = null
+                        onAction(HomeAction.DismissSaveSheet)
+//                        selectedEvent = null
                     }
                 },
                 onSaveClick = { onAction(HomeAction.SaveClicked(event.id)) },
-                onViewOnMapClick = { /* TODO */ },
+                onViewOnMapClick = {
+                    showDirectionsButton = true
+
+                    scope.launch {
+                        sheetState.partialExpand()
+                    }
+                },
                 onGetDirectionsClick = { /* TODO */ },
                 onSubmitReview = { _, _ -> }
             )
