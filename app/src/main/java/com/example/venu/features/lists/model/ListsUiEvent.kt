@@ -8,4 +8,6 @@ sealed interface ListsUiEvent {
     data class MoveEvent(val eventId: String, val from: ListType, val to: ListType) : ListsUiEvent
     data class ToggleWantToGo(val eventId: String) : ListsUiEvent
     data class CreateCustomList(val name: String) : ListsUiEvent
+
+    data object Refresh : ListsUiEvent
 }

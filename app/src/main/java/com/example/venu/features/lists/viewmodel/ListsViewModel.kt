@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+
 class ListsViewModel(): ViewModel() {
     private val listsRepo = AppGraph.listsRepo
     private val _state = MutableStateFlow(ListsUiState())
@@ -22,11 +23,12 @@ class ListsViewModel(): ViewModel() {
 
     fun onEvent(event: ListsUiEvent) {
         when (event) {
+            ListsUiEvent.Refresh -> {
+                refresh()
+            }
 
             is ListsUiEvent.SelectTab -> {
-                if (event.tab != _state.value.selectedTab) {
-                    refresh(event.tab) // only reloads if tab changed
-                }
+                refresh(event.tab)
             }
 
             is ListsUiEvent.ToggleWantToGo -> {
@@ -82,5 +84,4 @@ class ListsViewModel(): ViewModel() {
             )
         }
     }
-
 }
