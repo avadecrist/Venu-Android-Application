@@ -17,6 +17,7 @@ secrets-gradle = "2.0.1" # For secret API key
 places = "5.1.1"
 # For Google Directions
 googleGoogleMapsServices = "2.2.0"
+animation = "1.11.0"
 
 
 [libraries]
@@ -43,6 +44,7 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 places = { module = "com.google.android.libraries.places:places", version.ref = "places" }
 # For Google Directions
 google-google-maps-services = { module = "com.google.maps:google-maps-services", version.ref = "googleGoogleMapsServices" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
