@@ -126,9 +126,9 @@ fun EventDetailsSheet(
 
             RatingSummarySection(
                 credibilityScore = event.credibilityScore,
-                averageRating = event.averageRating,
-                googleRating = event.googleRating,
-                userRating = event.userRating,
+                averageRating = event.averageRating ?: 0.0,//event.averageRating,
+                googleRating = event.googleRating ?: 0.0,
+                userRating = event.userRating ?: 0.0,
                 reviewCount = event.reviewCount
             )
 

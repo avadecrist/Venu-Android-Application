@@ -11,7 +11,7 @@ import com.example.venu.core.core_common.AppGraph
 import com.example.venu.features.explore.mappers.toPlaceUi
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
-import com.example.venu.core.core_presentation.PlaceUi
+import com.example.venu.features.explore.model.PlaceUi
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 

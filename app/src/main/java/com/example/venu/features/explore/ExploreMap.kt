@@ -3,7 +3,7 @@ package com.example.venu.features.explore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import com.example.venu.core.core_presentation.PlaceUi
+import com.example.venu.features.explore.model.PlaceUi
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng

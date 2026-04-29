@@ -13,8 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.venu.core.core_common.core_ui.components.BaseEventCard
 import com.example.venu.core.core_domain.model.label
-import com.example.venu.core.core_presentation.PlaceUi
+import com.example.venu.features.explore.model.PlaceUi
 
 @Composable
 fun PlaceCard(
@@ -23,14 +24,10 @@ fun PlaceCard(
     onClick: () -> Unit,
     onSaveClick: () -> Unit
 ) {
-    val border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        border = border,
-        colors = CardDefaults.cardColors()
+    BaseEventCard(
+        modifier = Modifier.fillMaxWidth(),
+        selected = selected,
+        onClick = onClick
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
 

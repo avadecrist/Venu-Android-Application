@@ -52,13 +52,14 @@ import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
-import com.example.venu.core.core_presentation.PlaceUi
+import com.example.venu.features.explore.model.PlaceUi
 import com.example.venu.features.lists.tabLabel
 import com.example.venu.core.core_common.eventdetails.EventDetailsSheet
 import com.example.venu.core.core_presentation.toEventDetailsUi
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.label
 import androidx.compose.runtime.rememberCoroutineScope
+import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import kotlinx.coroutines.launch
 
 private val ExploreSheetPeekHeight = 120.dp
@@ -179,7 +180,14 @@ fun ExploreScreen(
         SaveToListSheet(
             pendingSaveEventId = state.pendingSaveEventId,
             availableLists = state.availableLists,
-            onAction = onAction,
+            onSaveToList = { eventId, listType ->
+                onAction(
+                    ExploreAction.SaveToList(
+                        eventId = eventId,
+                        listType = listType
+                    )
+                )
+            },
             onDismiss = onDismissSaveSheet
         )
     }
@@ -557,59 +565,6 @@ private fun filterAndSortPlaces(
         ExploreSortOption.DISTANCE -> filtered.sortedBy { it.distanceKm ?: Double.MAX_VALUE }
         ExploreSortOption.RATING -> filtered.sortedByDescending { it.rating }
         ExploreSortOption.NAME -> filtered.sortedBy { it.name.lowercase() }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SaveToListSheet(
-    pendingSaveEventId: String,
-    availableLists: List<ListType>,
-    onAction: (ExploreAction) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val sheetState = rememberModalBottomSheetState()
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = "Save to list",
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            availableLists.forEach { listType ->
-                TextButton(
-                    onClick = {
-                        onAction(
-                            ExploreAction.SaveToList(
-                                eventId = pendingSaveEventId,
-                                listType = listType
-                            )
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        Icon(Icons.Default.Bookmark, contentDescription = null)
-                        Spacer(Modifier.width(12.dp))
-                        Text(tabLabel(listType))
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
-        }
     }
 }
 

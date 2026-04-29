@@ -2,7 +2,7 @@ package com.example.venu.features.explore.model
 
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.repository.ListType
-import com.example.venu.core.core_presentation.PlaceUi
+import com.example.venu.features.explore.model.PlaceUi
 
 data class ExploreUiState(
     val query: String = "",
