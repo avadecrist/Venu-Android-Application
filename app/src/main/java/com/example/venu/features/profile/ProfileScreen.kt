@@ -268,7 +268,7 @@ private fun SettingsLikeCard(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, VenuColors.Border)
     ) {
         content()

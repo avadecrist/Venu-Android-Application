@@ -1,34 +1,50 @@
 package com.example.venu
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.*
-import com.example.venu.features.profile.menu.SettingsScreen
-import com.example.venu.features.explore.ExploreRoute
-import com.example.venu.features.home.HomeRoute
-import com.example.venu.features.lists.ListsRoute
-import com.example.venu.features.profile.ProfileRoute
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.venu.features.explore.ExploreRoute
+import com.example.venu.features.home.HomeRoute
+import com.example.venu.features.lists.ListsRoute
+import com.example.venu.features.profile.ProfileRoute
 import com.example.venu.features.profile.menu.MyReviewsScreen
+import com.example.venu.features.profile.menu.SettingsScreen
 
 @Composable
-fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick: () -> Unit) {
+fun AppScaffold(
+    isSignedIn: Boolean,
+    isDarkMode: Boolean,
+    onDarkModeChange: (Boolean) -> Unit,
+    onSignInClick: () -> Unit,
+    onSignOutClick: () -> Unit
+) {
     val navController = rememberNavController()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -50,19 +66,23 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick:
         return fineGranted || coarseGranted
     }
 
-    var hasLocationPermission by rememberSaveable { mutableStateOf(hasLocationPermissionNow()) }
-    var askedForLocationPermission by rememberSaveable { mutableStateOf(false) }
+    var hasLocationPermission by rememberSaveable {
+        mutableStateOf(hasLocationPermissionNow())
+    }
+
+    var askedForLocationPermission by rememberSaveable {
+        mutableStateOf(false)
+    }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
         hasLocationPermission =
-            (result[Manifest.permission.ACCESS_FINE_LOCATION] == true) ||
-                    (result[Manifest.permission.ACCESS_COARSE_LOCATION] == true)
+            result[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    result[Manifest.permission.ACCESS_COARSE_LOCATION] == true
     }
 
     LaunchedEffect(Unit) {
-        // Request once automatically; do not spam on recomposition, and don't run in Preview.
         if (!isInspection && !askedForLocationPermission && !hasLocationPermission) {
             askedForLocationPermission = true
             locationPermissionLauncher.launch(
@@ -73,6 +93,7 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick:
             )
         }
     }
+
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -80,52 +101,80 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick:
                     selected = currentRoute == "home",
                     onClick = {
                         navController.navigate("home") {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
                             launchSingleTop = true
                             restoreState = true
                         }
                     },
                     label = { Text("Home") },
-                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") }
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Home,
+                            contentDescription = "Home"
+                        )
+                    }
                 )
 
                 NavigationBarItem(
                     selected = currentRoute == "explore",
                     onClick = {
                         navController.navigate("explore") {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
                             launchSingleTop = true
                             restoreState = true
                         }
                     },
                     label = { Text("Explore") },
-                    icon = { Icon(Icons.Filled.Search, contentDescription = "Search") }
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "Search"
+                        )
+                    }
                 )
 
                 NavigationBarItem(
                     selected = currentRoute == "lists",
                     onClick = {
                         navController.navigate("lists") {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
                             launchSingleTop = true
                             restoreState = true
                         }
                     },
                     label = { Text("Lists") },
-                    icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Profile") }
+                    icon = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.List,
+                            contentDescription = "Lists"
+                        )
+                    }
                 )
 
                 NavigationBarItem(
                     selected = currentRoute == "profile",
                     onClick = {
                         navController.navigate("profile") {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
                             launchSingleTop = true
                             restoreState = true
                         }
                     },
                     label = { Text("Profile") },
-                    icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") }
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "Profile"
+                        )
+                    }
                 )
             }
         }
@@ -135,9 +184,20 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick:
             startDestination = "home",
             modifier = Modifier.padding(padding)
         ) {
-            composable("home") { HomeRoute() }
-            composable("explore") { ExploreRoute(hasLocationPermission = hasLocationPermission) }
-            composable("lists") { ListsRoute() }
+            composable("home") {
+                HomeRoute()
+            }
+
+            composable("explore") {
+                ExploreRoute(
+                    hasLocationPermission = hasLocationPermission
+                )
+            }
+
+            composable("lists") {
+                ListsRoute()
+            }
+
             composable("profile") {
                 ProfileRoute(
                     isSignedIn = isSignedIn,
@@ -150,16 +210,23 @@ fun AppScaffold(isSignedIn : Boolean, onSignInClick: () -> Unit, onSignOutClick:
                     }
                 )
             }
+
             composable("settings") {
                 SettingsScreen(
-                    onBackClick = { navController.popBackStack() },
+                    isDarkMode = isDarkMode,
+                    onDarkModeChange = onDarkModeChange,
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
                     onSignOutClick = onSignOutClick
                 )
             }
 
             composable("my_reviews") {
                 MyReviewsScreen(
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
                 )
             }
         }
