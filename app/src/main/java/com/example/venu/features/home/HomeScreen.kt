@@ -19,6 +19,7 @@ import com.example.venu.core.core_presentation.toEventDetailsUi
 import com.example.venu.features.home.model.HomeAction
 import com.example.venu.features.home.model.HomeUiState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import kotlinx.coroutines.launch
 
@@ -34,6 +35,7 @@ fun HomeScreen(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     Column(
@@ -145,12 +147,18 @@ fun HomeScreen(
                 onBack = {
                     scope.launch {
                         sheetState.hide()
-                        onAction(HomeAction.DismissSaveSheet)
-//                        selectedEvent = null
+                        selectedEventDetails = null
                     }
                 },
                 onSaveClick = { onAction(HomeAction.SaveClicked(event.id)) },
-                onGetDirectionsClick = { /* TODO */ },
+                onGetDirectionsClick = {
+                    scope.launch {
+                        sheetState.hide()
+                        selectedEventDetails = null
+
+
+                    }
+                },
                 onSubmitReview = { _, _ -> }
             )
         }
@@ -178,7 +186,8 @@ fun FeaturedCard(
 private fun VenueCard(
     name: String,
     details: String,
-    onClick: () -> Unit) {
+    onClick: () -> Unit
+) {
     BaseEventCard(
         modifier = Modifier
             .fillMaxWidth()

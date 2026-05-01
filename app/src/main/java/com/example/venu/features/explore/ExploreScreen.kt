@@ -58,6 +58,18 @@ import com.example.venu.core.core_domain.model.label
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import kotlinx.coroutines.launch
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.util.Log
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat
+import androidx.compose.ui.platform.LocalContext
 
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
@@ -87,7 +99,63 @@ fun ExploreScreen(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
+
     val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+
+    var userLocation by remember {
+        mutableStateOf<Location?>(null)
+    }
+
+    val locationManager = remember {
+        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    }
+
+    DisposableEffect(hasLocationPermission) {
+        if (!hasLocationPermission) {
+            userLocation = null
+            return@DisposableEffect onDispose {}
+        }
+
+        val hasFinePermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val hasCoarsePermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!hasFinePermission && !hasCoarsePermission) {
+            userLocation = null
+            return@DisposableEffect onDispose {}
+        }
+
+        val provider = LocationManager.GPS_PROVIDER
+
+        val listener = android.location.LocationListener { location ->
+            userLocation = location
+        }
+
+        try {
+            userLocation = locationManager.getLastKnownLocation(provider)
+
+            locationManager.requestLocationUpdates(
+                provider,
+                5000L,
+                10f,
+                listener
+            )
+        } catch (_: SecurityException) {
+            userLocation = null
+        }
+
+        onDispose {
+            locationManager.removeUpdates(listener)
+        }
+    }
 
     val displayedPlaces = remember(
         state.places,
@@ -215,8 +283,27 @@ fun ExploreScreen(
                     onAction(ExploreAction.SaveClicked(selectedEventDetails.id))
                 },
                 onGetDirectionsClick = {
+                    val location = userLocation ?: return@EventDetailsSheet
+
+                    Log.d("DirectionsDebug", "userLocation = $location")
+                    Log.d("DirectionsDebug", "selectedEventDetails = $selectedEventDetails")
+
+                    if (location == null) {
+                        Log.d("DirectionsDebug", "No user location yet")
+                        return@EventDetailsSheet
+                    }
+
+
                     scope.launch {
                         sheetState.hide()
+
+                        onAction(
+                            ExploreAction.GetDirectionsClicked(
+                                event = selectedEventDetails,
+                                userLat = location.latitude,
+                                userLng = location.longitude
+                            )
+                        )
                     }
                 },
                 onSubmitReview = { _, _ -> }
@@ -240,6 +327,7 @@ private fun ExploreMapContent(
             modifier = Modifier.fillMaxSize(),
             places = displayedPlaces,
             selectedPlaceId = state.selectedPlaceId,
+            directionsRoute = state.directionsRoute,
             onMarkerSelected = { id ->
                 onAction(ExploreAction.PlaceClicked(id))
             }
