@@ -6,7 +6,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -30,17 +29,12 @@ fun HomeScreen(
     state: HomeUiState,
     onAction: (HomeAction) -> Unit
 ) {
-    var selectedEvent by remember { mutableStateOf<EventDetailsUi?>(null) }
+    var selectedEventDetails by remember { mutableStateOf<EventDetailsUi?>(null) }
 
-    var showDirectionsButton by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
     val scope = rememberCoroutineScope()
-
-    LaunchedEffect(selectedEvent?.id) {
-        showDirectionsButton = false
-    }
 
     Column(
         modifier = Modifier
@@ -80,7 +74,7 @@ fun HomeScreen(
                 FeaturedCard(
                     title = venue.title,
                     subtitle = venue.subtitle,
-                    onClick = { selectedEvent = venue.toEventDetailsUi() }
+                    onClick = { selectedEventDetails = venue.toEventDetailsUi() }
                 )
             }
         }
@@ -111,7 +105,7 @@ fun HomeScreen(
                         append(it)
                     }
                 },
-                onClick = { selectedEvent = venue.toEventDetailsUi() }
+                onClick = { selectedEventDetails = venue.toEventDetailsUi() }
             )
         }
 
@@ -136,19 +130,18 @@ fun HomeScreen(
         )
     }
 
-    selectedEvent?.let { event ->
+    selectedEventDetails?.let { event ->
         ModalBottomSheet(
             sheetState = sheetState,
             onDismissRequest = {
                 scope.launch {
                     sheetState.hide()
-                    selectedEvent = null
+                    selectedEventDetails = null
                 }
             }
         ) {
             EventDetailsSheet(
                 event = event,
-                showDirectionsButton = showDirectionsButton,
                 onBack = {
                     scope.launch {
                         sheetState.hide()
@@ -157,13 +150,6 @@ fun HomeScreen(
                     }
                 },
                 onSaveClick = { onAction(HomeAction.SaveClicked(event.id)) },
-                onViewOnMapClick = {
-                    showDirectionsButton = true
-
-                    scope.launch {
-                        sheetState.partialExpand()
-                    }
-                },
                 onGetDirectionsClick = { /* TODO */ },
                 onSubmitReview = { _, _ -> }
             )

@@ -57,6 +57,11 @@ class HomeViewModel : ViewModel() {
                 loadHome() // or applyFilters()
             }
 
+            is HomeAction.ViewOnMapClicked -> {
+                // trigger navigation event (StateFlow / Channel)
+
+            }
+
             is HomeAction.DismissSaveSheet -> {
                 uiState = uiState.copy(
                     showSaveSheet = false,

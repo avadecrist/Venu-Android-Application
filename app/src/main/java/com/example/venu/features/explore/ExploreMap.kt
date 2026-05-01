@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.example.venu.features.explore.model.PlaceUi
+import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -32,7 +34,7 @@ fun ExploreMap(
         cameraPositionState.animate(
             update = CameraUpdateFactory.newLatLngZoom(
                 LatLng(selected.latitude, selected.longitude),
-                14f
+                16f
             )
         )
     }
@@ -42,10 +44,26 @@ fun ExploreMap(
         cameraPositionState = cameraPositionState
     ) {
         places.forEach { place ->
+//            Marker(
+//                state = MarkerState(position = LatLng(place.latitude, place.longitude)),
+//                title = place.name,
+//                snippet = place.subtitle,
+//                onClick = {
+//                    onMarkerSelected(place.id)
+//                    false
+//                }
+//            )
             Marker(
                 state = MarkerState(position = LatLng(place.latitude, place.longitude)),
                 title = place.name,
                 snippet = place.subtitle,
+                icon = BitmapDescriptorFactory.defaultMarker(
+                    if (place.id == selectedPlaceId) {
+                        BitmapDescriptorFactory.HUE_AZURE
+                    } else {
+                        BitmapDescriptorFactory.HUE_RED
+                    }
+                ),
                 onClick = {
                     onMarkerSelected(place.id)
                     false

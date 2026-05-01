@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
@@ -41,7 +40,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,11 +48,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.PlaceUi
-import com.example.venu.features.lists.tabLabel
 import com.example.venu.core.core_common.eventdetails.EventDetailsSheet
 import com.example.venu.core.core_presentation.toEventDetailsUi
 import com.example.venu.core.core_domain.model.Genre
@@ -87,7 +83,6 @@ fun ExploreScreen(
     var verifiedOnly by remember { mutableStateOf(false) }
     var savedOnly by remember { mutableStateOf(false) }
     var sortOption by remember { mutableStateOf(ExploreSortOption.FEATURED) }
-    var showDirectionsButton by remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
@@ -129,10 +124,6 @@ fun ExploreScreen(
         bottomSheetState = bottomSheetState
     )
 
-    LaunchedEffect(selectedEventDetails?.id) {
-        showDirectionsButton = false
-    }
-
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         modifier = Modifier.fillMaxSize(),
@@ -144,7 +135,10 @@ fun ExploreScreen(
                 places = displayedPlaces,
                 selectedPlaceId = state.selectedPlaceId,
                 onPlaceClicked = { id ->
-                    onAction(ExploreAction.PlaceClicked(id))
+                    scope.launch {
+                        onAction(ExploreAction.PlaceClicked(id))
+                        bottomSheetState.partialExpand()
+                    }
                 },
                 onSaveClick = { id ->
                     onAction(ExploreAction.SaveClicked(id))
@@ -211,7 +205,6 @@ fun ExploreScreen(
         ) {
             EventDetailsSheet(
                 event = selectedEventDetails,
-                showDirectionsButton = showDirectionsButton,
                 onBack = {
                     scope.launch {
                         sheetState.hide()
@@ -221,15 +214,11 @@ fun ExploreScreen(
                 onSaveClick = {
                     onAction(ExploreAction.SaveClicked(selectedEventDetails.id))
                 },
-                onViewOnMapClick = {
-                    showDirectionsButton = true
-
+                onGetDirectionsClick = {
                     scope.launch {
-                        bottomSheetState.partialExpand()
-                        sheetState.partialExpand()
+                        sheetState.hide()
                     }
                 },
-                onGetDirectionsClick = { /* TODO: open Google Maps directions */ },
                 onSubmitReview = { _, _ -> }
             )
         }

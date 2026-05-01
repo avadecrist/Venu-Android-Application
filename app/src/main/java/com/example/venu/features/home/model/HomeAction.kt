@@ -9,5 +9,6 @@ sealed interface HomeAction {
 
     data class SaveToList(val listType: ListType, val eventId: String) : HomeAction
 
+    data class ViewOnMapClicked(val eventId: String) : HomeAction
     object DismissSaveSheet : HomeAction
 }
