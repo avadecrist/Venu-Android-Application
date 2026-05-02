@@ -38,15 +38,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.features.profile.model.ProfileUiState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 
 @Composable
 fun ProfileScreen(
     state: ProfileUiState,
     onSignInClick: () -> Unit,
-    onEditProfileClick: () -> Unit = {},
+    onEditProfileSave: (String) -> Unit = {},
     onMyReviewsClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
+    var showEditProfileDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,7 +68,9 @@ fun ProfileScreen(
         ProfileHeader(
             state = state,
             onSignInClick = onSignInClick,
-            onEditProfileClick = onEditProfileClick
+            onEditProfileClick = {
+                showEditProfileDialog = true
+            }
         )
 
         if (state.isSignedIn) {
@@ -73,8 +86,83 @@ fun ProfileScreen(
             onSettingsClick = onSettingsClick
         )
     }
+
+    if (showEditProfileDialog) {
+        EditProfileDialog(
+            currentDisplayName = state.displayName,
+            onDismiss = {
+                showEditProfileDialog = false
+            },
+            onSave = { newDisplayName ->
+                onEditProfileSave(newDisplayName)
+                showEditProfileDialog = false
+            }
+        )
+    }
 }
 
+@Composable
+private fun EditProfileDialog(
+    currentDisplayName: String,
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    var displayName by rememberSaveable(currentDisplayName) {
+        mutableStateOf(currentDisplayName)
+    }
+
+    val trimmedDisplayName = displayName.trim()
+    val canSave = trimmedDisplayName.isNotEmpty()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Edit Profile",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = "Update your display name or nickname.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = VenuColors.TextSecondary
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = displayName,
+                    onValueChange = {
+                        displayName = it
+                    },
+                    label = {
+                        Text("Display name")
+                    },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = canSave,
+                onClick = {
+                    onSave(trimmedDisplayName)
+                }
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
 @Composable
 private fun ProfileHeader(
     state: ProfileUiState,
