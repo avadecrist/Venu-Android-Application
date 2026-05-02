@@ -96,4 +96,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.8.4") // Room core
     implementation("androidx.room:room-ktx:2.8.4") // Kotlin extensions (coroutines support)
     ksp("androidx.room:room-compiler:2.8.4") // Annotation processor (REQUIRED)
+
+    implementation("com.google.android.libraries.places:places:4.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 }

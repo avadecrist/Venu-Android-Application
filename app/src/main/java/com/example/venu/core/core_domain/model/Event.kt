@@ -16,7 +16,7 @@ data class Event(
 
     // Google Places bridge fields
     val googlePlaceId: String? = null,
-    val venueAddress: String? = null,
+    val googlePlaceAddress: String? = null,
 
     val latitude: Double,
     val longitude: Double,

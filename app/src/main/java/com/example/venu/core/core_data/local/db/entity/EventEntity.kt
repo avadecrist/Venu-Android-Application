@@ -12,13 +12,12 @@ data class EventEntity(
     val genre: String,
 
     val locationName: String,
+    val latitude: Double,
+    val longitude: Double,
 
     // Google Places bridge fields
     val googlePlaceId: String?,
-    val venueAddress: String?,
-
-    val latitude: Double,
-    val longitude: Double,
+    val googlePlaceAddress: String?,
 
     val distanceKm: Double?,
 
