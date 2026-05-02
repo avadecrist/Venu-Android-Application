@@ -19,6 +19,8 @@ fun ExploreRoute(
         state = viewModel.uiState,
         onAction = viewModel::onAction,
         onDismissSaveSheet = viewModel::dismissSaveSheet,
-        hasLocationPermission = hasLocationPermission
+        hasLocationPermission = hasLocationPermission,
+        onCreateDebugEvent = viewModel::createDebugUserEvent
+
     )
 }

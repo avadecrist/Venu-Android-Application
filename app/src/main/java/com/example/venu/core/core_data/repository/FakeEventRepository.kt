@@ -7,7 +7,7 @@ import com.example.venu.core.core_domain.repository.EventRepository
 
 class FakeEventRepository : EventRepository {
 
-     private val events = FakeSeed.events
+    private val events = FakeSeed.events.toMutableList()
 
     override suspend fun getTrendingEvents(): List<Event> {
         return events
@@ -67,5 +67,9 @@ class FakeEventRepository : EventRepository {
 
     override suspend fun getEventById(id: String): Event? {
         return events.find { it.id == id }
+    }
+
+    override suspend fun createEvent(event: Event) {
+        events.add(event)
     }
 }

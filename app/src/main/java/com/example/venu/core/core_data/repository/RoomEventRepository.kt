@@ -70,4 +70,11 @@ class RoomEventRepository(
     override suspend fun getEventById(id: String): Event? {
         return eventDao.getEventById(id)?.toDomain()
     }
+
+    override suspend fun createEvent(event: Event) {
+        eventDao.insertEvent(event.toEntity())
+
+        val countAfterInsert = eventDao.getCount()
+        println("VENU DATA DEBUG: Created real/user event. Room events now = $countAfterInsert")
+    }
 }

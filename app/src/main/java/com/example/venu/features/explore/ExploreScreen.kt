@@ -81,7 +81,8 @@ fun ExploreScreen(
     state: ExploreUiState,
     onAction: (ExploreAction) -> Unit,
     onDismissSaveSheet: () -> Unit,
-    hasLocationPermission: Boolean
+    hasLocationPermission: Boolean,
+    onCreateDebugEvent: () -> Unit
 ) {
     var showFilterSortDialog by remember { mutableStateOf(false) }
     var selectedGenres by remember { mutableStateOf(setOf<Genre>()) }
@@ -156,6 +157,7 @@ fun ExploreScreen(
             hasLocationPermission = hasLocationPermission,
             onAction = onAction,
             onOpenFilterSort = { showFilterSortDialog = true },
+            onCreateDebugEvent = onCreateDebugEvent,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
@@ -231,6 +233,7 @@ private fun ExploreMapContent(
     hasLocationPermission: Boolean,
     onAction: (ExploreAction) -> Unit,
     onOpenFilterSort: () -> Unit,
+    onCreateDebugEvent: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var zoomRequest by remember { mutableStateOf(0) }
@@ -251,6 +254,7 @@ private fun ExploreMapContent(
             query = state.query,
             onQueryChange = { onAction(ExploreAction.QueryChanged(it)) },
             onOpenFilterSort = onOpenFilterSort,
+            onCreateDebugEvent = onCreateDebugEvent,
             onZoomIn = {
                 zoomDelta = 1f
                 zoomRequest += 1
@@ -274,6 +278,7 @@ private fun ExploreTopControls(
     query: String,
     onQueryChange: (String) -> Unit,
     onOpenFilterSort: () -> Unit,
+    onCreateDebugEvent: () -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     activeFilterCount: Int,
@@ -298,6 +303,11 @@ private fun ExploreTopControls(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                TextButton(
+                    onClick = onCreateDebugEvent
+                ) {
+                    Text("Add Debug")
+                }
                 FilledTonalIconButton(onClick = onZoomOut) {
                     Icon(
                         imageVector = Icons.Default.Remove,
@@ -612,6 +622,7 @@ private fun ExploreScreenPreview() {
         state = ExploreUiState(),
         onAction = {},
         onDismissSaveSheet = {},
-        hasLocationPermission = false
+        hasLocationPermission = false,
+        onCreateDebugEvent = {}
     )
 }

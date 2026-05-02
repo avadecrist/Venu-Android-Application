@@ -14,6 +14,9 @@ import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.PlaceUi
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import com.example.venu.core.core_domain.model.Genre
+import com.example.venu.core.core_domain.model.PriceTier
+import java.util.UUID
 
 class ExploreViewModel(
     private val eventRepository: EventRepository = AppGraph.eventRepo,
@@ -102,6 +105,35 @@ class ExploreViewModel(
         )
     }
 
+    fun createDebugUserEvent() {
+        viewModelScope.launch {
+            val event = Event(
+                id = UUID.randomUUID().toString(),
+                name = "Debug User Event",
+                subtitle = "Created from repository write path",
+                genre = Genre.STUDY,
+                locationName = "UC3M Leganés",
+                latitude = 40.3318,
+                longitude = -3.7676,
+                distanceKm = null,
+                priceTier = PriceTier.FREE,
+                startTimeLabel = "Today",
+                imageUrl = null,
+                credibilityScore = 0,
+                reviewCount = 0,
+                isVerifiedVenue = false,
+                averageRating = 0.0
+            )
+
+            eventRepository.createEvent(event)
+
+            events = eventRepository.getTrendingEvents()
+            uiState = uiState.copy(
+                places = buildPlaces(),
+                availableLists = listsRepository.getAllLists()
+            )
+        }
+    }
     private fun buildPlaces(): List<PlaceUi> {
         return events.map { it.toPlaceUi(listsRepository) }
     }
