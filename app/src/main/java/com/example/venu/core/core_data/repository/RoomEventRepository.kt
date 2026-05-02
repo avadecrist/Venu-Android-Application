@@ -13,15 +13,19 @@ class RoomEventRepository(
 ) : EventRepository {
 
     suspend fun seedIfEmpty() {
-        if (eventDao.getCount() == 0) {
+        val countBefore = eventDao.getCount()
+
+        if (countBefore == 0) {
             val seedEvents = FakeSeed.events.map { it.toEntity() }
             eventDao.insertEvents(seedEvents)
+
+            println("VENU DATA DEBUG: Seeded ${seedEvents.size} fake events into Room.")
         } else {
-            println("Skipping seed — already populated")
+            println("VENU DATA DEBUG: Skipping seed. Room already has $countBefore events.")
         }
-        // log to confirm Room is being used
+
         val countAfter = eventDao.getCount()
-        println("Room event AFTER seed: $countAfter")
+        println("VENU DATA DEBUG: Room events after seed check = $countAfter")
     }
 
     // Use for development only

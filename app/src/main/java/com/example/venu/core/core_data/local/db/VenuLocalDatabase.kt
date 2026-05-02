@@ -15,7 +15,7 @@ import com.example.venu.core.core_data.local.db.entity.EventEntity
  */
 @Database(
     entities = [EventEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class VenuLocalDatabase : RoomDatabase() {
@@ -32,7 +32,11 @@ abstract class VenuLocalDatabase : RoomDatabase() {
                     context.applicationContext,
                     VenuLocalDatabase::class.java,
                     "venu_local_database"
-                ).build()
+                )
+                    // Development-only shortcut.
+                    // This clears/rebuilds the local DB when the schema changes.
+                    .fallbackToDestructiveMigration()
+                    .build()
 
                 INSTANCE = instance
                 instance
