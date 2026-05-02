@@ -64,6 +64,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.navigation:navigation-compose:2.7.7") // Added this navigation dep.
     implementation("androidx.compose.material:material-icons-extended") // For bookmark icon
+
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
     // TODO: Add the dependencies for Firebase products you want to use
@@ -72,6 +73,13 @@ dependencies {
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
     // Maps SDK (Play services)
+    // Google Sign-In via Android Credential Manager
+    implementation("androidx.credentials:credentials:1.6.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.2.0")
+    // Firebase Auth
+    implementation("com.google.firebase:firebase-auth")
+
     implementation("com.google.android.gms:play-services-maps:20.0.0")
     // Maps Compose UI
     implementation("com.google.maps.android:maps-compose:6.12.0")
