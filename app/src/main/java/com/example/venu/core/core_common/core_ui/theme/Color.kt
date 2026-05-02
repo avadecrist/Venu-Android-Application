@@ -12,8 +12,8 @@ val Pink40 = Color(0xFF7D5260)
 
 object VenuColors {
     val Background = Color(0xFFFFFFFF)
-    val SurfaceMuted = Color(0xFFF5F5F7)
-    val Border = Color(0xFFE7E7EC)
+    val SurfaceMuted = Color(0xFFFAFAF2)
+    val Border = Color(0xFFF9EEE2)
     val BorderDark = Color(0xFFCFCFD7)
     val Handle = Color(0xFFE6E6EA)
 
@@ -37,4 +37,18 @@ object VenuColors {
 
     val Star = Color(0xFFF5A623)
     val AvatarBg = Color(0xFFEAEFFD)
+
+    val CardShadow = Color(0x0A000000)
+    val Divider = Color(0xFFEDEDED)
+    val Pressed = Color(0x143B82F6)
+
+    // Genre colors
+    val GenreFood = Color(0xFFF97316)
+    val GenreStudy = Color(0xFF60A5FA)
+    val GenreMusic = Color(0xFFA855F7)
+    val GenreSports = Color(0xFF2DD4BF)
+    val GenreMuseums = Color(0xFFF472B6)
+    val GenreCoffee = Color(0xFF92400E)
+    val GenreNightlife = Color(0xFFEF4444)
+    val GenreOutdoors = Color(0xFFEAB308)
 }

@@ -27,6 +27,7 @@ suspend fun Event.toHomeVenueUi(
         distanceLabel = distanceKm?.let {
             "${it.roundTo1Decimal()} km"
         },
+        genre = genre,
         isSaved = listsRepo.isInList(ListType.WantToGo, id)
     )
 }

@@ -1,7 +1,6 @@
 package com.example.venu.core.core_presentation
 
 import com.example.venu.core.core_domain.model.CrowdLevel
-import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.features.explore.model.PlaceUi
 import com.example.venu.features.home.model.HomeVenueUi
 
@@ -54,7 +53,7 @@ fun HomeVenueUi.toEventDetailsUi(): EventDetailsUi {
         isSaved = isSaved,
 
         // Temporary defaults until HomeVenueUi has richer data
-        genre = Genre.FOOD,
+        genre = genre,
         startTimeLabel = "Today",
         priceText = "$$",
         isVerifiedVenue = false,

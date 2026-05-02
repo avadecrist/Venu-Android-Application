@@ -1,5 +1,7 @@
 package com.example.venu.features.home.model
 
+import com.example.venu.core.core_domain.model.Genre
+
 data class HomeVenueUi(
     val id: String,
     val title: String,
@@ -10,5 +12,6 @@ data class HomeVenueUi(
 
     val ratingLabel: String? = null,
     val distanceLabel: String? = null,
-    val isSaved: Boolean = false
+    val isSaved: Boolean = false,
+    val genre: Genre,
 )

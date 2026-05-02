@@ -8,9 +8,10 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-import com.example.venu.core.core_common.core_ui.theme.VenuColors
+
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -18,8 +19,8 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = Pink80
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
+/*private val LightColorScheme = lightColorScheme(
+    primary = VenuColors.AccentBlue,
     secondary = PurpleGrey40,
     tertiary = Pink40,
     background = VenuColors.Background,
@@ -33,13 +34,49 @@ private val LightColorScheme = lightColorScheme(
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
+)*/
+private val LightColorScheme = lightColorScheme(
+
+    // PRIMARY (main actions: buttons, highlights)
+    primary = VenuColors.AccentBlue,
+    onPrimary = Color.White,
+
+    primaryContainer = VenuColors.AccentBlueBorder,
+    onPrimaryContainer = VenuColors.TextPrimary,
+
+    // SECONDARY (chips / softer accents)
+    secondary = VenuColors.GenreChipBg,
+    onSecondary = VenuColors.GenreChipText,
+
+    // TERTIARY (optional accent — keep subtle)
+    tertiary = VenuColors.AvatarBg,
+    onTertiary = VenuColors.TextPrimary,
+
+    // BACKGROUNDS
+    background = VenuColors.Background,
+    onBackground = VenuColors.TextPrimary,
+
+    surface = VenuColors.Background,
+    onSurface = VenuColors.TextPrimary,
+
+    surfaceVariant = VenuColors.SurfaceMuted,
+    onSurfaceVariant = VenuColors.TextSecondary,
+
+    // BORDERS / DIVIDERS
+    outline = VenuColors.Border,
+    outlineVariant = VenuColors.BorderDark,
+
+    // EXTRA (nice to have)
+    inverseSurface = VenuColors.TextPrimary,
+    inverseOnSurface = VenuColors.Background
+
 )
 
 @Composable
 fun VenuTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

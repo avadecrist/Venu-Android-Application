@@ -46,16 +46,7 @@ fun ExploreMap(
     modifier: Modifier = Modifier,
     places: List<PlaceUi>,
     selectedPlaceId: String?,
-//<<<<<<< HEAD
     directionsRoute: DirectionsRoute?,
-//    onMarkerSelected: (String) -> Unit
-//) {
-//    Log.d("DirectionsDebug", "ExploreMap route = $directionsRoute")
-//
-//    val defaultCenter = places.firstOrNull()?.let {
-//        LatLng(it.latitude, it.longitude)
-//    } ?: LatLng(40.4168, -3.7038)
-//=======
     hasLocationPermission: Boolean,
     zoomRequest: Int,
     zoomDelta: Float,
@@ -201,7 +192,7 @@ fun DrawRoute(route: DirectionsRoute) {
 
     Polyline(
         points = pathPoints,
-        width = 8f
+        width = 10f
     )
 }
 
