@@ -11,4 +11,6 @@ interface EventRepository {
     suspend fun searchEvents(query: String, categories: Set<Genre> = emptySet()): List<Event>
 
     suspend fun getEventById(id: String): Event?
+
+    suspend fun createEvent(event: Event)
 }
