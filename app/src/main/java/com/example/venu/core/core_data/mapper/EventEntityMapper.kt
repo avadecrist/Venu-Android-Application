@@ -13,6 +13,8 @@ fun Event.toEntity(): EventEntity {
         subtitle = subtitle,
         genre = genre.name,
         locationName = locationName,
+        googlePlaceId = googlePlaceId,
+        venueAddress = venueAddress,
         latitude = latitude,
         longitude = longitude,
         distanceKm = distanceKm,
@@ -23,8 +25,6 @@ fun Event.toEntity(): EventEntity {
         reviewCount = reviewCount,
         isVerifiedVenue = isVerifiedVenue,
         averageRating = averageRating,
-//        attendeeCount = attendeeCount,
-//        crowdLevel = crowdLevel.name,
     )
 }
 
@@ -35,6 +35,8 @@ fun EventEntity.toDomain(): Event {
         subtitle = subtitle,
         genre = Genre.valueOf(genre),
         locationName = locationName,
+        googlePlaceId = googlePlaceId,
+        venueAddress = venueAddress,
         latitude = latitude,
         longitude = longitude,
         distanceKm = distanceKm,
@@ -45,8 +47,9 @@ fun EventEntity.toDomain(): Event {
         reviewCount = reviewCount,
         isVerifiedVenue = isVerifiedVenue,
         averageRating = averageRating,
-        // temp fixed values
+
+        // Still temporary until attendee/crowd data is added to Room
         attendeeCount = 0,
-        crowdLevel = CrowdLevel.UNKNOWN // CrowdLevel.valueOf(crowdLevel),
+        crowdLevel = CrowdLevel.UNKNOWN
     )
 }
