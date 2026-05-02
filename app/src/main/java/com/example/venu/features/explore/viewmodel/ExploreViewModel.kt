@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.PriceTier
 import java.util.UUID
+import com.example.venu.features.explore.mappers.toUserCreatedEvent
+import com.example.venu.features.explore.model.GooglePlaceEventDraft
 
 class ExploreViewModel(
     private val eventRepository: EventRepository = AppGraph.eventRepo,
@@ -105,6 +107,21 @@ class ExploreViewModel(
         )
     }
 
+    fun createUserEventFromGooglePlace(draft: GooglePlaceEventDraft) {
+        viewModelScope.launch {
+            val newEvent = draft.toUserCreatedEvent()
+
+            eventRepository.createEvent(newEvent)
+
+            events = eventRepository.getTrendingEvents()
+
+            uiState = uiState.copy(
+                places = buildPlaces(),
+                availableLists = listsRepository.getAllLists(),
+                selectedPlaceId = newEvent.id
+            )
+        }
+    }
     fun createDebugUserEvent() {
         viewModelScope.launch {
             val event = Event(
