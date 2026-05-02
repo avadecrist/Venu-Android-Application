@@ -7,6 +7,7 @@ import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_data.repository.FakeEventRepository
 import com.example.venu.core.core_data.repository.InMemoryListsRepository
 import com.example.venu.features.explore.viewmodel.ExploreViewModel
+import com.example.venu.features.explore.model.GooglePlaceEventDraft
 
 @Composable
 fun ExploreRoute(
@@ -20,7 +21,6 @@ fun ExploreRoute(
         onAction = viewModel::onAction,
         onDismissSaveSheet = viewModel::dismissSaveSheet,
         hasLocationPermission = hasLocationPermission,
-        onCreateDebugEvent = viewModel::createDebugUserEvent
-
+        onCreateGooglePlaceEvent = viewModel::createUserEventFromGooglePlace
     )
 }

@@ -63,7 +63,8 @@ import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-
+import com.example.venu.core.core_domain.model.PriceTier
+import com.example.venu.features.explore.model.GooglePlaceEventDraft
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
 
@@ -82,7 +83,7 @@ fun ExploreScreen(
     onAction: (ExploreAction) -> Unit,
     onDismissSaveSheet: () -> Unit,
     hasLocationPermission: Boolean,
-    onCreateDebugEvent: () -> Unit
+    onCreateGooglePlaceEvent: (GooglePlaceEventDraft) -> Unit
 ) {
     var showFilterSortDialog by remember { mutableStateOf(false) }
     var selectedGenres by remember { mutableStateOf(setOf<Genre>()) }
@@ -149,19 +150,49 @@ fun ExploreScreen(
             )
         }
     ) { innerPadding ->
-        ExploreMapContent(
-            state = state,
-            displayedPlaces = displayedPlaces,
-            activeFilterCount = activeFilterCount,
-            sortOption = sortOption,
-            hasLocationPermission = hasLocationPermission,
-            onAction = onAction,
-            onOpenFilterSort = { showFilterSortDialog = true },
-            onCreateDebugEvent = onCreateDebugEvent,
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        )
+        ) {
+            ExploreMapContent(
+                state = state,
+                displayedPlaces = displayedPlaces,
+                activeFilterCount = activeFilterCount,
+                sortOption = sortOption,
+                hasLocationPermission = hasLocationPermission,
+                onAction = onAction,
+                onOpenFilterSort = { showFilterSortDialog = true },
+                modifier = Modifier.fillMaxSize()
+            )
+
+            TextButton(
+                onClick = {
+                    onCreateGooglePlaceEvent(
+                        GooglePlaceEventDraft(
+                            eventName = "User-created Google Place Event",
+                            eventSubtitle = "Created from Google Places-backed venue data",
+                            genre = Genre.MUSIC,
+                            startTimeLabel = "Tonight",
+
+                            googlePlaceId = "ChIJN1t_tDeuEmsRUsoyG83frY4",
+                            venueName = "Google Place Venue",
+                            venueAddress = "Temporary address from Places API",
+                            latitude = 40.4168,
+                            longitude = -3.7038,
+
+                            imageUrl = null,
+                            priceTier = PriceTier.UNDER_20
+                        )
+                    )
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 140.dp)
+            ) {
+                Text("Create real place event")
+            }
+        }
     }
 
     if (showFilterSortDialog) {
@@ -233,7 +264,7 @@ private fun ExploreMapContent(
     hasLocationPermission: Boolean,
     onAction: (ExploreAction) -> Unit,
     onOpenFilterSort: () -> Unit,
-    onCreateDebugEvent: () -> Unit,
+    //onCreateDebugEvent: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var zoomRequest by remember { mutableStateOf(0) }
@@ -254,7 +285,6 @@ private fun ExploreMapContent(
             query = state.query,
             onQueryChange = { onAction(ExploreAction.QueryChanged(it)) },
             onOpenFilterSort = onOpenFilterSort,
-            onCreateDebugEvent = onCreateDebugEvent,
             onZoomIn = {
                 zoomDelta = 1f
                 zoomRequest += 1
@@ -278,7 +308,6 @@ private fun ExploreTopControls(
     query: String,
     onQueryChange: (String) -> Unit,
     onOpenFilterSort: () -> Unit,
-    onCreateDebugEvent: () -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     activeFilterCount: Int,
@@ -303,11 +332,6 @@ private fun ExploreTopControls(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(
-                    onClick = onCreateDebugEvent
-                ) {
-                    Text("Add Debug")
-                }
                 FilledTonalIconButton(onClick = onZoomOut) {
                     Icon(
                         imageVector = Icons.Default.Remove,
@@ -623,6 +647,6 @@ private fun ExploreScreenPreview() {
         onAction = {},
         onDismissSaveSheet = {},
         hasLocationPermission = false,
-        onCreateDebugEvent = {}
+        onCreateGooglePlaceEvent = {}
     )
 }
