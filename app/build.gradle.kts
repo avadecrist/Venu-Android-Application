@@ -86,6 +86,8 @@ dependencies {
     // For Google Maps
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
+    // For getting the user's current / last known location
+    implementation("com.google.android.gms:play-services-location:21.3.0")
     // For Google Places
     implementation(libs.places)
     // For Google Directions

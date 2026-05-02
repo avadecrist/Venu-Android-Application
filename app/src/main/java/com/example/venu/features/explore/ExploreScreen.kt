@@ -61,6 +61,8 @@ import com.example.venu.core.core_domain.model.label
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
@@ -151,6 +153,7 @@ fun ExploreScreen(
             displayedPlaces = displayedPlaces,
             activeFilterCount = activeFilterCount,
             sortOption = sortOption,
+            hasLocationPermission = hasLocationPermission,
             onAction = onAction,
             onOpenFilterSort = { showFilterSortDialog = true },
             modifier = Modifier
@@ -225,24 +228,37 @@ private fun ExploreMapContent(
     displayedPlaces: List<PlaceUi>,
     activeFilterCount: Int,
     sortOption: ExploreSortOption,
+    hasLocationPermission: Boolean,
     onAction: (ExploreAction) -> Unit,
     onOpenFilterSort: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var zoomRequest by remember { mutableStateOf(0) }
+    var zoomDelta by remember { mutableStateOf(0f) }
+
     Box(modifier = modifier) {
         ExploreMap(
             modifier = Modifier.fillMaxSize(),
             places = displayedPlaces,
             selectedPlaceId = state.selectedPlaceId,
-            onMarkerSelected = { id ->
-                onAction(ExploreAction.PlaceClicked(id))
-            }
+            hasLocationPermission = hasLocationPermission,
+            zoomRequest = zoomRequest,
+            zoomDelta = zoomDelta,
+            onMarkerSelected = { id -> onAction(ExploreAction.PlaceClicked(id)) }
         )
 
         ExploreTopControls(
             query = state.query,
             onQueryChange = { onAction(ExploreAction.QueryChanged(it)) },
             onOpenFilterSort = onOpenFilterSort,
+            onZoomIn = {
+                zoomDelta = 1f
+                zoomRequest += 1
+            },
+            onZoomOut = {
+                zoomDelta = -1f
+                zoomRequest += 1
+            },
             activeFilterCount = activeFilterCount,
             sortOption = sortOption,
             modifier = Modifier
@@ -258,6 +274,8 @@ private fun ExploreTopControls(
     query: String,
     onQueryChange: (String) -> Unit,
     onOpenFilterSort: () -> Unit,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
     activeFilterCount: Int,
     sortOption: ExploreSortOption,
     modifier: Modifier = Modifier
@@ -276,11 +294,30 @@ private fun ExploreTopControls(
                 style = MaterialTheme.typography.headlineLarge
             )
 
-            FilledTonalIconButton(onClick = onOpenFilterSort) {
-                Icon(
-                    imageVector = Icons.Default.FilterList,
-                    contentDescription = "Open filter and sort"
-                )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FilledTonalIconButton(onClick = onZoomOut) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = "Zoom out"
+                    )
+                }
+
+                FilledTonalIconButton(onClick = onZoomIn) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Zoom in"
+                    )
+                }
+
+                FilledTonalIconButton(onClick = onOpenFilterSort) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = "Open filter and sort"
+                    )
+                }
             }
         }
 
