@@ -14,7 +14,7 @@ fun GooglePlaceEventDraft.toUserCreatedEvent(): Event {
 
         locationName = venueName.trim(),
         googlePlaceId = googlePlaceId,
-        venueAddress = venueAddress?.trim(),
+        googlePlaceAddress = googlePlaceAddress?.trim(),
 
         latitude = latitude,
         longitude = longitude,

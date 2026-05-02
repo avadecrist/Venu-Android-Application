@@ -177,7 +177,7 @@ fun ExploreScreen(
 
                             googlePlaceId = "ChIJN1t_tDeuEmsRUsoyG83frY4",
                             venueName = "Google Place Venue",
-                            venueAddress = "Temporary address from Places API",
+                            googlePlaceAddress = "Temporary address from Places API",
                             latitude = 40.4168,
                             longitude = -3.7038,
 

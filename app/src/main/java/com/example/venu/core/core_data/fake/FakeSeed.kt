@@ -26,7 +26,7 @@ object FakeSeed {
             genre = Genre.MUSIC,
             locationName = "Tupperware Club",
             googlePlaceId = "TEMP_PLACE_ID_FOR_NOW",
-            venueAddress = "??",
+            googlePlaceAddress = "??",
             latitude = 40.4251,
             longitude = -3.7047,
             distanceKm = 0.2,

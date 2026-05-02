@@ -18,7 +18,7 @@ data class GooglePlaceEventDraft(
 
     val googlePlaceId: String,
     val venueName: String,
-    val venueAddress: String?,
+    val googlePlaceAddress: String?,
     val latitude: Double,
     val longitude: Double,
 
