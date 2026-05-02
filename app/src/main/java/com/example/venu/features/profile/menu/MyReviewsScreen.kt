@@ -8,20 +8,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.venu.core.core_common.core_ui.components.ReviewCard
+import com.example.venu.core.core_common.core_ui.theme.VenuColors
+import com.example.venu.core.core_presentation.ReviewUi
 
 @Composable
 fun MyReviewsScreen(
@@ -30,110 +30,65 @@ fun MyReviewsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 22.dp, vertical = 22.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(bottom = 18.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBackClick) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.size(44.dp)
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
+                    modifier = Modifier.size(26.dp),
+                    tint = VenuColors.TextPrimary
                 )
             }
 
             Text(
                 text = "My Reviews",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = VenuColors.TextPrimary
             )
         }
 
         Text(
             text = "Your recent reviews",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            color = VenuColors.TextSecondary
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(22.dp))
 
         ReviewCard(
-            venueName = "Blue Bottle Coffee",
-            rating = "5.0",
-            reviewText = "Great coffee and a really nice atmosphere.",
-            dateText = "Apr 19, 2026"
+            review = ReviewUi(
+                authorInitial = "B",
+                authorName = "Blue Bottle Coffee",
+                rating = 5,
+                comment = "Great coffee and a really nice atmosphere.",
+                timeAgo = "Apr 19, 2026",
+                id = "a"
+            )
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         ReviewCard(
-            venueName = "Madison Square Park",
-            rating = "4.0",
-            reviewText = "Nice place to walk around and relax in the afternoon.",
-            dateText = "Apr 12, 2026"
+            review = ReviewUi(
+                authorInitial = "M",
+                authorName = "Madison Square Park",
+                rating = 4,
+                comment = "Nice place to walk around and relax in the afternoon.",
+                timeAgo = "Apr 12, 2026",
+                id = "b"
+            )
         )
-    }
-}
-
-@Composable
-private fun ReviewCard(
-    venueName: String,
-    rating: String,
-    reviewText: String,
-    dateText: String
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        tonalElevation = 2.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = venueName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.size(4.dp))
-
-                Text(
-                    text = rating,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = reviewText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = dateText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
     }
 }
