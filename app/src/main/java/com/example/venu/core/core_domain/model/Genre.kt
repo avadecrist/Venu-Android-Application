@@ -22,3 +22,4 @@ val Genre.label: String
         Genre.NIGHTLIFE -> "Nightlife"
         Genre.OUTDOORS -> "Outdoors"
     }
+

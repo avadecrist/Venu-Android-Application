@@ -27,3 +27,16 @@ fun genreChipText(genre: Genre): String {
         Genre.OUTDOORS -> "🌿 Outdoors"
     }
 }
+
+fun genreEmoji(genre: Genre): String {
+    return when (genre) {
+        Genre.FOOD -> "🍔"
+        Genre.STUDY -> "📚"
+        Genre.MUSIC -> "🎵"
+        Genre.SPORTS -> "🏀"
+        Genre.MUSEUMS -> "🖼️"
+        Genre.COFFEE -> "☕"
+        Genre.NIGHTLIFE -> "🌙"
+        Genre.OUTDOORS -> "🌿"
+    }
+}
