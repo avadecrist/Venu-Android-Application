@@ -6,5 +6,6 @@ data class GooglePlaceResult(
     val address: String?,
     val latitude: Double,
     val longitude: Double,
-    val photoUrl: String? = null
+    val rating: Double?,
+    val photoUrl: String?
 )

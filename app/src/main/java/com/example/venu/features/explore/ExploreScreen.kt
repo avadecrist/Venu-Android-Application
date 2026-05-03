@@ -19,8 +19,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
@@ -30,6 +32,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -44,29 +47,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.venu.core.core_domain.repository.ListType
-import com.example.venu.features.explore.model.ExploreAction
-import com.example.venu.features.explore.model.ExploreUiState
-import com.example.venu.features.explore.model.PlaceUi
-import com.example.venu.features.lists.tabLabel
 import com.example.venu.core.core_common.eventdetails.EventDetailsSheet
-import com.example.venu.core.core_presentation.toEventDetailsUi
+import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.label
-import androidx.compose.runtime.rememberCoroutineScope
-import com.example.venu.core.core_common.eventdetails.SaveToListSheet
+import com.example.venu.core.core_presentation.toEventDetailsUi
+import com.example.venu.features.explore.model.ExploreAction
+import com.example.venu.features.explore.model.ExploreUiState
+import com.example.venu.features.explore.model.GooglePlaceSuggestionUi
+import com.example.venu.features.explore.model.PlaceUi
 import kotlinx.coroutines.launch
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
-import com.example.venu.core.core_domain.model.PriceTier
-import com.example.venu.features.explore.model.GooglePlaceEventDraft
+
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
+private const val MAX_GOOGLE_PLACE_SUGGESTIONS = 5
 
 private enum class ExploreSortOption(val label: String) {
     FEATURED("Featured"),
@@ -76,22 +78,18 @@ private enum class ExploreSortOption(val label: String) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("UNUSED_PARAMETER")
 @Composable
 fun ExploreScreen(
     state: ExploreUiState,
     onAction: (ExploreAction) -> Unit,
     onDismissSaveSheet: () -> Unit,
-    hasLocationPermission: Boolean,
-    onCreateGooglePlaceEvent: (GooglePlaceEventDraft) -> Unit)
-         {
-
+    hasLocationPermission: Boolean
+) {
     var showFilterSortDialog by remember { mutableStateOf(false) }
     var selectedGenres by remember { mutableStateOf(setOf<Genre>()) }
     var verifiedOnly by remember { mutableStateOf(false) }
     var savedOnly by remember { mutableStateOf(false) }
     var sortOption by remember { mutableStateOf(ExploreSortOption.FEATURED) }
-    var detailsVisible by remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -112,21 +110,22 @@ fun ExploreScreen(
         )
     }
 
-    // new variable for event details card
     val selectedPlace = displayedPlaces.firstOrNull { place ->
         place.id == state.selectedPlaceId
     }
 
     val selectedEventDetails = selectedPlace?.toEventDetailsUi()
 
-    val activeFilterCount = selectedGenres.size +
-            if (verifiedOnly) 1 else 0 +
-                    if (savedOnly) 1 else 0
+    val activeFilterCount =
+        selectedGenres.size +
+                (if (verifiedOnly) 1 else 0) +
+                (if (savedOnly) 1 else 0)
 
     val bottomSheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.PartiallyExpanded,
         skipHiddenState = true
     )
+
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = bottomSheetState
     )
@@ -136,7 +135,9 @@ fun ExploreScreen(
         modifier = Modifier.fillMaxSize(),
         sheetPeekHeight = ExploreSheetPeekHeight,
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        sheetDragHandle = { BottomSheetDefaults.DragHandle() },
+        sheetDragHandle = {
+            BottomSheetDefaults.DragHandle()
+        },
         sheetContent = {
             ExploreResultsSheet(
                 places = displayedPlaces,
@@ -163,34 +164,11 @@ fun ExploreScreen(
                 sortOption = sortOption,
                 hasLocationPermission = hasLocationPermission,
                 onAction = onAction,
-                onOpenFilterSort = { showFilterSortDialog = true },
+                onOpenFilterSort = {
+                    showFilterSortDialog = true
+                },
                 modifier = Modifier.fillMaxSize()
             )
-
-            TextButton(
-                onClick = {
-                    onCreateGooglePlaceEvent(
-                        GooglePlaceEventDraft(
-                            eventName = "User-created Google Place Event",
-                            eventSubtitle = "Created from a real Google Place ID",
-                            genre = Genre.MUSIC,
-                            startTimeLabel = "Tonight",
-                            googlePlaceId = "ChIJgUbEo8cfqBIRzY3Yq6cyHRc",
-                            venueName = "Google Place Venue",
-                            googlePlaceAddress = "Temporary address from Places API",
-                            latitude = 40.4168,
-                            longitude = -3.7038,
-                            imageUrl = null,
-                            priceTier = PriceTier.UNDER_20
-                        )
-                    )
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 140.dp)
-            ) {
-                Text("Create real place event")
-            }
         }
     }
 
@@ -200,7 +178,9 @@ fun ExploreScreen(
             currentVerifiedOnly = verifiedOnly,
             currentSavedOnly = savedOnly,
             currentSortOption = sortOption,
-            onDismiss = { showFilterSortDialog = false },
+            onDismiss = {
+                showFilterSortDialog = false
+            },
             onApply = { genres, verified, saved, sort ->
                 selectedGenres = genres
                 verifiedOnly = verified
@@ -263,7 +243,6 @@ private fun ExploreMapContent(
     hasLocationPermission: Boolean,
     onAction: (ExploreAction) -> Unit,
     onOpenFilterSort: () -> Unit,
-    //onCreateDebugEvent: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var zoomRequest by remember { mutableStateOf(0) }
@@ -277,12 +256,26 @@ private fun ExploreMapContent(
             hasLocationPermission = hasLocationPermission,
             zoomRequest = zoomRequest,
             zoomDelta = zoomDelta,
-            onMarkerSelected = { id -> onAction(ExploreAction.PlaceClicked(id)) }
+            onMarkerSelected = { id ->
+                onAction(ExploreAction.PlaceClicked(id))
+            }
         )
 
         ExploreTopControls(
             query = state.query,
-            onQueryChange = { onAction(ExploreAction.QueryChanged(it)) },
+            googlePlaceSuggestions = state.googlePlaceSuggestions,
+            isSearchingGooglePlaces = state.isSearchingGooglePlaces,
+            isCreatingGooglePlaceEvent = state.isCreatingGooglePlaceEvent,
+            googlePlacesError = state.googlePlacesError,
+            onQueryChange = {
+                onAction(ExploreAction.QueryChanged(it))
+            },
+            onGooglePlaceSuggestionClicked = { placeId ->
+                onAction(ExploreAction.GooglePlaceSuggestionClicked(placeId))
+            },
+            onDismissGooglePlacesError = {
+                onAction(ExploreAction.GooglePlacesErrorDismissed)
+            },
             onOpenFilterSort = onOpenFilterSort,
             onZoomIn = {
                 zoomDelta = 1f
@@ -305,7 +298,13 @@ private fun ExploreMapContent(
 @Composable
 private fun ExploreTopControls(
     query: String,
+    googlePlaceSuggestions: List<GooglePlaceSuggestionUi>,
+    isSearchingGooglePlaces: Boolean,
+    isCreatingGooglePlaceEvent: Boolean,
+    googlePlacesError: String?,
     onQueryChange: (String) -> Unit,
+    onGooglePlaceSuggestionClicked: (String) -> Unit,
+    onDismissGooglePlacesError: () -> Unit,
     onOpenFilterSort: () -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -355,15 +354,57 @@ private fun ExploreTopControls(
         }
 
         Card {
-            OutlinedTextField(
-                value = query,
-                onValueChange = onQueryChange,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                label = { Text("Search venues") },
-                singleLine = true
-            )
+            Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = onQueryChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text("Search events or Google Places")
+                    },
+                    singleLine = true
+                )
+
+                if (isSearchingGooglePlaces || isCreatingGooglePlaceEvent) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                googlePlacesError?.let { error ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = error,
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+
+                        TextButton(onClick = onDismissGooglePlacesError) {
+                            Text("Dismiss")
+                        }
+                    }
+                }
+
+                googlePlaceSuggestions
+                    .take(MAX_GOOGLE_PLACE_SUGGESTIONS)
+                    .forEach { suggestion ->
+                        GooglePlaceSuggestionRow(
+                            suggestion = suggestion,
+                            enabled = !isCreatingGooglePlaceEvent,
+                            onClick = {
+                                onGooglePlaceSuggestionClicked(suggestion.placeId)
+                            }
+                        )
+                    }
+            }
         }
 
         if (activeFilterCount > 0 || sortOption != ExploreSortOption.FEATURED) {
@@ -376,6 +417,52 @@ private fun ExploreTopControls(
                     },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                     style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GooglePlaceSuggestionRow(
+    suggestion: GooglePlaceSuggestionUi,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                enabled = enabled,
+                onClick = onClick
+            )
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Place,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = suggestion.primaryText,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            if (suggestion.secondaryText.isNotBlank()) {
+                Text(
+                    text = suggestion.secondaryText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -440,12 +527,19 @@ private fun ExploreResultsSheet(
                 ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(places, key = { it.id }) { place ->
+                items(
+                    items = places,
+                    key = { place -> place.id }
+                ) { place ->
                     PlaceCard(
                         place = place,
                         selected = place.id == selectedPlaceId,
-                        onClick = { onPlaceClicked(place.id) },
-                        onSaveClick = { onSaveClick(place.id) }
+                        onClick = {
+                            onPlaceClicked(place.id)
+                        },
+                        onSaveClick = {
+                            onSaveClick(place.id)
+                        }
                     )
                 }
             }
@@ -467,10 +561,21 @@ private fun ExploreFilterSortDialog(
         sortOption: ExploreSortOption
     ) -> Unit
 ) {
-    var tempGenres by remember(currentGenres) { mutableStateOf(currentGenres) }
-    var tempVerifiedOnly by remember(currentVerifiedOnly) { mutableStateOf(currentVerifiedOnly) }
-    var tempSavedOnly by remember(currentSavedOnly) { mutableStateOf(currentSavedOnly) }
-    var tempSortOption by remember(currentSortOption) { mutableStateOf(currentSortOption) }
+    var tempGenres by remember(currentGenres) {
+        mutableStateOf(currentGenres)
+    }
+
+    var tempVerifiedOnly by remember(currentVerifiedOnly) {
+        mutableStateOf(currentVerifiedOnly)
+    }
+
+    var tempSavedOnly by remember(currentSavedOnly) {
+        mutableStateOf(currentSavedOnly)
+    }
+
+    var tempSortOption by remember(currentSortOption) {
+        mutableStateOf(currentSortOption)
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -492,13 +597,17 @@ private fun ExploreFilterSortDialog(
                 DialogCheckboxRow(
                     label = "Verified only",
                     checked = tempVerifiedOnly,
-                    onCheckedChange = { tempVerifiedOnly = it }
+                    onCheckedChange = {
+                        tempVerifiedOnly = it
+                    }
                 )
 
                 DialogCheckboxRow(
                     label = "Saved only",
                     checked = tempSavedOnly,
-                    onCheckedChange = { tempSavedOnly = it }
+                    onCheckedChange = {
+                        tempSavedOnly = it
+                    }
                 )
 
                 Text(
@@ -531,7 +640,9 @@ private fun ExploreFilterSortDialog(
                     DialogRadioRow(
                         label = option.label,
                         selected = tempSortOption == option,
-                        onClick = { tempSortOption = option }
+                        onClick = {
+                            tempSortOption = option
+                        }
                     )
                 }
             }
@@ -580,7 +691,9 @@ private fun DialogCheckboxRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
+            .clickable {
+                onCheckedChange(!checked)
+            }
             .padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -588,7 +701,9 @@ private fun DialogCheckboxRow(
             checked = checked,
             onCheckedChange = onCheckedChange
         )
+
         Spacer(Modifier.width(8.dp))
+
         Text(label)
     }
 }
@@ -602,7 +717,9 @@ private fun DialogRadioRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable {
+                onClick()
+            }
             .padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -610,7 +727,9 @@ private fun DialogRadioRow(
             selected = selected,
             onClick = onClick
         )
+
         Spacer(Modifier.width(8.dp))
+
         Text(label)
     }
 }
@@ -632,9 +751,15 @@ private fun filterAndSortPlaces(
 
     return when (sortOption) {
         ExploreSortOption.FEATURED -> filtered
-        ExploreSortOption.DISTANCE -> filtered.sortedBy { it.distanceKm ?: Double.MAX_VALUE }
-        ExploreSortOption.RATING -> filtered.sortedByDescending { it.rating }
-        ExploreSortOption.NAME -> filtered.sortedBy { it.name.lowercase() }
+        ExploreSortOption.DISTANCE -> filtered.sortedBy { place ->
+            place.distanceKm ?: Double.MAX_VALUE
+        }
+        ExploreSortOption.RATING -> filtered.sortedByDescending { place ->
+            place.rating
+        }
+        ExploreSortOption.NAME -> filtered.sortedBy { place ->
+            place.name.lowercase()
+        }
     }
 }
 
@@ -645,7 +770,6 @@ private fun ExploreScreenPreview() {
         state = ExploreUiState(),
         onAction = {},
         onDismissSaveSheet = {},
-        hasLocationPermission = false,
-        onCreateGooglePlaceEvent = {}
+        hasLocationPermission = false
     )
 }

@@ -2,7 +2,6 @@ package com.example.venu.features.explore.model
 
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.repository.ListType
-import com.example.venu.features.explore.model.PlaceUi
 
 data class ExploreUiState(
     val query: String = "",
@@ -12,4 +11,8 @@ data class ExploreUiState(
     val showSaveSheet: Boolean = false,
     val pendingSaveEventId: String? = null,
     val availableLists: List<ListType> = emptyList(),
+    val googlePlaceSuggestions: List<GooglePlaceSuggestionUi> = emptyList(),
+    val isSearchingGooglePlaces: Boolean = false,
+    val isCreatingGooglePlaceEvent: Boolean = false,
+    val googlePlacesError: String? = null
 )
