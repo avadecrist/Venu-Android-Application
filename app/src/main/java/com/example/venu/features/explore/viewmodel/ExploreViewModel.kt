@@ -19,12 +19,14 @@ import com.example.venu.core.core_domain.model.PriceTier
 import java.util.UUID
 import com.example.venu.features.explore.mappers.toUserCreatedEvent
 import com.example.venu.features.explore.model.GooglePlaceEventDraft
+import com.example.venu.core.core_data.places.GooglePlacesVenueRepository
 
 class ExploreViewModel(
     private val eventRepository: EventRepository = AppGraph.eventRepo,
-    private val listsRepository: ListsRepository = AppGraph.listsRepo
-
-): ViewModel() {
+    private val listsRepository: ListsRepository = AppGraph.listsRepo,
+    private val googlePlacesVenueRepository: GooglePlacesVenueRepository =
+        AppGraph.googlePlacesVenueRepository
+) : ViewModel() {
 //    private val events: List<Event> = eventRepository.getTrendingEvents()
     private var events: List<Event> = emptyList()
     var uiState by mutableStateOf(
@@ -122,6 +124,54 @@ class ExploreViewModel(
             )
         }
     }
+
+    fun createUserEventFromGooglePlaceId(
+        placeId: String,
+        eventName: String,
+        eventSubtitle: String,
+        genre: Genre,
+        startTimeLabel: String,
+        priceTier: PriceTier
+    ) {
+        viewModelScope.launch {
+            try {
+                val venue = googlePlacesVenueRepository.getVenueByPlaceId(placeId)
+
+                val draft = GooglePlaceEventDraft(
+                    eventName = eventName,
+                    eventSubtitle = eventSubtitle,
+                    genre = genre,
+                    startTimeLabel = startTimeLabel,
+                    googlePlaceId = venue.googlePlaceId,
+                    venueName = venue.venueName,
+                    googlePlaceAddress = venue.venueAddress,
+                    latitude = venue.latitude,
+                    longitude = venue.longitude,
+                    imageUrl = venue.photoUrl,
+                    priceTier = priceTier
+                )
+
+                val newEvent = draft.toUserCreatedEvent()
+                eventRepository.createEvent(newEvent)
+
+                events = eventRepository.getTrendingEvents()
+
+                uiState = uiState.copy(
+                    places = buildPlaces(),
+                    availableLists = listsRepository.getAllLists(),
+                    selectedPlaceId = newEvent.id
+                )
+
+                println(
+                    "VENU PLACES DEBUG: Created event from Google Place ID=${venue.googlePlaceId}, " +
+                            "venue=${venue.venueName}, lat=${venue.latitude}, lng=${venue.longitude}"
+                )
+            } catch (error: Exception) {
+                println("VENU PLACES DEBUG: Failed to create event from placeId=$placeId. ${error.message}")
+            }
+        }
+    }
+
     fun createDebugUserEvent() {
         viewModelScope.launch {
             val event = Event(
