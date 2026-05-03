@@ -83,8 +83,9 @@ fun ExploreScreen(
     onAction: (ExploreAction) -> Unit,
     onDismissSaveSheet: () -> Unit,
     hasLocationPermission: Boolean,
-    onCreateGooglePlaceEvent: (GooglePlaceEventDraft) -> Unit
-) {
+    onCreateGooglePlaceEvent: (GooglePlaceEventDraft) -> Unit)
+         {
+
     var showFilterSortDialog by remember { mutableStateOf(false) }
     var selectedGenres by remember { mutableStateOf(setOf<Genre>()) }
     var verifiedOnly by remember { mutableStateOf(false) }
@@ -171,16 +172,14 @@ fun ExploreScreen(
                     onCreateGooglePlaceEvent(
                         GooglePlaceEventDraft(
                             eventName = "User-created Google Place Event",
-                            eventSubtitle = "Created from Google Places-backed venue data",
+                            eventSubtitle = "Created from a real Google Place ID",
                             genre = Genre.MUSIC,
                             startTimeLabel = "Tonight",
-
-                            googlePlaceId = "ChIJN1t_tDeuEmsRUsoyG83frY4",
+                            googlePlaceId = "ChIJgUbEo8cfqBIRzY3Yq6cyHRc",
                             venueName = "Google Place Venue",
                             googlePlaceAddress = "Temporary address from Places API",
                             latitude = 40.4168,
                             longitude = -3.7038,
-
                             imageUrl = null,
                             priceTier = PriceTier.UNDER_20
                         )
