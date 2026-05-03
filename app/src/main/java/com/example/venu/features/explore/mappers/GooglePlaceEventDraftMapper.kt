@@ -11,23 +11,19 @@ fun GooglePlaceEventDraft.toUserCreatedEvent(): Event {
         name = eventName.trim(),
         subtitle = eventSubtitle.trim(),
         genre = genre,
-
         locationName = venueName.trim(),
         googlePlaceId = googlePlaceId,
         googlePlaceAddress = googlePlaceAddress?.trim(),
-
         latitude = latitude,
         longitude = longitude,
         distanceKm = null,
-
         priceTier = priceTier,
         startTimeLabel = startTimeLabel.trim(),
         imageUrl = imageUrl,
-
         credibilityScore = 0,
         reviewCount = 0,
         isVerifiedVenue = true,
-        averageRating = 0.0,
+        averageRating = rating ?: 0.0,
         attendeeCount = 0,
         crowdLevel = CrowdLevel.UNKNOWN
     )

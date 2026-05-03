@@ -1,16 +1,16 @@
 package com.example.venu.features.explore.mappers
 
-
-
 import com.example.venu.core.core_domain.model.Event
+import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.core.core_domain.repository.ListsRepository
 import com.example.venu.features.explore.model.PlaceUi
-import com.example.venu.core.core_domain.repository.ListType
 
 fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
     val listsContainingEvent = listsRepository
         .getAllLists()
-        .filter { listType -> listsRepository.isInList(listType, id) }
+        .filter { listType ->
+            listsRepository.isInList(listType, id)
+        }
 
     val savedLabel = when (listsContainingEvent.size) {
         0 -> null
@@ -20,7 +20,6 @@ fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
             ListType.ToReview -> "To Review"
             is ListType.Custom -> list.name
         }
-
         else -> "${listsContainingEvent.size} lists"
     }
 
@@ -35,6 +34,7 @@ fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
         genre = genre,
         isVerified = isVerifiedVenue,
         isSaved = listsRepository.isSaved(id),
-        savedLabel = savedLabel
+        savedLabel = savedLabel,
+        imageUrl = imageUrl
     )
 }

@@ -4,35 +4,39 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.venu.core.core_common.AppGraph
+import com.example.venu.core.core_data.places.GooglePlacesRepository
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.EventRepository
+import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.core.core_domain.repository.ListsRepository
-import com.example.venu.core.core_common.AppGraph
+import com.example.venu.features.explore.mappers.toEventDraft
 import com.example.venu.features.explore.mappers.toPlaceUi
+import com.example.venu.features.explore.mappers.toUi
+import com.example.venu.features.explore.mappers.toUserCreatedEvent
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
-import com.example.venu.features.explore.model.PlaceUi
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import com.example.venu.core.core_domain.model.Genre
-import com.example.venu.core.core_domain.model.PriceTier
-import java.util.UUID
-import com.example.venu.features.explore.mappers.toUserCreatedEvent
 import com.example.venu.features.explore.model.GooglePlaceEventDraft
-import com.example.venu.core.core_data.places.GooglePlacesVenueRepository
+import com.example.venu.features.explore.model.PlaceUi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ExploreViewModel(
     private val eventRepository: EventRepository = AppGraph.eventRepo,
     private val listsRepository: ListsRepository = AppGraph.listsRepo,
-    private val googlePlacesVenueRepository: GooglePlacesVenueRepository =
-        AppGraph.googlePlacesVenueRepository
+    private val googlePlacesRepository: GooglePlacesRepository = AppGraph.googlePlacesRepo
 ) : ViewModel() {
-//    private val events: List<Event> = eventRepository.getTrendingEvents()
+
     private var events: List<Event> = emptyList()
+
+    private var googlePlacesSearchJob: Job? = null
+
     var uiState by mutableStateOf(
         ExploreUiState(
             places = emptyList(),
-            availableLists = listsRepository.getAllLists(),
+            availableLists = listsRepository.getAllLists()
         )
     )
         private set
@@ -41,22 +45,12 @@ class ExploreViewModel(
         loadInitialEvents()
     }
 
-    private fun loadInitialEvents() {
-        viewModelScope.launch {
-            events = eventRepository.getTrendingEvents()
-            uiState = uiState.copy(
-                places = buildPlaces(),
-                availableLists = listsRepository.getAllLists()
-            )
-        }
-    }
-
-
     fun onAction(action: ExploreAction) {
         when (action) {
             is ExploreAction.QueryChanged -> {
                 uiState = uiState.copy(query = action.text)
                 applyFilters()
+                searchGooglePlaces(action.text)
             }
 
             is ExploreAction.GenreSelected -> {
@@ -69,7 +63,7 @@ class ExploreViewModel(
             }
 
             is ExploreAction.ToggleWantToGo -> {
-                listsRepository.toggleWantToGo(action.id) // adds to 'want' val in InMemoryListsRepository
+                listsRepository.toggleWantToGo(action.id)
                 applyFilters()
             }
 
@@ -82,23 +76,23 @@ class ExploreViewModel(
             }
 
             is ExploreAction.SaveToList -> {
-                listsRepository.addToList(action.listType, action.eventId)
-
-                uiState = uiState.copy(
-                    showSaveSheet = false,
-                    pendingSaveEventId = null,
-                    availableLists = listsRepository.getAllLists()
+                saveToList(
+                    eventId = action.eventId,
+                    listType = action.listType
                 )
+            }
 
-                applyFilters()
+            is ExploreAction.GooglePlaceSuggestionClicked -> {
+                createEventFromGooglePlace(action.placeId)
+            }
+
+            ExploreAction.GooglePlacesErrorDismissed -> {
+                uiState = uiState.copy(googlePlacesError = null)
             }
 
             ExploreAction.PlaceDetailsDismissed -> {
-                uiState = uiState.copy(
-                    selectedPlaceId = null
-                )
+                uiState = uiState.copy(selectedPlaceId = null)
             }
-
         }
     }
 
@@ -125,110 +119,155 @@ class ExploreViewModel(
         }
     }
 
-    fun createUserEventFromGooglePlaceId(
-        placeId: String,
-        eventName: String,
-        eventSubtitle: String,
-        genre: Genre,
-        startTimeLabel: String,
-        priceTier: PriceTier
-    ) {
+    private fun loadInitialEvents() {
         viewModelScope.launch {
-            try {
-                val venue = googlePlacesVenueRepository.getVenueByPlaceId(placeId)
-
-                val draft = GooglePlaceEventDraft(
-                    eventName = eventName,
-                    eventSubtitle = eventSubtitle,
-                    genre = genre,
-                    startTimeLabel = startTimeLabel,
-                    googlePlaceId = venue.googlePlaceId,
-                    venueName = venue.venueName,
-                    googlePlaceAddress = venue.venueAddress,
-                    latitude = venue.latitude,
-                    longitude = venue.longitude,
-                    imageUrl = venue.photoUrl,
-                    priceTier = priceTier
-                )
-
-                val newEvent = draft.toUserCreatedEvent()
-                eventRepository.createEvent(newEvent)
-
-                events = eventRepository.getTrendingEvents()
-
-                uiState = uiState.copy(
-                    places = buildPlaces(),
-                    availableLists = listsRepository.getAllLists(),
-                    selectedPlaceId = newEvent.id
-                )
-
-                println(
-                    "VENU PLACES DEBUG: Created event from Google Place ID=${venue.googlePlaceId}, " +
-                            "venue=${venue.venueName}, lat=${venue.latitude}, lng=${venue.longitude}"
-                )
-            } catch (error: Exception) {
-                println("VENU PLACES DEBUG: Failed to create event from placeId=$placeId. ${error.message}")
-            }
-        }
-    }
-
-    fun createDebugUserEvent() {
-        viewModelScope.launch {
-            val event = Event(
-                id = UUID.randomUUID().toString(),
-                name = "Debug User Event",
-                subtitle = "Created from repository write path",
-                genre = Genre.STUDY,
-                locationName = "UC3M Leganés",
-                latitude = 40.3318,
-                longitude = -3.7676,
-                distanceKm = null,
-                priceTier = PriceTier.FREE,
-                startTimeLabel = "Today",
-                imageUrl = null,
-                credibilityScore = 0,
-                reviewCount = 0,
-                isVerifiedVenue = false,
-                averageRating = 0.0
-            )
-
-            eventRepository.createEvent(event)
-
             events = eventRepository.getTrendingEvents()
+
             uiState = uiState.copy(
                 places = buildPlaces(),
                 availableLists = listsRepository.getAllLists()
             )
         }
     }
+
+    private fun searchGooglePlaces(query: String) {
+        googlePlacesSearchJob?.cancel()
+
+        val trimmedQuery = query.trim()
+
+        if (trimmedQuery.length < MIN_GOOGLE_PLACES_QUERY_LENGTH) {
+            uiState = uiState.copy(
+                googlePlaceSuggestions = emptyList(),
+                isSearchingGooglePlaces = false,
+                googlePlacesError = null
+            )
+            return
+        }
+
+        googlePlacesSearchJob = viewModelScope.launch {
+            delay(GOOGLE_PLACES_SEARCH_DEBOUNCE_MS)
+
+            uiState = uiState.copy(
+                isSearchingGooglePlaces = true,
+                googlePlacesError = null
+            )
+
+            runCatching {
+                googlePlacesRepository.searchPlaces(trimmedQuery).map { suggestion ->
+                    suggestion.toUi()
+                }
+            }.onSuccess { suggestions ->
+                uiState = uiState.copy(
+                    googlePlaceSuggestions = suggestions,
+                    isSearchingGooglePlaces = false
+                )
+            }.onFailure { error ->
+                uiState = uiState.copy(
+                    googlePlaceSuggestions = emptyList(),
+                    isSearchingGooglePlaces = false,
+                    googlePlacesError = error.message ?: "Unable to search Google Places."
+                )
+            }
+        }
+    }
+
+    private fun createEventFromGooglePlace(placeId: String) {
+        viewModelScope.launch {
+            uiState = uiState.copy(
+                isCreatingGooglePlaceEvent = true,
+                googlePlacesError = null
+            )
+
+            runCatching {
+                googlePlacesRepository.getPlaceDetails(placeId)
+            }.onSuccess { place ->
+                if (place == null) {
+                    uiState = uiState.copy(
+                        isCreatingGooglePlaceEvent = false,
+                        googlePlacesError = "Unable to load place details."
+                    )
+                    return@onSuccess
+                }
+
+                val newEvent = place.toEventDraft().toUserCreatedEvent()
+
+                eventRepository.createEvent(newEvent)
+
+                events = eventRepository.getTrendingEvents()
+
+                uiState = uiState.copy(
+                    query = "",
+                    places = buildPlaces(),
+                    selectedPlaceId = newEvent.id,
+                    googlePlaceSuggestions = emptyList(),
+                    isCreatingGooglePlaceEvent = false,
+                    availableLists = listsRepository.getAllLists()
+                )
+            }.onFailure { error ->
+                uiState = uiState.copy(
+                    isCreatingGooglePlaceEvent = false,
+                    googlePlacesError = error.message ?: "Unable to create event from Google Place."
+                )
+            }
+        }
+    }
+
+    private fun saveToList(
+        eventId: String,
+        listType: ListType
+    ) {
+        listsRepository.addToList(
+            type = listType,
+            eventId = eventId
+        )
+
+        uiState = uiState.copy(
+            showSaveSheet = false,
+            pendingSaveEventId = null,
+            availableLists = listsRepository.getAllLists()
+        )
+
+        applyFilters()
+    }
+
     private fun buildPlaces(): List<PlaceUi> {
-        return events.map { it.toPlaceUi(listsRepository) }
+        return events.map { event ->
+            event.toPlaceUi(listsRepository)
+        }
     }
 
     private fun applyFilters() {
         val q = uiState.query.trim().lowercase()
         val g = uiState.selectedGenre
-
         val allPlaces = buildPlaces()
 
         val filtered = allPlaces.filter { place ->
-            val matchesQuery =
-                q.isBlank() ||
-                        place.name.lowercase().contains(q) ||
-                        place.subtitle.lowercase().contains(q)
+            val matchesQuery = q.isBlank() ||
+                    place.name.lowercase().contains(q) ||
+                    place.subtitle.lowercase().contains(q)
 
             val matchesGenre = g == null || place.genre == g
 
             matchesQuery && matchesGenre
         }
 
-        val selectedStillVisible =
-            uiState.selectedPlaceId?.let { id -> filtered.any { it.id == id } } == true
+        val selectedStillVisible = uiState.selectedPlaceId?.let { id ->
+            filtered.any { place -> place.id == id }
+        } == true
 
         uiState = uiState.copy(
             places = filtered,
-            selectedPlaceId = if (selectedStillVisible) uiState.selectedPlaceId else null,
+            selectedPlaceId = if (selectedStillVisible) {
+                uiState.selectedPlaceId
+            } else {
+                null
+            },
             availableLists = listsRepository.getAllLists()
         )
+    }
+
+    companion object {
+        private const val MIN_GOOGLE_PLACES_QUERY_LENGTH = 3
+        private const val GOOGLE_PLACES_SEARCH_DEBOUNCE_MS = 350L
     }
 }
