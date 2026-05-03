@@ -232,7 +232,11 @@ fun AppNavPreview() {
             }
 
             composable("home") {
-                HomeRoute()
+                HomeRoute(
+                    onNavigateToExploreDirections = {
+                        // no explore route for preview
+                    }
+                )
             }
         }
     }

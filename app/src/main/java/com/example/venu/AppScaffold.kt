@@ -28,10 +28,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.venu.features.explore.ExploreRoute
 import com.example.venu.features.home.HomeRoute
 import com.example.venu.features.lists.ListsRoute
@@ -122,7 +124,8 @@ fun AppScaffold(
                 )
 
                 NavigationBarItem(
-                    selected = currentRoute == "explore",
+//                    selected = currentRoute == "explore",
+                    selected = currentRoute?.startsWith("explore") == true,
                     onClick = {
                         navController.navigate("explore") {
                             popUpTo(navController.graph.findStartDestination().id) {
@@ -191,12 +194,40 @@ fun AppScaffold(
             )
         ) {
             composable("home") {
-                HomeRoute()
+                HomeRoute(
+                    onNavigateToExploreDirections = { eventId ->
+                        navController.navigate("explore?eventId=$eventId&startDirections=true") {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
 
-            composable("explore") {
+            composable(
+                route = "explore?eventId={eventId}&startDirections={startDirections}",
+                arguments = listOf(
+                    navArgument("eventId") {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                    navArgument("startDirections") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    }
+                )
+            ) { backStackEntry ->
+
+                val eventId = backStackEntry.arguments?.getString("eventId")
+                val startDirections = backStackEntry.arguments?.getBoolean("startDirections") ?: false
+
                 ExploreRoute(
-                    hasLocationPermission = hasLocationPermission
+                    hasLocationPermission = hasLocationPermission,
+                    eventId = eventId,
+                    startDirections = startDirections
                 )
             }
 

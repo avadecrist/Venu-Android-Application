@@ -74,6 +74,7 @@ import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.runtime.LaunchedEffect
 
 
 private val ExploreSheetPeekHeight = 120.dp
@@ -184,6 +185,29 @@ fun ExploreScreen(
     }
 
     val selectedEventDetails = selectedPlace?.toEventDetailsUi()
+
+    LaunchedEffect(
+        state.selectedPlaceId,
+        state.shouldStartDirections,
+        userLocation
+    ) {
+        val event = selectedEventDetails
+        val location = userLocation
+
+        if (
+            state.shouldStartDirections &&
+            event != null &&
+            location != null
+        ) {
+            onAction(
+                ExploreAction.GetDirectionsClicked(
+                    event = event,
+                    userLat = location.latitude,
+                    userLng = location.longitude
+                )
+            )
+        }
+    }
 
     val activeFilterCount = selectedGenres.size +
             if (verifiedOnly) 1 else 0 +

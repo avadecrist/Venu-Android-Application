@@ -92,6 +92,10 @@ class ExploreViewModel(
 
             is ExploreAction.GetDirectionsClicked -> {
                 Log.d("DirectionsDebug", "GetDirectionsClicked received")
+                uiState = uiState.copy(
+                    shouldStartDirections = false
+                )
+
                 getDirections(
                     event = action.event,
                     userLat = action.userLat,
@@ -196,4 +200,12 @@ class ExploreViewModel(
             }
         }
     }
+
+    fun openFromHomeForDirections(eventId: String) {
+        uiState = uiState.copy(
+            selectedPlaceId = eventId,
+            shouldStartDirections = true
+        )
+    }
 }
+

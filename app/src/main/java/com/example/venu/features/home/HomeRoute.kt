@@ -6,10 +6,12 @@ import com.example.venu.features.home.viewmodel.HomeViewModel
 
 @Composable
 fun HomeRoute(
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(),
+    onNavigateToExploreDirections: (eventId: String) -> Unit
 ) {
     HomeScreen(
         state = viewModel.uiState,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        onNavigateToExploreDirections = onNavigateToExploreDirections
     )
 }

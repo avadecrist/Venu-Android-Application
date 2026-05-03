@@ -17,8 +17,9 @@ data class ExploreUiState(
     // For highlighting a selected marker/card
     val selectedPlaceId: String? = null,
 
-    // For Event Details bottom sheet + directions
-    val selectedEventDetails: EventDetailsUi? = null,
+    // For Event Details bottom sheet + directions (instantiated in Screens so don't need here)
+//    val selectedEventDetails: EventDetailsUi? = null,
+    val shouldStartDirections: Boolean = false,
 
     // Google maps directions
     val directionsDestination: EventDetailsUi? = null,
