@@ -20,7 +20,6 @@ class GoogleAuthClient(
 
     suspend fun signIn(): Result<AppUser> {
         return try {
-
             val googleOption = GetSignInWithGoogleOption.Builder(
                 serverClientId = context.getString(R.string.google_web_client_id)
             ).build()
@@ -56,6 +55,7 @@ class GoogleAuthClient(
 
             Result.success(
                 AppUser(
+                    idToken = googleCredential.idToken,
                     email = googleCredential.id,
                     displayName = googleCredential.displayName,
                     profilePictureUri = googleCredential.profilePictureUri?.toString()
