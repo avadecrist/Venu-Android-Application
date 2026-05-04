@@ -317,6 +317,7 @@ fun AppNavPreview() {
 
             composable("home") {
                 HomeRoute(
+                    displayName = "Explorer",
                     onNavigateToExploreDirections = {
                         // no explore route for preview
                     }

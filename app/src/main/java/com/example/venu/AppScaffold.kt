@@ -197,6 +197,7 @@ fun AppScaffold(
         ) {
             composable("home") {
                 HomeRoute(
+                    displayName = currentUserDisplayName,
                     onNavigateToExploreDirections = { eventId ->
                         navController.navigate("explore?eventId=$eventId&startDirections=true") {
                             popUpTo(navController.graph.findStartDestination().id) {
