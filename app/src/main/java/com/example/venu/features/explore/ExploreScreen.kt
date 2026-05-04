@@ -75,6 +75,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.Button
+import com.example.venu.features.explore.model.GooglePlaceEventDraft
+
 
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
@@ -178,6 +181,20 @@ fun ExploreScreen(
         )
     }
 
+    val googlePreviewPlace: PlaceUi? = remember(state.selectedGooglePlacePreview) {
+        state.selectedGooglePlacePreview?.toPreviewPlaceUi()
+    }
+
+    val displayedMapPlaces: List<PlaceUi> = remember(displayedPlaces, googlePreviewPlace) {
+        if (googlePreviewPlace == null) {
+            displayedPlaces
+        } else {
+            displayedPlaces + googlePreviewPlace
+        }
+    }
+
+    val selectedMapPlaceId: String? = googlePreviewPlace?.id ?: state.selectedPlaceId
+
     val selectedPlace = displayedPlaces.firstOrNull { place ->
         place.id == state.selectedPlaceId
     }
@@ -252,14 +269,13 @@ fun ExploreScreen(
         ) {
             ExploreMapContent(
                 state = state,
-                displayedPlaces = displayedPlaces,
+                displayedPlaces = displayedMapPlaces,
+                selectedMapPlaceId = selectedMapPlaceId,
                 activeFilterCount = activeFilterCount,
                 sortOption = sortOption,
                 hasLocationPermission = hasLocationPermission,
                 onAction = onAction,
-                onOpenFilterSort = {
-                    showFilterSortDialog = true
-                },
+                onOpenFilterSort = { showFilterSortDialog = true },
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -349,12 +365,66 @@ fun ExploreScreen(
             )
         }
     }
+    state.selectedGooglePlacePreview?.let { draft ->
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = {
+                scope.launch {
+                    sheetState.hide()
+                    onAction(ExploreAction.GooglePlacePreviewDismissed)
+                }
+            }
+        ) {
+            GooglePlacePreviewSheet(
+                draft = draft,
+                isLoading = state.isCreatingGooglePlaceEvent,
+                onDismiss = {
+                    scope.launch {
+                        sheetState.hide()
+                        onAction(ExploreAction.GooglePlacePreviewDismissed)
+                    }
+                },
+                onCreateEvent = {
+                    onAction(ExploreAction.GooglePlaceCreateClicked(draft))
+                }
+            )
+        }
+    }
+    state.pendingGooglePlaceDraft?.let { draft ->
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = {
+                scope.launch {
+                    sheetState.hide()
+                    onAction(ExploreAction.GooglePlaceDraftDismissed)
+                }
+            }
+        ) {
+            GooglePlaceEventDraftSheet(
+                draft = draft,
+                isCreating = state.isCreatingGooglePlaceEvent,
+                onDraftChange = { updatedDraft ->
+                    onAction(ExploreAction.GooglePlaceDraftChanged(updatedDraft))
+                },
+                onDismiss = {
+                    scope.launch {
+                        sheetState.hide()
+                        onAction(ExploreAction.GooglePlaceDraftDismissed)
+                    }
+                },
+                onCreateEvent = {
+                    onAction(ExploreAction.GooglePlaceCreateConfirmed(draft))
+                }
+            )
+        }
+    }
 }
 
 @Composable
 private fun ExploreMapContent(
     state: ExploreUiState,
     displayedPlaces: List<PlaceUi>,
+    selectedMapPlaceId: String?,
     activeFilterCount: Int,
     sortOption: ExploreSortOption,
     hasLocationPermission: Boolean,
@@ -369,13 +439,15 @@ private fun ExploreMapContent(
         ExploreMap(
             modifier = Modifier.fillMaxSize(),
             places = displayedPlaces,
-            selectedPlaceId = state.selectedPlaceId,
+            selectedPlaceId = selectedMapPlaceId,
             directionsRoute = state.directionsRoute,
             hasLocationPermission = hasLocationPermission,
             zoomRequest = zoomRequest,
             zoomDelta = zoomDelta,
             onMarkerSelected = { id ->
-                onAction(ExploreAction.PlaceClicked(id))
+                if (!id.startsWith(GOOGLE_PREVIEW_PLACE_ID_PREFIX)) {
+                    onAction(ExploreAction.PlaceClicked(id))
+                }
             }
         )
 
@@ -581,6 +653,252 @@ private fun GooglePlaceSuggestionRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GooglePlacePreviewSheet(
+    draft: GooglePlaceEventDraft,
+    isLoading: Boolean,
+    onDismiss: () -> Unit,
+    onCreateEvent: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = draft.venueName,
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        draft.googlePlaceAddress?.let { address ->
+            Text(
+                text = address,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Text(
+            text = buildString {
+                append("Google Place preview")
+
+                draft.rating?.let { rating ->
+                    append(" • Rating: ")
+                    append(String.format("%.1f", rating))
+                }
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Text(
+            text = "This place is only being previewed. It will not be saved as a Venu event unless you press Create event.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !isLoading
+            ) {
+                Text("Close")
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                onClick = onCreateEvent,
+                enabled = !isLoading
+            ) {
+                Text("Create event")
+            }
+        }
+    }
+}
+
+@Composable
+private fun GooglePlaceEventDraftSheet(
+    draft: GooglePlaceEventDraft,
+    isCreating: Boolean,
+    onDraftChange: (GooglePlaceEventDraft) -> Unit,
+    onDismiss: () -> Unit,
+    onCreateEvent: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        Text(
+            text = "Draft event",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = draft.venueName,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        draft.googlePlaceAddress?.let { address ->
+            Text(
+                text = address,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        OutlinedTextField(
+            value = draft.eventName,
+            onValueChange = { value ->
+                onDraftChange(
+                    draft.copy(eventName = value)
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text("Event name")
+            },
+            singleLine = true
+        )
+
+        OutlinedTextField(
+            value = draft.eventSubtitle,
+            onValueChange = { value ->
+                onDraftChange(
+                    draft.copy(eventSubtitle = value)
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text("Subtitle / description")
+            },
+            minLines = 2,
+            maxLines = 4
+        )
+
+        OutlinedTextField(
+            value = draft.startTimeLabel,
+            onValueChange = { value ->
+                onDraftChange(
+                    draft.copy(startTimeLabel = value)
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text("Time label")
+            },
+            singleLine = true
+        )
+
+        Text(
+            text = "Category",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        GenreSelectionRows(
+            selectedGenre = draft.genre,
+            onGenreSelected = { genre ->
+                onDraftChange(
+                    draft.copy(genre = genre)
+                )
+            }
+        )
+
+        Text(
+            text = buildString {
+                append("Google verified venue")
+
+                draft.rating?.let { rating ->
+                    append(" • Rating: ")
+                    append(String.format("%.1f", rating))
+                }
+
+                append(" • Price tier: ")
+                append(draft.priceTier.name.replace("_", " "))
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !isCreating
+            ) {
+                Text("Cancel")
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                onClick = onCreateEvent,
+                enabled = !isCreating &&
+                        draft.eventName.isNotBlank() &&
+                        draft.eventSubtitle.isNotBlank() &&
+                        draft.startTimeLabel.isNotBlank()
+            ) {
+                Text(
+                    text = if (isCreating) {
+                        "Creating..."
+                    } else {
+                        "Save event"
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GenreSelectionRows(
+    selectedGenre: Genre,
+    onGenreSelected: (Genre) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Genre.entries.forEach { genre ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onGenreSelected(genre)
+                    }
+                    .padding(vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = selectedGenre == genre,
+                    onClick = {
+                        onGenreSelected(genre)
+                    }
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = genre.label,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -850,6 +1168,29 @@ private fun DialogRadioRow(
 
         Text(label)
     }
+}
+
+private const val GOOGLE_PREVIEW_PLACE_ID_PREFIX = "google-preview-"
+
+private fun GooglePlaceEventDraft.toPreviewPlaceUi(): PlaceUi {
+    return PlaceUi(
+        id = toPreviewPlaceId(),
+        name = venueName,
+        subtitle = googlePlaceAddress ?: eventSubtitle,
+        latitude = latitude,
+        longitude = longitude,
+        distanceKm = null,
+        rating = rating ?: 0.0,
+        genre = genre,
+        isVerified = true,
+        isSaved = false,
+        savedLabel = null,
+        imageUrl = imageUrl
+    )
+}
+
+private fun GooglePlaceEventDraft.toPreviewPlaceId(): String {
+    return "$GOOGLE_PREVIEW_PLACE_ID_PREFIX$googlePlaceId"
 }
 
 private fun filterAndSortPlaces(
