@@ -45,8 +45,11 @@ import com.example.venu.features.profile.menu.SettingsScreen
 fun AppScaffold(
     isSignedIn: Boolean,
     isDarkMode: Boolean,
+    currentUserDisplayName: String?,
+    currentUserEmail: String?,
     onDarkModeChange: (Boolean) -> Unit,
     onSignInClick: () -> Unit,
+    onEditProfileSave: (String) -> Unit,
     onSignOutClick: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -124,7 +127,6 @@ fun AppScaffold(
                 )
 
                 NavigationBarItem(
-//                    selected = currentRoute == "explore",
                     selected = currentRoute?.startsWith("explore") == true,
                     onClick = {
                         navController.navigate("explore") {
@@ -238,7 +240,10 @@ fun AppScaffold(
             composable("profile") {
                 ProfileRoute(
                     isSignedIn = isSignedIn,
+                    displayName = currentUserDisplayName,
+                    email = currentUserEmail,
                     onSignInClick = onSignInClick,
+                    onEditProfileSave = onEditProfileSave,
                     onMyReviewsClick = {
                         navController.navigate("my_reviews")
                     },
