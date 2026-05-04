@@ -99,22 +99,6 @@ fun HomeScreen(
 
             Spacer(Modifier.height(12.dp))
 
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .horizontalScroll(rememberScrollState()),
-//            horizontalArrangement = Arrangement.spacedBy(12.dp)
-//        ) {
-//            // maps fake seed data to each feature card
-//            state.featured.forEach { venue ->
-//                FeaturedCard(
-//                    title = venue.title,
-//                    subtitle = venue.subtitle,
-//                    genre = venue.genre,
-//                    onClick = { selectedEventDetails = venue.toEventDetailsUi() }
-//                )
-//            }
-//        }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -172,19 +156,6 @@ fun HomeScreen(
                 onClick = { selectedEventDetails = venue.toEventDetailsUi() }
             )
         }
-//            state.nearYou.forEach { venue ->
-//                VenueCard(
-//                    name = venue.title,
-//                    details = buildString {
-//                        append(venue.subtitle)
-//                        venue.distanceLabel?.let { append(" • $it") }
-//                        venue.ratingLabel?.let { append(" • $it") }
-//                    },
-//                    genre = venue.genre,
-//                    onClick = { selectedEventDetails = venue.toEventDetailsUi() }
-//                )
-//            }
-
             Spacer(Modifier.height(24.dp))
         }
     }
@@ -334,7 +305,6 @@ private fun VenueCard(
                 Text(
                     text = genreEmoji(genre),
                     style = MaterialTheme.typography.titleMedium,
-//                    color = contentColor
                 )
             }
 
