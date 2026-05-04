@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
 
     // PRIMARY
-    primary = VenuColors.AccentBlue,
+    primary = Color(0xFF1E3A5F),//VenuColors.AccentBlue,
     onPrimary = Color.White,
 
     primaryContainer = Color(0xFF1E3A5F),
@@ -52,7 +52,7 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
 
     // PRIMARY (main actions: buttons, highlights)
-    primary = VenuColors.AccentBlue,
+    primary = Color(0xFF1E3A5F),
     onPrimary = Color.White,
 
     primaryContainer = VenuColors.AccentBlueBorder,

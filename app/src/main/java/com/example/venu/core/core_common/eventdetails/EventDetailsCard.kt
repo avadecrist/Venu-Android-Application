@@ -1,6 +1,6 @@
 package com.example.venu.core.core_common.eventdetails
 
-import androidx.compose.animation.animateColorAsState
+//import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -72,7 +72,7 @@ fun EventDetailsSheet(
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
-            .background(VenuColors.Background),
+            .background(MaterialTheme.colorScheme.surface),
         contentPadding = PaddingValues(
             start = 20.dp,
             end = 20.dp,
@@ -346,21 +346,6 @@ private fun ActionButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val backgroundColor by animateColorAsState(
-        targetValue = VenuColors.AccentBlue,
-        label = "action_button_bg"
-    )
-
-    val contentColor by animateColorAsState(
-        targetValue = Color.White,
-        label = "action_button_content"
-    )
-
-    val borderColor by animateColorAsState(
-        targetValue = VenuColors.AccentBlue,
-        label = "action_button_border"
-    )
-
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.93f else 1f,
         label = "action_button_scale"
@@ -381,9 +366,9 @@ private fun ActionButton(
         onClick = onClick,
         interactionSource = interactionSource,
         shape = RoundedCornerShape(20.dp),
-        color = backgroundColor,
+        color = VenuColors.AccentBlue,
         shadowElevation = elevation,
-        border = BorderStroke(1.dp, borderColor)
+        border = BorderStroke(1.dp, VenuColors.AccentBlue)
     ) {
         Row(
             modifier = Modifier
@@ -395,14 +380,14 @@ private fun ActionButton(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = contentColor
+                tint = VenuColors.Background
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
                 text = "Get Directions",
-                color = contentColor,
+                color = VenuColors.Background,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -531,8 +516,8 @@ private fun PriceAndVerifiedCard(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, VenuColors.Border)
+        color = MaterialTheme.colorScheme.onPrimary,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Row(
             modifier = Modifier
@@ -545,13 +530,13 @@ private fun PriceAndVerifiedCard(
                 Text(
                     text = "Price",
                     style = MaterialTheme.typography.titleMedium,
-                    color = VenuColors.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = priceText,
                     style = MaterialTheme.typography.headlineMedium,
-                    color = VenuColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
             }
