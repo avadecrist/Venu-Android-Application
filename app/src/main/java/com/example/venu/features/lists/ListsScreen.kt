@@ -1,5 +1,6 @@
 package com.example.venu.features.lists
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,12 +53,14 @@ fun ListsScreen(
     var newListName by remember { mutableStateOf("") }
     Box(
         modifier = Modifier.fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
             Text(
                 text = "Lists",
+                color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(16.dp)
             )
@@ -91,6 +94,8 @@ fun ListsScreen(
                             Tab(
                                 selected = tab == state.selectedTab,
                                 onClick = { onEvent(ListsUiEvent.SelectTab(tab)) },
+                                selectedContentColor = MaterialTheme.colorScheme.onSurface,
+                                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 text = { Text(tabLabel(tab)) }
                             )
                         }
@@ -104,6 +109,7 @@ fun ListsScreen(
                 Text(
                     text = emptyMessageFor(state.selectedTab),
                     modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.bodyLarge
                 )
             } else {

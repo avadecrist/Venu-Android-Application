@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.venu.core.core_common.core_ui.theme.VenuTheme
 import androidx.compose.ui.platform.LocalContext
+import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import com.example.venu.core.core_common.eventdetails.genreEmoji
 import com.example.venu.core.core_domain.model.Genre
@@ -65,9 +66,9 @@ fun HomeScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colorStops = arrayOf(
-                            0.0f to MaterialTheme.colorScheme.primary.copy(alpha = 0.50f),
-                            0.20f to MaterialTheme.colorScheme.primary.copy(alpha = 0.70f),
-                            0.70f to MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+                            0.0f to VenuColors.AccentBlue.copy(alpha = 0.50f),
+                            0.20f to VenuColors.AccentBlue.copy(alpha = 0.70f),
+                            0.70f to VenuColors.AccentBlue.copy(alpha = 0.10f),
                             1.0f to MaterialTheme.colorScheme.background
                         )
                     )
@@ -80,13 +81,14 @@ fun HomeScreen(
             Text(
                 text = "Welcome, Explorer",
                 style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = "Find something good near you today",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(Modifier.height(32.dp))
@@ -94,6 +96,7 @@ fun HomeScreen(
             Text(
                 text = "Featured",
                 style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
             )
 
@@ -186,6 +189,13 @@ fun HomeScreen(
                     sheetState.hide()
                     selectedEventDetails = null
                 }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            dragHandle = {
+                BottomSheetDefaults.DragHandle(
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
             }
         ) {
             EventDetailsSheet(
@@ -221,7 +231,6 @@ fun FeaturedCard(
     onClick: () -> Unit
 ) {
     val baseColor = genreColor(genre)
-    val glowColor = baseColor.copy(alpha = 0.35f)
     Box(
         modifier = Modifier
             .width(220.dp)
@@ -237,7 +246,7 @@ fun FeaturedCard(
             onClick = onClick,
             contentPadding = 18.dp,
             borderColor = baseColor.copy(alpha = 0.35f),
-            contentColor = baseColor.copy(alpha = 0.15f),
+            contentColor = baseColor.copy(alpha = 0.10f),
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -266,7 +275,7 @@ fun FeaturedCard(
                     text = "Learn More",
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = VenuColors.AccentBlue
                 )
             }
         }

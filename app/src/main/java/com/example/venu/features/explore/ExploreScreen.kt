@@ -308,6 +308,13 @@ fun ExploreScreen(
                     sheetState.hide()
                     onAction(ExploreAction.PlaceDetailsDismissed)
                 }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            dragHandle = {
+                BottomSheetDefaults.DragHandle(
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
             }
         ) {
             EventDetailsSheet(

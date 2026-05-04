@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.example.venu.core.core_common.core_ui.theme.VenuColors
 
 private const val VENU_NOTIFICATION_CHANNEL_ID = "venu_test_notifications_v2"
 
@@ -122,7 +121,7 @@ fun SettingsScreen(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
                     modifier = Modifier.size(26.dp),
-                    tint = VenuColors.TextPrimary
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
 
@@ -130,7 +129,7 @@ fun SettingsScreen(
                 text = "Settings",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = VenuColors.TextPrimary
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
 
@@ -138,7 +137,7 @@ fun SettingsScreen(
             text = "Manage your account and app preferences",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
-            color = VenuColors.TextSecondary
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(modifier = Modifier.height(26.dp))
@@ -286,7 +285,7 @@ private fun SettingsCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, VenuColors.Border)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         content()
     }
@@ -300,7 +299,7 @@ private fun SectionTitle(
         text = title,
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
-        color = VenuColors.TextPrimary
+        color = MaterialTheme.colorScheme.onPrimaryContainer
     )
 }
 
@@ -322,7 +321,7 @@ private fun SettingsSwitchRow(
             imageVector = leadingIcon,
             contentDescription = null,
             modifier = Modifier.size(22.dp),
-            tint = VenuColors.TextSecondary
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.size(18.dp))
@@ -331,7 +330,7 @@ private fun SettingsSwitchRow(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
-            color = VenuColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.weight(1f)
         )
 
@@ -352,7 +351,7 @@ private fun SettingsActionRow(
     val contentColor = if (isDestructive) {
         MaterialTheme.colorScheme.error
     } else {
-        VenuColors.TextPrimary
+        MaterialTheme.colorScheme.onPrimaryContainer
     }
 
     Row(
