@@ -55,12 +55,6 @@ class HomeViewModel : ViewModel() {
                 loadHome() // or applyFilters()
             }
 
-//            is HomeAction.GetDirectionsClicked -> {
-//                // trigger navigation event (StateFlow / Channel)
-//                navController.navigate("explore?eventId=${action.event.id}&startDirections=true")
-//
-//            }
-
             is HomeAction.DismissSaveSheet -> {
                 uiState = uiState.copy(
                     showSaveSheet = false,
