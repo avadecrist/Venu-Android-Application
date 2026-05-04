@@ -26,6 +26,7 @@ sealed interface ExploreAction {
     ) : ExploreAction
 
     data object GooglePlacesErrorDismissed : ExploreAction
+
     data object PlaceDetailsDismissed : ExploreAction
 
     // Google maps directions

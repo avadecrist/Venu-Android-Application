@@ -76,7 +76,6 @@ import androidx.core.content.ContextCompat
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.LaunchedEffect
 
-
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
 private const val MAX_GOOGLE_PLACE_SUGGESTIONS = 5
@@ -375,7 +374,6 @@ private fun ExploreMapContent(
             hasLocationPermission = hasLocationPermission,
             zoomRequest = zoomRequest,
             zoomDelta = zoomDelta,
-
             onMarkerSelected = { id ->
                 onAction(ExploreAction.PlaceClicked(id))
             }

@@ -92,24 +92,24 @@ class ExploreViewModel(
                 createEventFromGooglePlace(action.placeId)
             }
 
-            ExploreAction.GooglePlacesErrorDismissed -> {
+            is ExploreAction.GooglePlacesErrorDismissed -> {
                 uiState = uiState.copy(googlePlacesError = null)
             }
 
             is ExploreAction.GetDirectionsClicked -> {
                 Log.d("DirectionsDebug", "GetDirectionsClicked received")
-                uiState = uiState.copy(
-                    shouldStartDirections = false
-                )
-
                 getDirections(
                     event = action.event,
                     userLat = action.userLat,
                     userLng = action.userLng
                 )
+
+                uiState = uiState.copy(
+                    shouldStartDirections = false
+                )
             }
 
-            ExploreAction.ClearDirections -> {
+            is ExploreAction.ClearDirections -> {
                 uiState = uiState.copy(
                     directionsDestination = null,
                     directionsRoute = null,
@@ -293,7 +293,7 @@ class ExploreViewModel(
         )
     }
 
-    private fun getDirections(
+    fun getDirections(
         event: EventDetailsUi,
         userLat: Double,
         userLng: Double
@@ -348,4 +348,5 @@ class ExploreViewModel(
         private const val GOOGLE_PLACES_SEARCH_DEBOUNCE_MS = 350L
     }
 }
+
 
