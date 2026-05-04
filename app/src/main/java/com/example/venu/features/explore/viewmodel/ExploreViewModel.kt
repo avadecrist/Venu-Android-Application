@@ -89,7 +89,37 @@ class ExploreViewModel(
             }
 
             is ExploreAction.GooglePlaceSuggestionClicked -> {
-                createEventFromGooglePlace(action.placeId)
+                previewGooglePlace(action.placeId)
+            }
+
+            is ExploreAction.GooglePlaceCreateClicked -> {
+                uiState = uiState.copy(
+                    selectedGooglePlacePreview = null,
+                    pendingGooglePlaceDraft = action.draft
+                )
+            }
+
+            is ExploreAction.GooglePlaceDraftChanged -> {
+                uiState = uiState.copy(
+                    pendingGooglePlaceDraft = action.draft
+                )
+            }
+
+            is ExploreAction.GooglePlaceCreateConfirmed -> {
+                createUserEventFromGooglePlace(action.draft)
+            }
+
+            ExploreAction.GooglePlacePreviewDismissed -> {
+                uiState = uiState.copy(
+                    selectedGooglePlacePreview = null
+                )
+            }
+
+            ExploreAction.GooglePlaceDraftDismissed -> {
+                uiState = uiState.copy(
+                    pendingGooglePlaceDraft = null,
+                    isCreatingGooglePlaceEvent = false
+                )
             }
 
             is ExploreAction.GooglePlacesErrorDismissed -> {
@@ -132,17 +162,34 @@ class ExploreViewModel(
 
     fun createUserEventFromGooglePlace(draft: GooglePlaceEventDraft) {
         viewModelScope.launch {
-            val newEvent = draft.toUserCreatedEvent()
-
-            eventRepository.createEvent(newEvent)
-
-            events = eventRepository.getTrendingEvents()
-
             uiState = uiState.copy(
-                places = buildPlaces(),
-                availableLists = listsRepository.getAllLists(),
-                selectedPlaceId = newEvent.id
+                isCreatingGooglePlaceEvent = true,
+                googlePlacesError = null
             )
+
+            runCatching {
+                val newEvent = draft.toUserCreatedEvent()
+                eventRepository.createEvent(newEvent)
+                newEvent
+            }.onSuccess { newEvent ->
+                events = eventRepository.getTrendingEvents()
+
+                uiState = uiState.copy(
+                    query = "",
+                    places = buildPlaces(),
+                    availableLists = listsRepository.getAllLists(),
+                    selectedPlaceId = newEvent.id,
+                    googlePlaceSuggestions = emptyList(),
+                    selectedGooglePlacePreview = null,
+                    pendingGooglePlaceDraft = null,
+                    isCreatingGooglePlaceEvent = false
+                )
+            }.onFailure { error ->
+                uiState = uiState.copy(
+                    isCreatingGooglePlaceEvent = false,
+                    googlePlacesError = error.message ?: "Unable to create event from Google Place."
+                )
+            }
         }
     }
 
@@ -198,9 +245,12 @@ class ExploreViewModel(
         }
     }
 
-    private fun createEventFromGooglePlace(placeId: String) {
+    private fun previewGooglePlace(placeId: String) {
         viewModelScope.launch {
             uiState = uiState.copy(
+                selectedPlaceId = null,
+                selectedGooglePlacePreview = null,
+                pendingGooglePlaceDraft = null,
                 isCreatingGooglePlaceEvent = true,
                 googlePlacesError = null
             )
@@ -216,24 +266,20 @@ class ExploreViewModel(
                     return@onSuccess
                 }
 
-                val newEvent = place.toEventDraft().toUserCreatedEvent()
-
-                eventRepository.createEvent(newEvent)
-
-                events = eventRepository.getTrendingEvents()
+                val draft = place.toEventDraft()
 
                 uiState = uiState.copy(
-                    query = "",
-                    places = buildPlaces(),
-                    selectedPlaceId = newEvent.id,
+                    selectedPlaceId = null,
+                    selectedGooglePlacePreview = draft,
+                    pendingGooglePlaceDraft = null,
                     googlePlaceSuggestions = emptyList(),
-                    isCreatingGooglePlaceEvent = false,
-                    availableLists = listsRepository.getAllLists()
+                    isCreatingGooglePlaceEvent = false
                 )
             }.onFailure { error ->
                 uiState = uiState.copy(
+                    selectedGooglePlacePreview = null,
                     isCreatingGooglePlaceEvent = false,
-                    googlePlacesError = error.message ?: "Unable to create event from Google Place."
+                    googlePlacesError = error.message ?: "Unable to load place details."
                 )
             }
         }

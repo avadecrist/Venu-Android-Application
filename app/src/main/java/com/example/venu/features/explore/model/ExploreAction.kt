@@ -25,6 +25,22 @@ sealed interface ExploreAction {
         val placeId: String
     ) : ExploreAction
 
+    data class GooglePlaceCreateClicked(
+        val draft: GooglePlaceEventDraft
+    ) : ExploreAction
+
+    data class GooglePlaceDraftChanged(
+        val draft: GooglePlaceEventDraft
+    ) : ExploreAction
+
+    data class GooglePlaceCreateConfirmed(
+        val draft: GooglePlaceEventDraft
+    ) : ExploreAction
+
+    data object GooglePlacePreviewDismissed : ExploreAction
+
+    data object GooglePlaceDraftDismissed : ExploreAction
+
     data object GooglePlacesErrorDismissed : ExploreAction
 
     data object PlaceDetailsDismissed : ExploreAction
