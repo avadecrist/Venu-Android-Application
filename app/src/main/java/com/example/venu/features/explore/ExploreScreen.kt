@@ -680,33 +680,35 @@ private fun GooglePlacePreviewSheet(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = draft.venueName,
-            style = MaterialTheme.typography.titleLarge
+            text = draft.location,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
         )
 
-        draft.googlePlaceAddress?.let { address ->
+        if (draft.address.isNotBlank()) {
             Text(
-                text = address,
+                text = draft.address,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
         Text(
-            text = buildString {
-                append("Google Place preview")
-
-                draft.rating?.let { rating ->
-                    append(" • Rating: ")
-                    append(String.format("%.1f", rating))
-                }
-            },
+            text = "Create a custom event from this Google verified venue.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Text(
-            text = "This place is only being previewed. It will not be saved as a Venu event unless you press Create event.",
+            text = buildString {
+                append("Google verified venue")
+                draft.rating?.let { rating ->
+                    append(" • Rating: ")
+                    append(String.format("%.1f", rating))
+                }
+                append(" • Price tier: ")
+                append(draft.priceTier.name.replace("_", " "))
+            },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -746,6 +748,8 @@ private fun GooglePlaceEventDraftSheet(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .fillMaxHeight(0.92f)
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -754,20 +758,6 @@ private fun GooglePlaceEventDraftSheet(
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
-
-        Text(
-            text = draft.venueName,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        draft.googlePlaceAddress?.let { address ->
-            Text(
-                text = address,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
 
         OutlinedTextField(
             value = draft.eventName,
@@ -784,18 +774,47 @@ private fun GooglePlaceEventDraftSheet(
         )
 
         OutlinedTextField(
-            value = draft.eventSubtitle,
+            value = draft.description,
             onValueChange = { value ->
                 onDraftChange(
-                    draft.copy(eventSubtitle = value)
+                    draft.copy(description = value)
                 )
             },
             modifier = Modifier.fillMaxWidth(),
             label = {
-                Text("Subtitle / description")
+                Text("Description")
             },
             minLines = 2,
             maxLines = 4
+        )
+
+        OutlinedTextField(
+            value = draft.location,
+            onValueChange = { value ->
+                onDraftChange(
+                    draft.copy(location = value)
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text("Location")
+            },
+            singleLine = true
+        )
+
+        OutlinedTextField(
+            value = draft.address,
+            onValueChange = { value ->
+                onDraftChange(
+                    draft.copy(address = value)
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text("Address")
+            },
+            minLines = 2,
+            maxLines = 3
         )
 
         OutlinedTextField(
@@ -830,12 +849,10 @@ private fun GooglePlaceEventDraftSheet(
         Text(
             text = buildString {
                 append("Google verified venue")
-
                 draft.rating?.let { rating ->
                     append(" • Rating: ")
                     append(String.format("%.1f", rating))
                 }
-
                 append(" • Price tier: ")
                 append(draft.priceTier.name.replace("_", " "))
             },
@@ -861,7 +878,9 @@ private fun GooglePlaceEventDraftSheet(
                 onClick = onCreateEvent,
                 enabled = !isCreating &&
                         draft.eventName.isNotBlank() &&
-                        draft.eventSubtitle.isNotBlank() &&
+                        draft.description.isNotBlank() &&
+                        draft.location.isNotBlank() &&
+                        draft.address.isNotBlank() &&
                         draft.startTimeLabel.isNotBlank()
             ) {
                 Text(
@@ -882,7 +901,7 @@ private fun GenreSelectionRows(
     onGenreSelected: (Genre) -> Unit
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Genre.entries.forEach { genre ->
             Row(
@@ -891,7 +910,7 @@ private fun GenreSelectionRows(
                     .clickable {
                         onGenreSelected(genre)
                     }
-                    .padding(vertical = 2.dp),
+                    .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
@@ -905,6 +924,7 @@ private fun GenreSelectionRows(
 
                 Text(
                     text = genre.label,
+                    modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -1182,8 +1202,8 @@ private const val GOOGLE_PREVIEW_PLACE_ID_PREFIX = "google-preview-"
 private fun GooglePlaceEventDraft.toPreviewPlaceUi(): PlaceUi {
     return PlaceUi(
         id = toPreviewPlaceId(),
-        name = venueName,
-        subtitle = googlePlaceAddress ?: eventSubtitle,
+        name = location,
+        subtitle = address ?: description,
         latitude = latitude,
         longitude = longitude,
         distanceKm = null,
