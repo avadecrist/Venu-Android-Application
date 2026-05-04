@@ -234,6 +234,8 @@ class MainActivity : ComponentActivity() {
                         AppScaffold(
                             isSignedIn = isSignedIn,
                             isDarkMode = isDarkMode,
+                            currentUserDisplayName = currentUserDisplayName,
+                            currentUserEmail = currentUserEmail,
                             onDarkModeChange = { darkMode ->
                                 isDarkMode = darkMode
                             },
@@ -243,6 +245,25 @@ class MainActivity : ComponentActivity() {
                                         inclusive = true
                                     }
                                     launchSingleTop = true
+                                }
+                            },
+                            onEditProfileSave = { newDisplayName ->
+                                scope.launch {
+                                    try {
+                                        val firebaseUser = firebaseAuthClient.currentUser()
+
+                                        if (firebaseUser != null) {
+                                            userFirestoreRepository.updateDisplayName(
+                                                uid = firebaseUser.uid,
+                                                displayName = newDisplayName
+                                            )
+                                        }
+
+                                        currentUserDisplayName = newDisplayName
+                                    } catch (error: Exception) {
+                                        loginErrorMessage =
+                                            "${error::class.simpleName}: ${error.message ?: "Failed to update display name."}"
+                                    }
                                 }
                             },
                             onSignOutClick = {
@@ -296,6 +317,7 @@ fun AppNavPreview() {
 
             composable("home") {
                 HomeRoute(
+                    displayName = "Explorer",
                     onNavigateToExploreDirections = {
                         // no explore route for preview
                     }
