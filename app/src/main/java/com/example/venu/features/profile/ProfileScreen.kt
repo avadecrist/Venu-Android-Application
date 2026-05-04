@@ -191,7 +191,7 @@ private fun ProfileHeader(
         Spacer(modifier = Modifier.height(18.dp))
 
         Text(
-            text = if (state.isSignedIn) state.displayName else "Profile",
+            text = if (state.isSignedIn) state.displayName else "Explorer",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = VenuColors.TextPrimary
