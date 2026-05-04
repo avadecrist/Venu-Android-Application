@@ -14,13 +14,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.view.WindowCompat
-import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.venu.auth.FirebaseAuthClient
 import com.example.venu.auth.GoogleAuthClient
 import com.example.venu.core.core_common.core_ui.theme.VenuTheme
+import com.example.venu.core.core_data.remote.firestore.UserFirestoreRepository
 import com.example.venu.features.home.HomeRoute
 import com.example.venu.features.login.LoginScreen
 import com.example.venu.features.onboarding.CompleteProfileScreen
@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // To make status bar transparent
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                 scrim = android.graphics.Color.TRANSPARENT,
@@ -39,8 +38,8 @@ class MainActivity : ComponentActivity() {
                 darkScrim = android.graphics.Color.TRANSPARENT
             )
         )
-        super.onCreate(savedInstanceState)
 
+        super.onCreate(savedInstanceState)
 
         setContent {
             var isDarkMode by rememberSaveable {
@@ -73,8 +72,17 @@ class MainActivity : ComponentActivity() {
             ) {
                 val context = LocalContext.current
                 val scope = rememberCoroutineScope()
+
                 val googleAuthClient = remember {
                     GoogleAuthClient(context)
+                }
+
+                val firebaseAuthClient = remember {
+                    FirebaseAuthClient()
+                }
+
+                val userFirestoreRepository = remember {
+                    UserFirestoreRepository()
                 }
 
                 val navController = rememberNavController()
@@ -96,30 +104,67 @@ class MainActivity : ComponentActivity() {
                                 loginErrorMessage = null
 
                                 scope.launch {
-                                    val result = googleAuthClient.signIn()
+                                    val googleResult = googleAuthClient.signIn()
 
-                                    result
-                                        .onSuccess { user ->
-                                            currentUserEmail = user.email
-                                            currentUserDisplayName = user.displayName
-                                            isSignedIn = true
-                                            isSigningIn = false
+                                    googleResult
+                                        .onSuccess { googleUser ->
+                                            try {
+                                                val firebaseUser =
+                                                    firebaseAuthClient.signInWithGoogleIdToken(
+                                                        idToken = googleUser.idToken
+                                                    )
 
-                                            navController.navigate("complete_profile") {
-                                                popUpTo("login") {
-                                                    inclusive = true
+                                                userFirestoreRepository.createUserIfMissing(
+                                                    uid = firebaseUser.uid,
+                                                    email = firebaseUser.email,
+                                                    displayName = null,
+                                                    photoUrl = firebaseUser.photoUrl
+                                                )
+
+                                                val firestoreUser =
+                                                    userFirestoreRepository.getUser(firebaseUser.uid)
+
+                                                currentUserEmail = firebaseUser.email
+                                                currentUserDisplayName =
+                                                    firestoreUser?.displayName
+                                                isSignedIn = true
+                                                isSigningIn = false
+
+                                                if (firestoreUser?.displayName.isNullOrBlank()) {
+                                                    navController.navigate("complete_profile") {
+                                                        popUpTo("login") {
+                                                            inclusive = true
+                                                        }
+                                                        launchSingleTop = true
+                                                    }
+                                                } else {
+                                                    navController.navigate("app") {
+                                                        popUpTo("login") {
+                                                            inclusive = true
+                                                        }
+                                                        launchSingleTop = true
+                                                    }
                                                 }
-                                                launchSingleTop = true
+                                            } catch (error: Exception) {
+                                                isSigningIn = false
+                                                loginErrorMessage =
+                                                    "${error::class.simpleName}: ${error.message ?: "Firebase sign-in failed."}"
                                             }
                                         }
                                         .onFailure { error ->
                                             isSigningIn = false
 
                                             loginErrorMessage = when {
-                                                error.message?.contains("Account reauth failed", ignoreCase = true) == true ->
+                                                error.message?.contains(
+                                                    "Account reauth failed",
+                                                    ignoreCase = true
+                                                ) == true ->
                                                     "Google account re-auth failed. Remove and re-add the Google account on this device, then try again."
 
-                                                error.message?.contains("No credentials", ignoreCase = true) == true ->
+                                                error.message?.contains(
+                                                    "No credentials",
+                                                    ignoreCase = true
+                                                ) == true ->
                                                     "No Google account is available. Add a Google account to this device, then try again."
 
                                                 else ->
@@ -148,13 +193,30 @@ class MainActivity : ComponentActivity() {
                         CompleteProfileScreen(
                             suggestedDisplayName = currentUserDisplayName,
                             onContinueClick = { displayName ->
-                                currentUserDisplayName = displayName
+                                scope.launch {
+                                    try {
+                                        val firebaseUser =
+                                            firebaseAuthClient.currentUser()
 
-                                navController.navigate("app") {
-                                    popUpTo("complete_profile") {
-                                        inclusive = true
+                                        if (firebaseUser != null) {
+                                            userFirestoreRepository.updateDisplayName(
+                                                uid = firebaseUser.uid,
+                                                displayName = displayName
+                                            )
+                                        }
+
+                                        currentUserDisplayName = displayName
+
+                                        navController.navigate("app") {
+                                            popUpTo("complete_profile") {
+                                                inclusive = true
+                                            }
+                                            launchSingleTop = true
+                                        }
+                                    } catch (error: Exception) {
+                                        loginErrorMessage =
+                                            "${error::class.simpleName}: ${error.message ?: "Failed to save display name."}"
                                     }
-                                    launchSingleTop = true
                                 }
                             },
                             onSkipClick = {
@@ -185,6 +247,7 @@ class MainActivity : ComponentActivity() {
                             },
                             onSignOutClick = {
                                 scope.launch {
+                                    firebaseAuthClient.signOut()
                                     googleAuthClient.signOut()
 
                                     isSignedIn = false
