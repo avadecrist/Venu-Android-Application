@@ -1,10 +1,9 @@
 package com.example.venu.core.core_common
 
-// tiny TEMPORARY dependency container so screens can access repos
-// use this in ViewModels!
-
 import android.content.Context
+import com.example.venu.BuildConfig
 import com.example.venu.core.core_data.local.db.VenuLocalDatabase
+import com.example.venu.core.core_data.places.GooglePlacesRepository
 import com.example.venu.core.core_data.repository.FakeReviewRepository
 import com.example.venu.core.core_data.repository.InMemoryListsRepository
 import com.example.venu.core.core_data.repository.RoomEventRepository
@@ -12,6 +11,8 @@ import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListsRepository
 import com.example.venu.core.core_domain.repository.ReviewRepository
 
+// Tiny TEMPORARY dependency container so screens can access repos.
+// Use this in ViewModels.
 object AppGraph {
 
     private lateinit var database: VenuLocalDatabase
@@ -22,6 +23,9 @@ object AppGraph {
     lateinit var listsRepo: ListsRepository
         private set
 
+    lateinit var googlePlacesRepo: GooglePlacesRepository
+        private set
+
     val reviewRepo: ReviewRepository by lazy {
         FakeReviewRepository()
     }
@@ -30,14 +34,23 @@ object AppGraph {
         database = VenuLocalDatabase.getDatabase(context)
 
         val roomEventRepository = RoomEventRepository(database.eventDao())
-        // database.clearAllTables() //uncomment if we want to test reseeding again
+
+        // database.clearAllTables()
+        // Uncomment only if we want to test reseeding again.
+
         roomEventRepository.seedIfEmpty()
 
-        // Temp test to confirm Room is initialized
+        // Temp test to confirm Room is initialized.
         val events = roomEventRepository.getAllEvents()
         println("AppGraph init: Loaded ${events.size} events from Room")
 
         eventRepo = roomEventRepository
+
         listsRepo = InMemoryListsRepository(eventRepo)
+
+        googlePlacesRepo = GooglePlacesRepository(
+            context = context,
+            apiKey = BuildConfig.MAPS_API_KEY
+        )
     }
 }

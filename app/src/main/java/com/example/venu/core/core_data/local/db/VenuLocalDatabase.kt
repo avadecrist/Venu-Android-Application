@@ -7,15 +7,16 @@ import androidx.room.RoomDatabase
 import com.example.venu.core.core_data.local.db.dao.EventDao
 import com.example.venu.core.core_data.local.db.entity.EventEntity
 
-/* This class:
- * Declares the Room database
- * Lists the entities
- * Exposes our DAO
- * Creates a singleton DB instance
+/*
+ * This class:
+ * - Declares the Room database
+ * - Lists the entities
+ * - Exposes our DAO
+ * - Creates a singleton DB instance
  */
 @Database(
     entities = [EventEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class VenuLocalDatabase : RoomDatabase() {
@@ -32,7 +33,11 @@ abstract class VenuLocalDatabase : RoomDatabase() {
                     context.applicationContext,
                     VenuLocalDatabase::class.java,
                     "venu_local_database"
-                ).build()
+                )
+                    // Development-only migration choice.
+                    // This wipes and rebuilds the database when the schema changes.
+                    .fallbackToDestructiveMigration(true)
+                    .build()
 
                 INSTANCE = instance
                 instance

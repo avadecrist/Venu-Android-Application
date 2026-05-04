@@ -17,13 +17,17 @@ data class ExploreUiState(
     // For highlighting a selected marker/card
     val selectedPlaceId: String? = null,
 
-    // For Event Details bottom sheet + directions (instantiated in Screens so don't need here)
-//    val selectedEventDetails: EventDetailsUi? = null,
+    // For receiving event from Home -> Explore
     val shouldStartDirections: Boolean = false,
 
     // Google maps directions
     val directionsDestination: EventDetailsUi? = null,
     val directionsRoute: DirectionsRoute? = null,
     val isLoadingDirections: Boolean = false,
-    val directionsError: String? = null
+    val directionsError: String? = null,
+
+    val googlePlaceSuggestions: List<GooglePlaceSuggestionUi> = emptyList(),
+    val isSearchingGooglePlaces: Boolean = false,
+    val isCreatingGooglePlaceEvent: Boolean = false,
+    val googlePlacesError: String? = null
 )

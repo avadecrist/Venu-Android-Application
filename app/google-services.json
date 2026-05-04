@@ -12,7 +12,36 @@
           "package_name": "com.example.venu"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "719899327421-c8o67m5gk8im8utqs23c2mr30d2kr2uh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.venu",
+            "certificate_hash": "ba822dca9a366b3c155e227e27a04b590224c7f8"
+          }
+        },
+        {
+          "client_id": "719899327421-p913vc04deep6onsl9kukdobqmi9indb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.venu",
+            "certificate_hash": "a5888306160a19dccf61d5c5246a363b4c9ef5a1"
+          }
+        },
+        {
+          "client_id": "719899327421-sjj3qkgph0tk92akot6n378q277ooupd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.venu",
+            "certificate_hash": "0d69148962892d833dc28656ec80e9489e729125"
+          }
+        },
+        {
+          "client_id": "719899327421-mr5l8b5d3gct941t0eg5dchvs54i4n12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC39K_nCaywcxaTC8j-hUM1mLRGTt6UI5E"
@@ -20,7 +49,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719899327421-gqvsj6gqjs131u1bvmjp22ga4an3df9v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

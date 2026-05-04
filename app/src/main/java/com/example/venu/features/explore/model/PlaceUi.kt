@@ -13,5 +13,6 @@ data class PlaceUi(
     val genre: Genre,
     val isVerified: Boolean,
     val isSaved: Boolean,
-    val savedLabel: String? = null
+    val savedLabel: String? = null,
+    val imageUrl: String? = null
 )
