@@ -70,7 +70,7 @@ fun MyReviewsScreen(
         ReviewCard(
             review = ReviewUi(
                 authorInitial = "B",
-                authorName = "Blue Bottle Coffee",
+                displayName = "Blue Bottle Coffee",
                 rating = 5,
                 comment = "Great coffee and a really nice atmosphere.",
                 timeAgo = "Apr 19, 2026",
@@ -83,7 +83,7 @@ fun MyReviewsScreen(
         ReviewCard(
             review = ReviewUi(
                 authorInitial = "M",
-                authorName = "Madison Square Park",
+                displayName = "Madison Square Park",
                 rating = 4,
                 comment = "Nice place to walk around and relax in the afternoon.",
                 timeAgo = "Apr 12, 2026",

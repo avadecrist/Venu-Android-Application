@@ -51,7 +51,7 @@ fun ReviewCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = review.authorName,
+                        text = review.displayName,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = VenuColors.TextPrimary
@@ -84,6 +84,7 @@ fun ReviewCard(
     }
 }
 
+// tweak this to use photoUrl from Google Auth
 @Composable
 private fun ReviewerAvatar(initial: String) {
     Box(

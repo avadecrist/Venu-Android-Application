@@ -2,6 +2,7 @@ package com.example.venu.features.explore.model
 
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.repository.ListType
+import com.example.venu.core.core_presentation.EventDetailsUi
 
 sealed interface ExploreAction {
 
@@ -27,4 +28,13 @@ sealed interface ExploreAction {
     data object GooglePlacesErrorDismissed : ExploreAction
 
     data object PlaceDetailsDismissed : ExploreAction
+
+    // Google maps directions
+    data class GetDirectionsClicked(
+        val event: EventDetailsUi,
+        val userLat: Double,
+        val userLng: Double
+    ) : ExploreAction
+
+    data object ClearDirections : ExploreAction
 }

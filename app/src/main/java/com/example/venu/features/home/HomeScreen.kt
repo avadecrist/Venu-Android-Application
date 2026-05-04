@@ -23,11 +23,11 @@ import com.example.venu.features.home.model.HomeUiState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.venu.core.core_common.core_ui.theme.VenuTheme
+import androidx.compose.ui.platform.LocalContext
 import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import com.example.venu.core.core_common.eventdetails.genreEmoji
 import com.example.venu.core.core_domain.model.Genre
@@ -40,11 +40,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     state: HomeUiState,
-    onAction: (HomeAction) -> Unit
+    onAction: (HomeAction) -> Unit,
+    onNavigateToExploreDirections: (eventId: String) -> Unit
 ) {
-    var selectedEvent by remember { mutableStateOf<EventDetailsUi?>(null) }
+    var selectedEventDetails by remember { mutableStateOf<EventDetailsUi?>(null) }
 
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     Column(
@@ -95,6 +99,22 @@ fun HomeScreen(
 
             Spacer(Modifier.height(12.dp))
 
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .horizontalScroll(rememberScrollState()),
+//            horizontalArrangement = Arrangement.spacedBy(12.dp)
+//        ) {
+//            // maps fake seed data to each feature card
+//            state.featured.forEach { venue ->
+//                FeaturedCard(
+//                    title = venue.title,
+//                    subtitle = venue.subtitle,
+//                    genre = venue.genre,
+//                    onClick = { selectedEventDetails = venue.toEventDetailsUi() }
+//                )
+//            }
+//        }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -106,7 +126,7 @@ fun HomeScreen(
                         title = venue.title,
                         subtitle = venue.subtitle,
                         genre = venue.genre,
-                        onClick = { selectedEvent = venue.toEventDetailsUi() }
+                        onClick = { selectedEventDetails = venue.toEventDetailsUi() }
                     )
                 }
             }
@@ -131,18 +151,39 @@ fun HomeScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            state.nearYou.forEach { venue ->
-                VenueCard(
-                    name = venue.title,
-                    details = buildString {
-                        append(venue.subtitle)
-                        venue.distanceLabel?.let { append(" • $it") }
-                        venue.ratingLabel?.let { append(" • $it") }
-                    },
-                    genre = venue.genre,
-                    onClick = { selectedEvent = venue.toEventDetailsUi() }
-                )
-            }
+        // maps fake seed data to each venue card
+        state.nearYou.forEach { venue ->
+            VenueCard(
+                name = venue.title,
+                details = buildString {
+                    append(venue.subtitle)
+
+                    venue.distanceLabel?.let {
+                        append(" • ")
+                        append(it)
+                    }
+
+                    venue.ratingLabel?.let {
+                        append(" • ")
+                        append(it)
+                    }
+                },
+                genre = venue.genre,
+                onClick = { selectedEventDetails = venue.toEventDetailsUi() }
+            )
+        }
+//            state.nearYou.forEach { venue ->
+//                VenueCard(
+//                    name = venue.title,
+//                    details = buildString {
+//                        append(venue.subtitle)
+//                        venue.distanceLabel?.let { append(" • $it") }
+//                        venue.ratingLabel?.let { append(" • $it") }
+//                    },
+//                    genre = venue.genre,
+//                    onClick = { selectedEventDetails = venue.toEventDetailsUi() }
+//                )
+//            }
 
             Spacer(Modifier.height(24.dp))
         }
@@ -166,25 +207,34 @@ fun HomeScreen(
         )
     }
 
-    selectedEvent?.let { event ->
+    selectedEventDetails?.let { event ->
         ModalBottomSheet(
             sheetState = sheetState,
             onDismissRequest = {
-                selectedEvent = null
+                scope.launch {
+                    sheetState.hide()
+                    selectedEventDetails = null
+                }
             }
         ) {
             EventDetailsSheet(
                 event = event,
-                showDirectionsButton = false,
                 onBack = {
                     scope.launch {
                         sheetState.hide()
-                        selectedEvent = null
+                        selectedEventDetails = null
                     }
                 },
                 onSaveClick = { onAction(HomeAction.SaveClicked(event.id)) },
-                onViewOnMapClick = { /* TODO */ },
-                onGetDirectionsClick = { /* TODO */ },
+                onGetDirectionsClick = {
+                    scope.launch {
+                        sheetState.hide()
+                        selectedEventDetails = null
+
+                        onNavigateToExploreDirections(event.id)
+
+                    }
+                },
                 onSubmitReview = { _, _ -> }
             )
         }
@@ -332,6 +382,8 @@ private fun HomeScreenPreview() {
                         title = "Sushi Miko",
                         subtitle = "Sushi Miko • Dinner hours",
                         distanceLabel = "0.4 km",
+                        latitude = 0.0,
+                        longitude = 0.0,
                         ratingLabel = "★ 4.7",
                         genre = Genre.FOOD
                     ),
@@ -340,6 +392,8 @@ private fun HomeScreenPreview() {
                         title = "Indie Night at Tupperware",
                         subtitle = "Tupperware Club • Tonight 11 PM",
                         distanceLabel = "0.2 km",
+                        latitude = 0.0,
+                        longitude = 0.0,
                         ratingLabel = "★ 4.5",
                         genre = Genre.MUSIC
                     )
@@ -350,6 +404,8 @@ private fun HomeScreenPreview() {
                         title = "Indie Night at Tupperware",
                         subtitle = "Tupperware Club • Tonight 11 PM",
                         distanceLabel = "0.2 km",
+                        latitude = 0.0,
+                        longitude = 0.0,
                         ratingLabel = "★ 4.5",
                         genre = Genre.NIGHTLIFE
                     ),
@@ -358,6 +414,8 @@ private fun HomeScreenPreview() {
                         title = "Late Night Study Session",
                         subtitle = "HanSo Café • Tonight 9 PM",
                         distanceLabel = "0.1 km",
+                        latitude = 0.0,
+                        longitude = 0.0,
                         ratingLabel = null,
                         genre = Genre.STUDY
                     ),
@@ -366,12 +424,15 @@ private fun HomeScreenPreview() {
                         title = "Open Mic Comedy",
                         subtitle = "La Vía Láctea • Fri 10 PM",
                         distanceLabel = "0.3 km",
+                        latitude = 0.0,
+                        longitude = 0.0,
                         ratingLabel = "★ 4.8",
                         genre = Genre.COFFEE
                     )
                 )
             ),
-            onAction = {}
+            onAction = {},
+            onNavigateToExploreDirections = {}
         )
     }
 }

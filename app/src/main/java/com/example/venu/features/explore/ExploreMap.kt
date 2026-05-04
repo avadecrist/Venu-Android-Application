@@ -1,13 +1,20 @@
 package com.example.venu.features.explore
 
-import android.annotation.SuppressLint
-import android.content.pm.PackageManager
+
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+
 import androidx.compose.runtime.setValue
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -15,22 +22,31 @@ import com.example.venu.features.explore.model.PlaceUi
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+
+import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberUpdatedMarkerState
+import com.google.maps.model.DirectionsRoute
+
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 
 private val MadridLatLng = LatLng(40.4168, -3.7038)
+
 
 @Composable
 fun ExploreMap(
     modifier: Modifier = Modifier,
     places: List<PlaceUi>,
     selectedPlaceId: String?,
+    directionsRoute: DirectionsRoute?,
     hasLocationPermission: Boolean,
     zoomRequest: Int,
     zoomDelta: Float,
@@ -121,7 +137,7 @@ fun ExploreMap(
         cameraPositionState.animate(
             update = CameraUpdateFactory.newLatLngZoom(
                 LatLng(selected.latitude, selected.longitude),
-                14f
+                16f
             )
         )
     }
@@ -137,6 +153,10 @@ fun ExploreMap(
             zoomControlsEnabled = false
         )
     ) {
+        directionsRoute?.let { route ->
+            DrawRoute(route = route)
+        }
+
         places.forEach { place ->
             val markerState = rememberUpdatedMarkerState(
                 position = LatLng(place.latitude, place.longitude)
@@ -146,6 +166,13 @@ fun ExploreMap(
                 state = markerState,
                 title = place.name,
                 snippet = place.subtitle,
+                icon = BitmapDescriptorFactory.defaultMarker(
+                    if (place.id == selectedPlaceId) {
+                        BitmapDescriptorFactory.HUE_AZURE
+                    } else {
+                        BitmapDescriptorFactory.HUE_RED
+                    }
+                ),
                 onClick = {
                     onMarkerSelected(place.id)
                     false
@@ -155,8 +182,22 @@ fun ExploreMap(
     }
 }
 
+@Composable
+fun DrawRoute(route: DirectionsRoute) {
+    val pathPoints = remember(route) {
+        route.overviewPolyline.decodePath().map {
+            LatLng(it.lat, it.lng)
+        }
+    }
+
+    Polyline(
+        points = pathPoints,
+        width = 10f
+    )
+}
+
 @SuppressLint("MissingPermission")
-private fun fetchUserLocation(
+fun fetchUserLocation(
     fusedLocationClient: FusedLocationProviderClient,
     onLocationFound: (LatLng) -> Unit,
     onLocationMissing: () -> Unit

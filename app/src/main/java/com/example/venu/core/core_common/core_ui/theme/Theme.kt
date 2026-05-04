@@ -14,27 +14,41 @@ import androidx.compose.ui.platform.LocalContext
 
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+
+    // PRIMARY
+    primary = VenuColors.AccentBlue,
+    onPrimary = Color.White,
+
+    primaryContainer = Color(0xFF1E3A5F),
+    onPrimaryContainer = Color(0xFFEAF2FF),
+
+    // SECONDARY
+    secondary = Color(0xFF3A2618),
+    onSecondary = Color(0xFFFFB86B),
+
+    // TERTIARY
+    tertiary = Color(0xFF25304A),
+    onTertiary = Color(0xFFEAEFFD),
+
+    // BACKGROUNDS
+    background = Color(0xFF101318),
+    onBackground = Color(0xFFF4F5F7),
+
+    surface = Color(0xFF171A21),
+    onSurface = Color(0xFFF4F5F7),
+
+    surfaceVariant = Color(0xFF222631),
+    onSurfaceVariant = Color(0xFFC6CBD4),
+
+    // BORDERS / DIVIDERS
+    outline = Color(0xFF343946),
+    outlineVariant = Color(0xFF4B5263),
+
+    // EXTRA
+    inverseSurface = Color(0xFFF4F5F7),
+    inverseOnSurface = Color(0xFF101318)
 )
 
-/*private val LightColorScheme = lightColorScheme(
-    primary = VenuColors.AccentBlue,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    background = VenuColors.Background,
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
-)*/
 private val LightColorScheme = lightColorScheme(
 
     // PRIMARY (main actions: buttons, highlights)

@@ -9,6 +9,10 @@ data class EventDetailsUi(
     val subtitle: String,
     val genre: Genre,
     val locationName: String,
+
+    val latitude: Double,
+    val longitude: Double,
+
     val distanceKm: Double?,
     val priceText: String,
     val startTimeLabel: String,
@@ -16,9 +20,11 @@ data class EventDetailsUi(
     val credibilityScore: Int,
     val reviewCount: Int,
     val isVerifiedVenue: Boolean,
+
     val averageRating: Double?,
     val googleRating: Double?,
     val userRating: Double?,
+
     val attendeeCount: Int,
     val crowdLevel: CrowdLevel,
     val reviews: List<ReviewUi>,

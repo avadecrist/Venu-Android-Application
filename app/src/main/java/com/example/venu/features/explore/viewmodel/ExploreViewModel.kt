@@ -1,5 +1,6 @@
 package com.example.venu.features.explore.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,6 +20,9 @@ import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.GooglePlaceEventDraft
 import com.example.venu.features.explore.model.PlaceUi
+import androidx.lifecycle.viewModelScope
+import com.example.venu.core.core_data.location.DirectionsService
+import com.example.venu.core.core_presentation.EventDetailsUi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,6 +34,8 @@ class ExploreViewModel(
 ) : ViewModel() {
 
     private var events: List<Event> = emptyList()
+
+    private val directionsService = DirectionsService()
 
     private var googlePlacesSearchJob: Job? = null
 
@@ -86,8 +92,29 @@ class ExploreViewModel(
                 createEventFromGooglePlace(action.placeId)
             }
 
-            ExploreAction.GooglePlacesErrorDismissed -> {
+            is ExploreAction.GooglePlacesErrorDismissed -> {
                 uiState = uiState.copy(googlePlacesError = null)
+            }
+
+            is ExploreAction.GetDirectionsClicked -> {
+                Log.d("DirectionsDebug", "GetDirectionsClicked received")
+                getDirections(
+                    event = action.event,
+                    userLat = action.userLat,
+                    userLng = action.userLng
+                )
+
+                uiState = uiState.copy(
+                    shouldStartDirections = false
+                )
+            }
+
+            is ExploreAction.ClearDirections -> {
+                uiState = uiState.copy(
+                    directionsDestination = null,
+                    directionsRoute = null,
+                    directionsError = null
+                )
             }
 
             ExploreAction.PlaceDetailsDismissed -> {
@@ -266,8 +293,60 @@ class ExploreViewModel(
         )
     }
 
+    fun getDirections(
+        event: EventDetailsUi,
+        userLat: Double,
+        userLng: Double
+    ) {
+        viewModelScope.launch {
+            uiState = uiState.copy(
+                directionsDestination = event,
+                isLoadingDirections = true,
+                directionsError = null
+            )
+
+            try {
+                Log.d("DirectionsDebug", "Fetching route...")
+
+                val route = directionsService.getDrivingRoute(
+                    originLat = userLat,
+                    originLng = userLng,
+                    destinationLat = event.latitude,
+                    destinationLng = event.longitude
+                )
+
+                Log.d(
+                    "DirectionsDebug",
+                    "Route received. Polyline null? ${route.overviewPolyline == null}"
+                )
+
+                uiState = uiState.copy(
+                    directionsRoute = route,
+                    isLoadingDirections = false
+                )
+            } catch (e: Exception) {
+                Log.e("DirectionsDebug", "Directions failed", e)
+
+                uiState = uiState.copy(
+                    directionsRoute = null,
+                    isLoadingDirections = false,
+                    directionsError = e.message ?: "Could not load directions"
+                )
+            }
+        }
+    }
+
+    fun openFromHomeForDirections(eventId: String) {
+        uiState = uiState.copy(
+            selectedPlaceId = eventId,
+            shouldStartDirections = true
+        )
+    }
+
     companion object {
         private const val MIN_GOOGLE_PLACES_QUERY_LENGTH = 3
         private const val GOOGLE_PLACES_SEARCH_DEBOUNCE_MS = 350L
     }
 }
+
+

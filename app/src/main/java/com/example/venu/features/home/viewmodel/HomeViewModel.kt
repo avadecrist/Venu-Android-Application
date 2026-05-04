@@ -6,12 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.venu.core.core_common.AppGraph
-import com.example.venu.core.core_domain.model.Event
-import com.example.venu.core.core_domain.repository.ListType
+import com.example.venu.features.home.mappers.toHomeVenueUi
 import com.example.venu.features.home.model.HomeAction
 import com.example.venu.features.home.model.HomeUiState
 import com.example.venu.features.home.model.HomeVenueUi
-import kotlin.math.round
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
@@ -71,11 +69,21 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             allFeatured = eventRepo
                 .getTrendingEvents()
-                .map { it.toHomeVenueUi() }
+                .map { event ->
+                    event.toHomeVenueUi(
+                        reviewRepo = reviewRepo,
+                        listsRepo = listsRepo
+                    )
+                }
 
             allNearYou = eventRepo
                 .getNearbyEvents()
-                .map { it.toHomeVenueUi() }
+                .map { event ->
+                    event.toHomeVenueUi(
+                        reviewRepo = reviewRepo,
+                        listsRepo = listsRepo
+                    )
+                }
 
             applyFilters()
         }
@@ -100,29 +108,5 @@ class HomeViewModel : ViewModel() {
             featured = filteredFeatured,
             nearYou = filteredNearYou
         )
-    }
-
-    private suspend fun Event.toHomeVenueUi(): HomeVenueUi {
-        val summary = reviewRepo.getRatingSummary(id)
-
-        return HomeVenueUi(
-            id = id,
-            title = name,
-            subtitle = "$locationName • $startTimeLabel",
-            ratingLabel = if (summary.count > 0) {
-                "★ ${summary.average.roundTo1Decimal()}"
-            } else {
-                null
-            },
-            distanceLabel = distanceKm?.let {
-                "${it.roundTo1Decimal()} km"
-            },
-            genre = genre,
-            isSaved = listsRepo.isInList(ListType.WantToGo, id)
-        )
-    }
-
-    private fun Double.roundTo1Decimal(): Double {
-        return round(this * 10) / 10.0
     }
 }

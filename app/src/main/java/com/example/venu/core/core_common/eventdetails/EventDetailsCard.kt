@@ -1,14 +1,9 @@
 package com.example.venu.core.core_common.eventdetails
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,9 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -70,10 +63,8 @@ import com.example.venu.core.core_presentation.ReviewUi
 @Composable
 fun EventDetailsSheet(
     event: EventDetailsUi,
-    showDirectionsButton: Boolean,
     onBack: () -> Unit,
     onSaveClick: () -> Unit,
-    onViewOnMapClick: () -> Unit,
     onGetDirectionsClick: () -> Unit,
     onSubmitReview: (Int, String) -> Unit,
     modifier: Modifier = Modifier
@@ -117,8 +108,6 @@ fun EventDetailsSheet(
 
         item {
             ActionButtonsRow(
-                showDirectionsButton = showDirectionsButton,
-                onViewOnMapClick = onViewOnMapClick,
                 onGetDirectionsClick = onGetDirectionsClick
             )
 
@@ -332,8 +321,6 @@ private fun HeroImagePlaceholder(
 
 @Composable
 private fun ActionButtonsRow(
-    showDirectionsButton: Boolean,
-    onViewOnMapClick: () -> Unit,
     onGetDirectionsClick: () -> Unit
 ) {
     Row(
@@ -344,52 +331,33 @@ private fun ActionButtonsRow(
     ) {
         ActionButton(
             modifier = Modifier.weight(1f),
-            text = "View on Map",
-            icon = Icons.Outlined.LocationOn,
-            onClick = onViewOnMapClick,
-            isActive = false
+            icon = Icons.AutoMirrored.Filled.DirectionsWalk,
+            onClick = onGetDirectionsClick,
         )
-
-        AnimatedVisibility(
-            visible = showDirectionsButton,
-            modifier = Modifier.weight(1f),
-            enter = fadeIn() + slideInHorizontally { it / 3 },
-            exit = fadeOut() + slideOutHorizontally { it / 3 }
-        ) {
-            ActionButton(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Get Directions",
-                icon = Icons.AutoMirrored.Filled.DirectionsWalk,
-                onClick = onGetDirectionsClick,
-                isActive = true
-            )
-        }
     }
 }
 
 @Composable
 private fun ActionButton(
-    text: String,
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isActive: Boolean = false
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val backgroundColor by animateColorAsState(
-        targetValue = if (isActive) VenuColors.AccentBlue else Color.White,
+        targetValue = VenuColors.AccentBlue,
         label = "action_button_bg"
     )
 
     val contentColor by animateColorAsState(
-        targetValue = if (isActive) Color.White else VenuColors.AccentBlue,
+        targetValue = Color.White,
         label = "action_button_content"
     )
 
     val borderColor by animateColorAsState(
-        targetValue = if (isActive) VenuColors.AccentBlue else VenuColors.AccentBlueBorder,
+        targetValue = VenuColors.AccentBlue,
         label = "action_button_border"
     )
 
@@ -399,7 +367,7 @@ private fun ActionButton(
     )
 
     val elevation by animateDpAsState(
-        targetValue = if (isPressed) 2.dp else if (isActive) 8.dp else 0.dp,
+        targetValue = 2.dp,
         label = "action_button_elevation"
     )
 
@@ -412,7 +380,7 @@ private fun ActionButton(
             },
         onClick = onClick,
         interactionSource = interactionSource,
-        shape = RoundedCornerShape(if (isActive) 20.dp else 18.dp),
+        shape = RoundedCornerShape(20.dp),
         color = backgroundColor,
         shadowElevation = elevation,
         border = BorderStroke(1.dp, borderColor)
@@ -433,7 +401,7 @@ private fun ActionButton(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = text,
+                text = "Get Directions",
                 color = contentColor,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
@@ -624,6 +592,8 @@ private val PreviewEvent = EventDetailsUi(
     subtitle = "Authentic ramen from a local chef. Limited bowls, first come first served.",
     genre = Genre.FOOD,
     locationName = "East Quad",
+    latitude = 0.0,
+    longitude = 0.0,
     distanceKm = 0.4,
     priceText = "$8",
     startTimeLabel = "Feb 19 • 12:00 PM",
@@ -640,7 +610,7 @@ private val PreviewEvent = EventDetailsUi(
     reviews = listOf(
         ReviewUi(
             id = "r1",
-            authorName = "Avery C.",
+            displayName = "Avery C.",
             authorInitial = "A",
             rating = 5,
             comment = "Best ramen I've had on campus. The broth was perfect.",
@@ -648,7 +618,7 @@ private val PreviewEvent = EventDetailsUi(
         ),
         ReviewUi(
             id = "r2",
-            authorName = "Jordan M.",
+            displayName = "Jordan M.",
             authorInitial = "J",
             rating = 4,
             comment = "Really good and worth the wait. Noodles were great, line moved a little slow.",
@@ -656,7 +626,7 @@ private val PreviewEvent = EventDetailsUi(
         ),
         ReviewUi(
             id = "r3",
-            authorName = "Sophia T.",
+            displayName = "Sophia T.",
             authorInitial = "S",
             rating = 5,
             comment = "Would absolutely go again. Super fun atmosphere and quality food.",
@@ -677,10 +647,8 @@ private fun EventDetailsSheetPreview() {
     MaterialTheme {
         EventDetailsSheet(
             event = PreviewEvent,
-            showDirectionsButton = true,
             onBack = {},
             onSaveClick = {},
-            onViewOnMapClick = {},
             onGetDirectionsClick = {},
             onSubmitReview = { _, _ -> }
         )
@@ -696,10 +664,8 @@ fun PreviewQuiet() {
             attendeeCount = 12,
             crowdLevel = CrowdLevel.QUIET
         ),
-        showDirectionsButton = true,
         onBack = {},
         onSaveClick = {},
-        onViewOnMapClick = {},
         onGetDirectionsClick = {},
         onSubmitReview = { _, _ -> }
     )
@@ -714,10 +680,8 @@ fun PreviewPacked() {
             attendeeCount = 240,
             crowdLevel = CrowdLevel.PACKED
         ),
-        showDirectionsButton = true,
         onBack = {},
         onSaveClick = {},
-        onViewOnMapClick = {},
         onGetDirectionsClick = {},
         onSubmitReview = { _, _ -> }
     )
@@ -726,16 +690,11 @@ fun PreviewPacked() {
 @Preview(showBackground = true)
 @Composable
 fun InteractivePreview() {
-    var showDirections by remember { mutableStateOf(false) }
 
     EventDetailsSheet(
         event = PreviewEvent,
-        showDirectionsButton = showDirections,
         onBack = {},
         onSaveClick = {},
-        onViewOnMapClick = {
-            showDirections = true // simulate navigation result
-        },
         onGetDirectionsClick = {},
         onSubmitReview = { _, _ -> }
     )

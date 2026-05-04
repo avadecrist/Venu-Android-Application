@@ -11,17 +11,23 @@ fun PlaceUi.toEventDetailsUi(): EventDetailsUi {
         subtitle = subtitle,
         genre = genre,
         locationName = name,
+
+        latitude = latitude,
+        longitude = longitude,
+
         distanceKm = distanceKm,
         priceText = "$",
         startTimeLabel = "Open now",
         imageUrl = null,
-        credibilityScore = 85,
-        reviewCount = 0,
+        credibilityScore = 85, //temporary or default value
+        reviewCount = 0, //temporary or default value
         isVerifiedVenue = isVerified,
+
         averageRating = rating,
         googleRating = rating,
         userRating = rating,
-        attendeeCount = 0,
+
+        attendeeCount = 0, //temporary or default value
         crowdLevel = CrowdLevel.UNKNOWN, //temporary or default value
         reviews = emptyList(),
         isSaved = isSaved || savedLabel != null
@@ -34,6 +40,10 @@ fun HomeVenueUi.toEventDetailsUi(): EventDetailsUi {
         name = title,
         subtitle = subtitle,
         locationName = title,
+
+        latitude = latitude,
+        longitude = longitude,
+
         distanceKm = distanceLabel
             ?.removeSuffix(" km")
             ?.toDoubleOrNull(),

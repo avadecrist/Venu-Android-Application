@@ -42,7 +42,7 @@ class FakeReviewRepository : ReviewRepository {
                 id = UUID.randomUUID().toString(),
                 eventId = eventId,
                 userId = currentUserId,
-                authorName = "You",
+                displayName = "You",
                 rating = rating,
                 comment = comment,
                 createdAtLabel = "just now"

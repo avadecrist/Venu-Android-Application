@@ -10,5 +10,5 @@ data class HomeUiState(
     // mimics explore page
     val showSaveSheet: Boolean = false,
     val pendingSaveEventId: String? = null,
-    val availableLists: List<ListType> = emptyList()
+    val availableLists: List<ListType> = emptyList(),
 )

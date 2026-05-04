@@ -65,6 +65,16 @@ import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.GooglePlaceSuggestionUi
 import com.example.venu.features.explore.model.PlaceUi
 import kotlinx.coroutines.launch
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.util.Log
+import androidx.compose.runtime.DisposableEffect
+import androidx.core.content.ContextCompat
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
 
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
@@ -91,8 +101,66 @@ fun ExploreScreen(
     var savedOnly by remember { mutableStateOf(false) }
     var sortOption by remember { mutableStateOf(ExploreSortOption.FEATURED) }
 
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
+
     val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+
+    var userLocation by remember {
+        mutableStateOf<Location?>(null)
+    }
+
+    val locationManager = remember {
+        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    }
+
+    DisposableEffect(hasLocationPermission) {
+        if (!hasLocationPermission) {
+            userLocation = null
+            return@DisposableEffect onDispose {}
+        }
+
+        val hasFinePermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val hasCoarsePermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!hasFinePermission && !hasCoarsePermission) {
+            userLocation = null
+            return@DisposableEffect onDispose {}
+        }
+
+        val provider = LocationManager.GPS_PROVIDER
+
+        val listener = android.location.LocationListener { location ->
+            userLocation = location
+        }
+
+        try {
+            userLocation = locationManager.getLastKnownLocation(provider)
+
+            locationManager.requestLocationUpdates(
+                provider,
+                5000L,
+                10f,
+                listener
+            )
+        } catch (_: SecurityException) {
+            userLocation = null
+        }
+
+        onDispose {
+            locationManager.removeUpdates(listener)
+        }
+    }
 
     val displayedPlaces = remember(
         state.places,
@@ -116,10 +184,32 @@ fun ExploreScreen(
 
     val selectedEventDetails = selectedPlace?.toEventDetailsUi()
 
-    val activeFilterCount =
-        selectedGenres.size +
-                (if (verifiedOnly) 1 else 0) +
-                (if (savedOnly) 1 else 0)
+    LaunchedEffect(
+        state.selectedPlaceId,
+        state.shouldStartDirections,
+        userLocation
+    ) {
+        val event = selectedEventDetails
+        val location = userLocation
+
+        if (
+            state.shouldStartDirections &&
+            event != null &&
+            location != null
+        ) {
+            onAction(
+                ExploreAction.GetDirectionsClicked(
+                    event = event,
+                    userLat = location.latitude,
+                    userLng = location.longitude
+                )
+            )
+        }
+    }
+
+    val activeFilterCount = selectedGenres.size +
+            if (verifiedOnly) 1 else 0 +
+                    if (savedOnly) 1 else 0
 
     val bottomSheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.PartiallyExpanded,
@@ -143,7 +233,10 @@ fun ExploreScreen(
                 places = displayedPlaces,
                 selectedPlaceId = state.selectedPlaceId,
                 onPlaceClicked = { id ->
-                    onAction(ExploreAction.PlaceClicked(id))
+                    scope.launch {
+                        onAction(ExploreAction.PlaceClicked(id))
+                        bottomSheetState.partialExpand()
+                    }
                 },
                 onSaveClick = { id ->
                     onAction(ExploreAction.SaveClicked(id))
@@ -211,12 +304,14 @@ fun ExploreScreen(
         ModalBottomSheet(
             sheetState = sheetState,
             onDismissRequest = {
-                onAction(ExploreAction.PlaceDetailsDismissed)
+                scope.launch {
+                    sheetState.hide()
+                    onAction(ExploreAction.PlaceDetailsDismissed)
+                }
             }
         ) {
             EventDetailsSheet(
                 event = selectedEventDetails,
-                showDirectionsButton = false,
                 onBack = {
                     scope.launch {
                         sheetState.hide()
@@ -226,8 +321,30 @@ fun ExploreScreen(
                 onSaveClick = {
                     onAction(ExploreAction.SaveClicked(selectedEventDetails.id))
                 },
-                onViewOnMapClick = {},
-                onGetDirectionsClick = {},
+                onGetDirectionsClick = {
+                    val location = userLocation ?: return@EventDetailsSheet
+
+                    Log.d("DirectionsDebug", "userLocation = $location")
+                    Log.d("DirectionsDebug", "selectedEventDetails = $selectedEventDetails")
+
+                    if (location == null) {
+                        Log.d("DirectionsDebug", "No user location yet")
+                        return@EventDetailsSheet
+                    }
+
+
+                    scope.launch {
+                        sheetState.hide()
+
+                        onAction(
+                            ExploreAction.GetDirectionsClicked(
+                                event = selectedEventDetails,
+                                userLat = location.latitude,
+                                userLng = location.longitude
+                            )
+                        )
+                    }
+                },
                 onSubmitReview = { _, _ -> }
             )
         }
@@ -253,6 +370,7 @@ private fun ExploreMapContent(
             modifier = Modifier.fillMaxSize(),
             places = displayedPlaces,
             selectedPlaceId = state.selectedPlaceId,
+            directionsRoute = state.directionsRoute,
             hasLocationPermission = hasLocationPermission,
             zoomRequest = zoomRequest,
             zoomDelta = zoomDelta,
