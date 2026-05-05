@@ -102,4 +102,6 @@ dependencies {
 
     implementation("com.google.android.libraries.places:places:4.3.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
+
+    implementation("io.coil-kt:coil-compose:2.7.0")
 }
