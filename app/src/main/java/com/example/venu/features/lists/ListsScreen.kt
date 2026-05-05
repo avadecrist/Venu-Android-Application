@@ -34,6 +34,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -71,7 +72,9 @@ fun ListsScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 18.dp)
+                .statusBarsPadding()
+                .padding(horizontal = 18.dp)
+                .padding(top = 24.dp, bottom = 0.dp)
         ) {
             Text(
                 text = "Your Lists",
@@ -87,6 +90,8 @@ fun ListsScreen(
                 style = MaterialTheme.typography.bodyMedium
             )
 
+            Spacer(modifier = Modifier.height(4.dp))
+
             val selectedIndex =
                 state.tabs.indexOfFirst { it == state.selectedTab }
                     .let { if (it >= 0) it else 0 }
@@ -100,7 +105,10 @@ fun ListsScreen(
                 }
             }) {
                 ScrollableTabRow(
-                    selectedTabIndex = selectedIndex
+                    selectedTabIndex = selectedIndex,
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    edgePadding = 16.dp
                 ) {
                     state.tabs.forEach { tab ->
                         key(
@@ -114,7 +122,7 @@ fun ListsScreen(
                             Tab(
                                 selected = tab == state.selectedTab,
                                 onClick = { onEvent(ListsUiEvent.SelectTab(tab)) },
-                                selectedContentColor = MaterialTheme.colorScheme.onSurface,
+                                selectedContentColor = MaterialTheme.colorScheme.onBackground,
                                 unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 text = { Text(tabLabel(tab)) }
                             )
@@ -136,7 +144,7 @@ fun ListsScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 14.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(bottom = 96.dp)
                 ) {

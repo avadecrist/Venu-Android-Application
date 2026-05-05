@@ -566,37 +566,37 @@ private fun Throwable.toLoginMessage(): String {
 //    }
 //}
 //
-//@Preview(showBackground = true, name = "App Nav Preview")
-//@Composable
-//fun AppNavPreview() {
-//    VenuTheme {
-//        val navController = rememberNavController()
-//
-//        NavHost(
-//            navController = navController,
-//            startDestination = "login"
-//        ) {
-//            composable("login") {
-//                LoginScreen(
-//                    isSigningIn = false,
-//                    errorMessage = null,
-//                    onLoginClick = {
-//                        navController.navigate("home")
-//                    },
-//                    onContinueAsGuestClick = {
-//                        navController.navigate("home")
-//                    }
-//                )
-//            }
-//
-//            composable("home") {
-//                HomeRoute(
-//                    displayName = "Explorer",
-//                    onNavigateToExploreDirections = {
-//                        // no explore route for preview
-//                    }
-//                )
-//            }
-//        }
-//    }
-//}
+@Preview(showBackground = true, name = "App Nav Preview")
+@Composable
+fun AppNavPreview() {
+    VenuTheme {
+        val navController = rememberNavController()
+
+        NavHost(
+            navController = navController,
+            startDestination = "login"
+        ) {
+            composable("login") {
+                LoginScreen(
+                    isSigningIn = false,
+                    errorMessage = null,
+                    onLoginClick = {
+                        navController.navigate("home")
+                    },
+                    onContinueAsGuestClick = {
+                        navController.navigate("home")
+                    }
+                )
+            }
+
+            composable("home") {
+                HomeRoute(
+                    displayName = "Explorer",
+                    onNavigateToExploreDirections = {
+                        // no explore route for preview
+                    }
+                )
+            }
+        }
+    }
+}
