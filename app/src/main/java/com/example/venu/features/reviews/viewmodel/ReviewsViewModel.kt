@@ -82,10 +82,6 @@ class ReviewsViewModel(
         val draft = _state.value.draft ?: return
         Log.d("ReviewDebug", "Current draft = $draft")
 
-        if (draft == null) {
-            Log.d("ReviewDebug", "Stopping: draft is null")
-            return
-        }
         if (draft.rating !in 1..5) {
             _state.value = _state.value.copy(
                 errorMessage = "Please select a rating."

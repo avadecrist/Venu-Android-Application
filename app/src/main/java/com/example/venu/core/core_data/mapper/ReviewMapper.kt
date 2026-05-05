@@ -27,9 +27,9 @@ fun Review.toDto(): ReviewFireStoreDto {
         googlePlaceId = googlePlaceId,
         uid = userId,
         displayName = displayName,
-        photoUrl = null,
+        photoUrl = photoUrl,
         rating = rating,
         comment = comment,
-        createdAt = System.currentTimeMillis()
+        createdAt = createdAt
     )
 }

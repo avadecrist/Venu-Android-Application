@@ -40,10 +40,3 @@ data class Event(
     val crowdLevel: CrowdLevel = CrowdLevel.UNKNOWN
 )
 
-data class EventMetrics(
-    val goingCount: Int? = null,
-    val saveCount: Int? = null,
-    val viewCount: Int? = null,
-    val checkInCount: Int? = null,
-    val estimatedCapacity: Int? = null
-)
