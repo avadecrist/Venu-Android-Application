@@ -295,11 +295,11 @@ object FakeSeed {
     )
 
     val reviews = listOf(
-        Review("r1","e1","user_2","Alex",5,"Great DJ set.","2d ago"),
-        Review("r2","e1","user_3","Jordan",4,"Fun crowd.","3d ago"),
-        Review("r3","e1","user_4","Maya",5,"One of the best nights out.","4d ago"),
-        Review("r4","e1","user_5","Chris",4,"Packed but worth it.","5d ago"),
-        Review("r5","e1","user_6","Sam",5,"Love this place.","1w ago"),
-        Review("r6","e1","user_7","Taylor",4,"Great indie music.","1w ago")
+        Review("r1","e1",null,"user_2","Alex","",5,"Great DJ set.",9,"2d ago"),
+        Review("r2","e1",null,"user_3","Jordan","",4,"Fun crowd.",9,"3d ago"),
+        Review("r3","e1",null,"user_4","Maya","",5,"One of the best nights out.",9,"4d ago"),
+        Review("r4","e1",null,"user_5","Chris","",4,"Packed but worth it.",9,"5d ago"),
+        Review("r5","e1",null,"user_6","Sam","",5,"Love this place.",9,"1w ago"),
+        Review("r6","e1",null,"user_7","Taylor","",4,"Great indie music.",9,"1w ago")
     )
 }

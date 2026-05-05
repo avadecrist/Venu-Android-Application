@@ -71,6 +71,7 @@ fun MyReviewsScreen(
             review = ReviewUi(
                 authorInitial = "B",
                 displayName = "Blue Bottle Coffee",
+                photoUrl = "",
                 rating = 5,
                 comment = "Great coffee and a really nice atmosphere.",
                 timeAgo = "Apr 19, 2026",
@@ -84,6 +85,7 @@ fun MyReviewsScreen(
             review = ReviewUi(
                 authorInitial = "M",
                 displayName = "Madison Square Park",
+                photoUrl = "",
                 rating = 4,
                 comment = "Nice place to walk around and relax in the afternoon.",
                 timeAgo = "Apr 12, 2026",

@@ -75,6 +75,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.LaunchedEffect
+import com.example.venu.core.core_common.AppGraph
+import com.example.venu.features.reviews.viewmodel.ReviewsViewModel
 
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
@@ -104,6 +106,10 @@ fun ExploreScreen(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
+
+    val reviewsViewModel = remember {
+        ReviewsViewModel(AppGraph.reviewRepo)
+    }
 
     val scope = rememberCoroutineScope()
 
@@ -319,6 +325,7 @@ fun ExploreScreen(
         ) {
             EventDetailsSheet(
                 event = selectedEventDetails,
+                reviewsViewModel = reviewsViewModel,
                 onBack = {
                     scope.launch {
                         sheetState.hide()
@@ -352,7 +359,6 @@ fun ExploreScreen(
                         )
                     }
                 },
-                onSubmitReview = { _, _ -> }
             )
         }
     }

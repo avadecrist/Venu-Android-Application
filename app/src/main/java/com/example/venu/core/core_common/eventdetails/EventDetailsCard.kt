@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_domain.model.Genre
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import com.example.venu.core.core_common.core_ui.components.LeaveReviewCard
 import com.example.venu.core.core_common.core_ui.components.ReviewCard
@@ -55,18 +56,23 @@ import com.example.venu.core.core_common.core_ui.components.ReviewsCountHeader
 import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.core.core_common.util.formatDistance
 import com.example.venu.core.core_common.util.formatOneDecimal
+import com.example.venu.core.core_data.repository.FakeReviewRepository
 import com.example.venu.core.core_domain.model.CrowdLevel
+import com.example.venu.core.core_domain.model.Review
 import com.example.venu.core.core_presentation.EventDetailsUi
 import com.example.venu.core.core_presentation.ReviewUi
+import com.example.venu.features.reviews.ReviewsSection
+import com.example.venu.features.reviews.model.ReviewsAction
+import com.example.venu.features.reviews.viewmodel.ReviewsViewModel
 
 
 @Composable
 fun EventDetailsSheet(
     event: EventDetailsUi,
     onBack: () -> Unit,
+    reviewsViewModel: ReviewsViewModel,
     onSaveClick: () -> Unit,
     onGetDirectionsClick: () -> Unit,
-    onSubmitReview: (Int, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -141,16 +147,22 @@ fun EventDetailsSheet(
             )
         }
 
+//        item {
+//            ReviewsCountHeader(reviewCount = event.reviewCount)
+//        }
+//
+//        item {
+//            LeaveReviewCard(onSubmitReview = onSubmitReview)
+//        }
+//
+//        items(event.reviews, key = { it.id }) { review ->
+//            ReviewCard(review = review)
+//        }
         item {
-            ReviewsCountHeader(reviewCount = event.reviewCount)
-        }
-
-        item {
-            LeaveReviewCard(onSubmitReview = onSubmitReview)
-        }
-
-        items(event.reviews, key = { it.id }) { review ->
-            ReviewCard(review = review)
+            ReviewsSection(
+                eventId = event.id,
+                viewModel = reviewsViewModel
+            )
         }
 
         item {
@@ -597,6 +609,7 @@ private val PreviewEvent = EventDetailsUi(
             id = "r1",
             displayName = "Avery C.",
             authorInitial = "A",
+            photoUrl = "",
             rating = 5,
             comment = "Best ramen I've had on campus. The broth was perfect.",
             timeAgo = "1d ago"
@@ -605,6 +618,7 @@ private val PreviewEvent = EventDetailsUi(
             id = "r2",
             displayName = "Jordan M.",
             authorInitial = "J",
+            photoUrl = "",
             rating = 4,
             comment = "Really good and worth the wait. Noodles were great, line moved a little slow.",
             timeAgo = "2d ago"
@@ -613,6 +627,7 @@ private val PreviewEvent = EventDetailsUi(
             id = "r3",
             displayName = "Sophia T.",
             authorInitial = "S",
+            photoUrl = "",
             rating = 5,
             comment = "Would absolutely go again. Super fun atmosphere and quality food.",
             timeAgo = "3d ago"
@@ -620,67 +635,66 @@ private val PreviewEvent = EventDetailsUi(
     )
 )
 
-@Preview(
-    name = "Event Details Sheet",
-    showBackground = true,
-    backgroundColor = 0xFFFFFFFF,
-    widthDp = 400,
-    heightDp = 1400
-)
-@Composable
-private fun EventDetailsSheetPreview() {
-    MaterialTheme {
-        EventDetailsSheet(
-            event = PreviewEvent,
-            onBack = {},
-            onSaveClick = {},
-            onGetDirectionsClick = {},
-            onSubmitReview = { _, _ -> }
-        )
-    }
-}
-
-@Preview(name = "Quiet Event", showBackground = true)
-@Composable
-fun PreviewQuiet() {
-    EventDetailsSheet(
-        event = PreviewEvent.copy(
-            name = "Late Night Study",
-            attendeeCount = 12,
-            crowdLevel = CrowdLevel.QUIET
-        ),
-        onBack = {},
-        onSaveClick = {},
-        onGetDirectionsClick = {},
-        onSubmitReview = { _, _ -> }
-    )
-}
-
-@Preview(name = "Packed Event", showBackground = true)
-@Composable
-fun PreviewPacked() {
-    EventDetailsSheet(
-        event = PreviewEvent.copy(
-            name = "Campus Festival",
-            attendeeCount = 240,
-            crowdLevel = CrowdLevel.PACKED
-        ),
-        onBack = {},
-        onSaveClick = {},
-        onGetDirectionsClick = {},
-        onSubmitReview = { _, _ -> }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun InteractivePreview() {
-
-    EventDetailsSheet(
-        event = PreviewEvent,
-        onBack = {},
-        onSaveClick = {},
-        onGetDirectionsClick = {},
-        onSubmitReview = { _, _ -> }
-    )
-}
+//@Preview(
+//    name = "Event Details Sheet",
+//    showBackground = true,
+//    backgroundColor = 0xFFFFFFFF,
+//    widthDp = 400,
+//    heightDp = 1400
+//)
+//@Composable
+//private fun EventDetailsSheetPreview() {
+//    MaterialTheme {
+//        EventDetailsSheet(
+//            event = PreviewEvent,
+//            onBack = {},
+//            onSaveClick = {},
+//            onGetDirectionsClick = {},
+//        )
+//    }
+//}
+//
+//@Preview(name = "Quiet Event", showBackground = true)
+//@Composable
+//fun PreviewQuiet() {
+//    EventDetailsSheet(
+//        event = PreviewEvent.copy(
+//            name = "Late Night Study",
+//            attendeeCount = 12,
+//            crowdLevel = CrowdLevel.QUIET
+//        ),
+//        onBack = {},
+//        onSaveClick = {},
+//        onGetDirectionsClick = {},
+//        onSubmitReview = { _, _ -> }
+//    )
+//}
+//
+//@Preview(name = "Packed Event", showBackground = true)
+//@Composable
+//fun PreviewPacked() {
+//    EventDetailsSheet(
+//        event = PreviewEvent.copy(
+//            name = "Campus Festival",
+//            attendeeCount = 240,
+//            crowdLevel = CrowdLevel.PACKED
+//        ),
+//        onBack = {},
+//        onSaveClick = {},
+//        onGetDirectionsClick = {},
+//        onSubmitReview = { _, _ -> }
+//    )
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun InteractivePreview() {
+//
+//    EventDetailsSheet(
+//        event = PreviewEvent,
+//        onBack = {},
+//        onSaveClick = {},
+//        onGetDirectionsClick = {},
+//        onSubmitReview = { _, _ -> }
+//    )
+//}

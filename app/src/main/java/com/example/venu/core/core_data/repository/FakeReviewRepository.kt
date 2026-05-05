@@ -41,10 +41,13 @@ class FakeReviewRepository : ReviewRepository {
             Review(
                 id = UUID.randomUUID().toString(),
                 eventId = eventId,
+                googlePlaceId = null,
                 userId = currentUserId,
                 displayName = "You",
+                photoUrl = "",
                 rating = rating,
                 comment = comment,
+                createdAt = 9,
                 createdAtLabel = "just now"
             )
         )

@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.venu.BuildConfig
 import com.example.venu.core.core_data.local.db.VenuLocalDatabase
 import com.example.venu.core.core_data.places.GooglePlacesRepository
-import com.example.venu.core.core_data.repository.FakeReviewRepository
+import com.example.venu.core.core_data.remote.firestore.ReviewFireStoreRepository
 import com.example.venu.core.core_data.repository.InMemoryListsRepository
 import com.example.venu.core.core_data.repository.RoomEventRepository
 import com.example.venu.core.core_domain.repository.EventRepository
@@ -27,7 +27,7 @@ object AppGraph {
         private set
 
     val reviewRepo: ReviewRepository by lazy {
-        FakeReviewRepository()
+        ReviewFireStoreRepository() // now uses Firestore instead of fake reviews
     }
 
     suspend fun initialize(context: Context) {

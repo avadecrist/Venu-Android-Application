@@ -1,5 +1,6 @@
 package com.example.venu.core.core_data.remote.firestore
 
+import com.example.venu.core.core_data.mapper.toDomain
 import com.example.venu.core.core_domain.repository.ReviewRepository
 import com.example.venu.core.core_domain.model.Review
 import com.example.venu.core.core_domain.model.RatingSummary
@@ -37,7 +38,6 @@ import kotlinx.coroutines.tasks.await
 //                onResult(reviews)
 //            }
 //    }
-//}
 
 class ReviewFireStoreRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
@@ -60,15 +60,8 @@ class ReviewFireStoreRepository(
     override suspend fun getRatingSummary(eventId: String): RatingSummary {
         val reviews = getReviewsForEvent(eventId)
 
-        if (reviews.isEmpty()) {
-            return RatingSummary(
-                average = 0.0,
-                count = 0
-            )
-        }
-
         return RatingSummary(
-            average = reviews.map { it.rating }.average(),
+            average = if (reviews.isEmpty()) 0.0 else reviews.map { it.rating }.average(),
             count = reviews.size
         )
     }
@@ -83,10 +76,10 @@ class ReviewFireStoreRepository(
 
         val docRef = reviewsCollection.document()
 
-        val reviewFireStoreDto = ReviewFireStoreDto(
+        val dto = ReviewFireStoreDto(
             reviewId = docRef.id,
             eventId = eventId,
-            googlePlaceId = "", // fill this later if needed
+            googlePlaceId = null,
             uid = user.uid,
             displayName = user.displayName ?: "Anonymous",
             photoUrl = user.photoUrl?.toString(),
@@ -95,13 +88,10 @@ class ReviewFireStoreRepository(
             createdAt = System.currentTimeMillis()
         )
 
-        docRef.set(reviewFireStoreDto).await()
+        docRef.set(dto).await()
     }
 
-    override suspend fun hasUserReviewed(
-        eventId: String,
-        userId: String
-    ): Boolean {
+    override suspend fun hasUserReviewed(eventId: String, userId: String): Boolean {
         val snapshot = reviewsCollection
             .whereEqualTo("eventId", eventId)
             .whereEqualTo("uid", userId)
