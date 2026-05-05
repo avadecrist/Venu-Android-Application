@@ -8,6 +8,8 @@ fun ProfileRoute(
     isSignedIn: Boolean,
     displayName: String?,
     email: String?,
+    reviewsCount: Int,
+    eventsVisitedCount: Int,
     onSignInClick: () -> Unit,
     onEditProfileSave: (String) -> Unit,
     onMyReviewsClick: () -> Unit,
@@ -16,7 +18,9 @@ fun ProfileRoute(
     ProfileScreen(
         state = ProfileUiState(
             isSignedIn = isSignedIn,
-            displayName = displayName ?: email ?: "Explorer"
+            displayName = displayName ?: email ?: "Explorer",
+            reviewsCount = reviewsCount,
+            eventsVisitedCount = eventsVisitedCount
         ),
         onSignInClick = onSignInClick,
         onEditProfileSave = onEditProfileSave,

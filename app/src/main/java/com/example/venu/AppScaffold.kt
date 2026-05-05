@@ -50,7 +50,9 @@ fun AppScaffold(
     onDarkModeChange: (Boolean) -> Unit,
     onSignInClick: () -> Unit,
     onEditProfileSave: (String) -> Unit,
-    onSignOutClick: () -> Unit
+    onSignOutClick: () -> Unit,
+    currentUserReviewsCount: Int,
+    currentUserEventsVisitedCount: Int
 ) {
     val navController = rememberNavController()
 
@@ -243,6 +245,8 @@ fun AppScaffold(
                     isSignedIn = isSignedIn,
                     displayName = currentUserDisplayName,
                     email = currentUserEmail,
+                    reviewsCount = currentUserReviewsCount,
+                    eventsVisitedCount = currentUserEventsVisitedCount,
                     onSignInClick = onSignInClick,
                     onEditProfileSave = onEditProfileSave,
                     onMyReviewsClick = {

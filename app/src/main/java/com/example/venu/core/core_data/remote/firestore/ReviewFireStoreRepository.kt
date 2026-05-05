@@ -8,6 +8,7 @@ import com.example.venu.core.core_domain.model.RatingSummary
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
+import kotlin.text.get
 
 
 class ReviewFireStoreRepository(
@@ -94,5 +95,29 @@ class ReviewFireStoreRepository(
         return snapshot.documents.firstOrNull()
             ?.toObject(ReviewFireStoreDto::class.java)
             ?.toDomain()
+    }
+
+    suspend fun getReviewCountForCurrentUser(): Int {
+        val user = auth.currentUser ?: return 0
+
+        val snapshot = reviewsCollection
+            .whereEqualTo("uid", user.uid)
+            .get()
+            .await()
+
+        return snapshot.size()
+    }
+
+    suspend fun getReviewsForCurrentUser(): List<Review> {
+        val user = auth.currentUser ?: return emptyList()
+
+        val snapshot = reviewsCollection
+            .whereEqualTo("uid", user.uid)
+            .get()
+            .await()
+
+        return snapshot.documents.mapNotNull { doc ->
+            doc.toObject(ReviewFireStoreDto::class.java)?.toDomain()
+        }
     }
 }

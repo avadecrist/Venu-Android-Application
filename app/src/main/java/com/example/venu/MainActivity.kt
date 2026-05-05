@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.venu.auth.FirebaseAuthClient
 import com.example.venu.auth.GoogleAuthClient
 import com.example.venu.core.core_common.core_ui.theme.VenuTheme
+import com.example.venu.core.core_data.remote.firestore.ReviewFireStoreRepository
 import com.example.venu.core.core_data.remote.firestore.UserFirestoreRepository
 import com.example.venu.features.home.HomeRoute
 import com.example.venu.features.login.LoginScreen
@@ -66,6 +67,14 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf<String?>(null)
             }
 
+            var currentUserReviewsCount by rememberSaveable {
+                mutableStateOf(0)
+            }
+
+            var currentUserEventsVisitedCount by rememberSaveable {
+                mutableStateOf(0)
+            }
+
             VenuTheme(
                 darkTheme = isDarkMode,
                 dynamicColor = false,
@@ -83,6 +92,10 @@ class MainActivity : ComponentActivity() {
 
                 val userFirestoreRepository = remember {
                     UserFirestoreRepository()
+                }
+
+                val reviewFireStoreRepository = remember {
+                    ReviewFireStoreRepository()
                 }
 
                 val navController = rememberNavController()
@@ -125,8 +138,11 @@ class MainActivity : ComponentActivity() {
                                                     userFirestoreRepository.getUser(firebaseUser.uid)
 
                                                 currentUserEmail = firebaseUser.email
-                                                currentUserDisplayName =
-                                                    firestoreUser?.displayName
+                                                currentUserDisplayName = firestoreUser?.displayName
+                                                currentUserReviewsCount =
+                                                    reviewFireStoreRepository.getReviewCountForCurrentUser()
+                                                currentUserEventsVisitedCount = 0
+
                                                 isSignedIn = true
                                                 isSigningIn = false
 
@@ -177,6 +193,8 @@ class MainActivity : ComponentActivity() {
                                 isSignedIn = false
                                 currentUserEmail = null
                                 currentUserDisplayName = null
+                                currentUserReviewsCount = 0
+                                currentUserEventsVisitedCount = 0
                                 loginErrorMessage = null
 
                                 navController.navigate("app") {
@@ -195,8 +213,7 @@ class MainActivity : ComponentActivity() {
                             onContinueClick = { displayName ->
                                 scope.launch {
                                     try {
-                                        val firebaseUser =
-                                            firebaseAuthClient.currentUser()
+                                        val firebaseUser = firebaseAuthClient.currentUser()
 
                                         if (firebaseUser != null) {
                                             userFirestoreRepository.updateDisplayName(
@@ -236,6 +253,8 @@ class MainActivity : ComponentActivity() {
                             isDarkMode = isDarkMode,
                             currentUserDisplayName = currentUserDisplayName,
                             currentUserEmail = currentUserEmail,
+                            currentUserReviewsCount = currentUserReviewsCount,
+                            currentUserEventsVisitedCount = currentUserEventsVisitedCount,
                             onDarkModeChange = { darkMode ->
                                 isDarkMode = darkMode
                             },
@@ -274,6 +293,8 @@ class MainActivity : ComponentActivity() {
                                     isSignedIn = false
                                     currentUserEmail = null
                                     currentUserDisplayName = null
+                                    currentUserReviewsCount = 0
+                                    currentUserEventsVisitedCount = 0
                                     loginErrorMessage = null
 
                                     navController.navigate("login") {
