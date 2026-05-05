@@ -51,11 +51,11 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme = lightColorScheme(
 
-    // PRIMARY (main actions: buttons, highlights)
+    // PRIMARY (main actions)
     primary = Color(0xFF1E3A5F),
     onPrimary = Color.White,
 
-    primaryContainer = VenuColors.AccentBlueBorder,
+    primaryContainer = Color(0xFFE6F0FF),
     onPrimaryContainer = VenuColors.TextPrimary,
 
     // SECONDARY (chips / softer accents)

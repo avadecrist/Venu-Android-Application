@@ -43,284 +43,529 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            var isDarkMode by rememberSaveable {
-                mutableStateOf(false)
-            }
-
-            var isSignedIn by rememberSaveable {
-                mutableStateOf(false)
-            }
-
-            var isSigningIn by rememberSaveable {
-                mutableStateOf(false)
-            }
-
-            var loginErrorMessage by rememberSaveable {
-                mutableStateOf<String?>(null)
-            }
-
-            var currentUserEmail by rememberSaveable {
-                mutableStateOf<String?>(null)
-            }
-
-            var currentUserDisplayName by rememberSaveable {
-                mutableStateOf<String?>(null)
-            }
-
-            var currentUserPhotoUrl by rememberSaveable {
-                mutableStateOf<String?>(null)
-            }
-
-            var currentUserReviewsCount by rememberSaveable {
-                mutableStateOf(0)
-            }
-
-            var currentUserEventsVisitedCount by rememberSaveable {
-                mutableStateOf(0)
-            }
-
-            VenuTheme(
-                darkTheme = isDarkMode,
-                dynamicColor = false,
-            ) {
-                val context = LocalContext.current
-                val scope = rememberCoroutineScope()
-
-                val googleAuthClient = remember {
-                    GoogleAuthClient(context)
-                }
-
-                val firebaseAuthClient = remember {
-                    FirebaseAuthClient()
-                }
-
-                val userFirestoreRepository = remember {
-                    UserFirestoreRepository()
-                }
-
-                val reviewFireStoreRepository = remember {
-                    ReviewFireStoreRepository()
-                }
-
-                val navController = rememberNavController()
-
-                NavHost(
-                    navController = navController,
-                    startDestination = "login"
-                ) {
-                    composable("login") {
-                        LoginScreen(
-                            isSigningIn = isSigningIn,
-                            errorMessage = loginErrorMessage,
-                            onLoginClick = {
-                                if (isSigningIn) {
-                                    return@LoginScreen
-                                }
-
-                                isSigningIn = true
-                                loginErrorMessage = null
-
-                                scope.launch {
-                                    val googleResult = googleAuthClient.signIn()
-
-                                    googleResult
-                                        .onSuccess { googleUser ->
-                                            try {
-                                                val firebaseUser =
-                                                    firebaseAuthClient.signInWithGoogleIdToken(
-                                                        idToken = googleUser.idToken
-                                                    )
-
-                                                userFirestoreRepository.createUserIfMissing(
-                                                    uid = firebaseUser.uid,
-                                                    email = firebaseUser.email,
-                                                    displayName = null,
-                                                    photoUrl = firebaseUser.photoUrl
-                                                )
-
-                                                val firestoreUser =
-                                                    userFirestoreRepository.getUser(firebaseUser.uid)
-
-                                                currentUserEmail = firebaseUser.email
-                                                currentUserDisplayName = firestoreUser?.displayName
-                                                currentUserPhotoUrl = firebaseUser.photoUrl
-                                                currentUserReviewsCount =
-                                                    reviewFireStoreRepository.getReviewCountForCurrentUser()
-                                                currentUserEventsVisitedCount = 0
-
-                                                isSignedIn = true
-                                                isSigningIn = false
-
-                                                if (firestoreUser?.displayName.isNullOrBlank()) {
-                                                    navController.navigate("complete_profile") {
-                                                        popUpTo("login") {
-                                                            inclusive = true
-                                                        }
-                                                        launchSingleTop = true
-                                                    }
-                                                } else {
-                                                    navController.navigate("app") {
-                                                        popUpTo("login") {
-                                                            inclusive = true
-                                                        }
-                                                        launchSingleTop = true
-                                                    }
-                                                }
-                                            } catch (error: Exception) {
-                                                isSigningIn = false
-                                                loginErrorMessage =
-                                                    "${error::class.simpleName}: ${error.message ?: "Firebase sign-in failed."}"
-                                            }
-                                        }
-                                        .onFailure { error ->
-                                            isSigningIn = false
-
-                                            loginErrorMessage = when {
-                                                error.message?.contains(
-                                                    "Account reauth failed",
-                                                    ignoreCase = true
-                                                ) == true ->
-                                                    "Google account re-auth failed. Remove and re-add the Google account on this device, then try again."
-
-                                                error.message?.contains(
-                                                    "No credentials",
-                                                    ignoreCase = true
-                                                ) == true ->
-                                                    "No Google account is available. Add a Google account to this device, then try again."
-
-                                                else ->
-                                                    "${error::class.simpleName}: ${error.message ?: "Google sign-in failed."}"
-                                            }
-                                        }
-                                }
-                            },
-                            onContinueAsGuestClick = {
-                                isSignedIn = false
-                                currentUserEmail = null
-                                currentUserDisplayName = null
-                                currentUserPhotoUrl = null
-                                currentUserReviewsCount = 0
-                                currentUserEventsVisitedCount = 0
-                                loginErrorMessage = null
-
-                                navController.navigate("app") {
-                                    popUpTo("login") {
-                                        inclusive = true
-                                    }
-                                    launchSingleTop = true
-                                }
-                            }
-                        )
-                    }
-
-                    composable("complete_profile") {
-                        CompleteProfileScreen(
-                            suggestedDisplayName = currentUserDisplayName,
-                            onContinueClick = { displayName ->
-                                scope.launch {
-                                    try {
-                                        val firebaseUser = firebaseAuthClient.currentUser()
-
-                                        if (firebaseUser != null) {
-                                            userFirestoreRepository.updateDisplayName(
-                                                uid = firebaseUser.uid,
-                                                displayName = displayName
-                                            )
-                                        }
-
-                                        currentUserDisplayName = displayName
-
-                                        navController.navigate("app") {
-                                            popUpTo("complete_profile") {
-                                                inclusive = true
-                                            }
-                                            launchSingleTop = true
-                                        }
-                                    } catch (error: Exception) {
-                                        loginErrorMessage =
-                                            "${error::class.simpleName}: ${error.message ?: "Failed to save display name."}"
-                                    }
-                                }
-                            },
-                            onSkipClick = {
-                                navController.navigate("app") {
-                                    popUpTo("complete_profile") {
-                                        inclusive = true
-                                    }
-                                    launchSingleTop = true
-                                }
-                            }
-                        )
-                    }
-
-                    composable("app") {
-                        AppScaffold(
-                            isSignedIn = isSignedIn,
-                            isDarkMode = isDarkMode,
-                            currentUserDisplayName = currentUserDisplayName,
-                            currentUserPhotoUrl = currentUserPhotoUrl,
-                            currentUserEmail = currentUserEmail,
-                            currentUserReviewsCount = currentUserReviewsCount,
-                            currentUserEventsVisitedCount = currentUserEventsVisitedCount,
-                            onDarkModeChange = { darkMode ->
-                                isDarkMode = darkMode
-                            },
-                            onSignInClick = {
-                                navController.navigate("login") {
-                                    popUpTo("app") {
-                                        inclusive = true
-                                    }
-                                    launchSingleTop = true
-                                }
-                            },
-                            onEditProfileSave = { newDisplayName ->
-                                scope.launch {
-                                    try {
-                                        val firebaseUser = firebaseAuthClient.currentUser()
-
-                                        if (firebaseUser != null) {
-                                            userFirestoreRepository.updateDisplayName(
-                                                uid = firebaseUser.uid,
-                                                displayName = newDisplayName
-                                            )
-                                        }
-
-                                        currentUserDisplayName = newDisplayName
-                                    } catch (error: Exception) {
-                                        loginErrorMessage =
-                                            "${error::class.simpleName}: ${error.message ?: "Failed to update display name."}"
-                                    }
-                                }
-                            },
-                            onSignOutClick = {
-                                scope.launch {
-                                    firebaseAuthClient.signOut()
-                                    googleAuthClient.signOut()
-
-                                    isSignedIn = false
-                                    currentUserEmail = null
-                                    currentUserDisplayName = null
-                                    currentUserPhotoUrl = null
-                                    currentUserReviewsCount = 0
-                                    currentUserEventsVisitedCount = 0
-                                    loginErrorMessage = null
-
-                                    navController.navigate("login") {
-                                        popUpTo("app") {
-                                            inclusive = true
-                                        }
-                                        launchSingleTop = true
-                                    }
-                                }
-                            }
-                        )
-                    }
-                }
-            }
+            VenuApp()
         }
     }
 }
 
+@Composable
+private fun VenuApp() {
+    var isDarkMode by rememberSaveable { mutableStateOf(false) }
+
+    VenuTheme(
+        darkTheme = isDarkMode,
+        dynamicColor = false
+    ) {
+        VenuNavHost(
+            isDarkMode = isDarkMode,
+            onDarkModeChange = { isDarkMode = it }
+        )
+    }
+}
+
+@Composable
+private fun VenuNavHost(
+    isDarkMode: Boolean,
+    onDarkModeChange: (Boolean) -> Unit
+) {
+    var isSignedIn by rememberSaveable { mutableStateOf(false) }
+    var isSigningIn by rememberSaveable { mutableStateOf(false) }
+    var loginErrorMessage by rememberSaveable { mutableStateOf<String?>(null) }
+
+    var currentUserEmail by rememberSaveable { mutableStateOf<String?>(null) }
+    var currentUserDisplayName by rememberSaveable { mutableStateOf<String?>(null) }
+    var currentUserPhotoUrl by rememberSaveable { mutableStateOf<String?>(null) }
+    var currentUserReviewsCount by rememberSaveable { mutableStateOf(0) }
+    var currentUserEventsVisitedCount by rememberSaveable { mutableStateOf(0) }
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val navController = rememberNavController()
+
+    val googleAuthClient = remember { GoogleAuthClient(context) }
+    val firebaseAuthClient = remember { FirebaseAuthClient() }
+    val userFirestoreRepository = remember { UserFirestoreRepository() }
+    val reviewFireStoreRepository = remember { ReviewFireStoreRepository() }
+
+    fun clearCurrentUser() {
+        isSignedIn = false
+        currentUserEmail = null
+        currentUserDisplayName = null
+        currentUserPhotoUrl = null
+        currentUserReviewsCount = 0
+        currentUserEventsVisitedCount = 0
+        loginErrorMessage = null
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = "login"
+    ) {
+        composable("login") {
+            LoginScreen(
+                isSigningIn = isSigningIn,
+                errorMessage = loginErrorMessage,
+                onLoginClick = {
+                    if (isSigningIn) return@LoginScreen
+
+                    isSigningIn = true
+                    loginErrorMessage = null
+
+                    scope.launch {
+                        val googleResult = googleAuthClient.signIn()
+
+                        googleResult
+                            .onSuccess { googleUser ->
+                                try {
+                                    val firebaseUser =
+                                        firebaseAuthClient.signInWithGoogleIdToken(
+                                            idToken = googleUser.idToken
+                                        )
+
+                                    userFirestoreRepository.createUserIfMissing(
+                                        uid = firebaseUser.uid,
+                                        email = firebaseUser.email,
+                                        displayName = null,
+                                        photoUrl = firebaseUser.photoUrl
+                                    )
+
+                                    val firestoreUser =
+                                        userFirestoreRepository.getUser(firebaseUser.uid)
+
+                                    currentUserEmail = firebaseUser.email
+                                    currentUserDisplayName = firestoreUser?.displayName
+                                    currentUserPhotoUrl = firebaseUser.photoUrl
+                                    currentUserReviewsCount =
+                                        reviewFireStoreRepository.getReviewCountForCurrentUser()
+                                    currentUserEventsVisitedCount = 0
+                                    isSignedIn = true
+                                    isSigningIn = false
+
+                                    val destination =
+                                        if (firestoreUser?.displayName.isNullOrBlank()) {
+                                            "complete_profile"
+                                        } else {
+                                            "app"
+                                        }
+
+                                    navController.navigate(destination) {
+                                        popUpTo("login") { inclusive = true }
+                                        launchSingleTop = true
+                                    }
+                                } catch (error: Exception) {
+                                    isSigningIn = false
+                                    loginErrorMessage =
+                                        "${error::class.simpleName}: ${error.message ?: "Firebase sign-in failed."}"
+                                }
+                            }
+                            .onFailure { error ->
+                                isSigningIn = false
+                                loginErrorMessage = error.toLoginMessage()
+                            }
+                    }
+                },
+                onContinueAsGuestClick = {
+                    clearCurrentUser()
+
+                    navController.navigate("app") {
+                        popUpTo("login") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable("complete_profile") {
+            CompleteProfileScreen(
+                suggestedDisplayName = currentUserDisplayName,
+                onContinueClick = { displayName ->
+                    scope.launch {
+                        try {
+                            firebaseAuthClient.currentUser()?.let { firebaseUser ->
+                                userFirestoreRepository.updateDisplayName(
+                                    uid = firebaseUser.uid,
+                                    displayName = displayName
+                                )
+                            }
+
+                            currentUserDisplayName = displayName
+
+                            navController.navigate("app") {
+                                popUpTo("complete_profile") { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        } catch (error: Exception) {
+                            loginErrorMessage =
+                                "${error::class.simpleName}: ${error.message ?: "Failed to save display name."}"
+                        }
+                    }
+                },
+                onSkipClick = {
+                    navController.navigate("app") {
+                        popUpTo("complete_profile") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable("app") {
+            AppScaffold(
+                isSignedIn = isSignedIn,
+                isDarkMode = isDarkMode,
+                currentUserDisplayName = currentUserDisplayName,
+                currentUserPhotoUrl = currentUserPhotoUrl,
+                currentUserEmail = currentUserEmail,
+                currentUserReviewsCount = currentUserReviewsCount,
+                currentUserEventsVisitedCount = currentUserEventsVisitedCount,
+                onDarkModeChange = onDarkModeChange,
+                onSignInClick = {
+                    navController.navigate("login") {
+                        popUpTo("app") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onEditProfileSave = { newDisplayName ->
+                    scope.launch {
+                        try {
+                            firebaseAuthClient.currentUser()?.let { firebaseUser ->
+                                userFirestoreRepository.updateDisplayName(
+                                    uid = firebaseUser.uid,
+                                    displayName = newDisplayName
+                                )
+                            }
+
+                            currentUserDisplayName = newDisplayName
+                        } catch (error: Exception) {
+                            loginErrorMessage =
+                                "${error::class.simpleName}: ${error.message ?: "Failed to update display name."}"
+                        }
+                    }
+                },
+                onSignOutClick = {
+                    scope.launch {
+                        firebaseAuthClient.signOut()
+                        googleAuthClient.signOut()
+                        clearCurrentUser()
+
+                        navController.navigate("login") {
+                            popUpTo("app") { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
+
+// Error handling helper
+private fun Throwable.toLoginMessage(): String {
+    return when {
+        message?.contains("Account reauth failed", ignoreCase = true) == true ->
+            "Google account re-auth failed. Remove and re-add the Google account on this device, then try again."
+
+        message?.contains("No credentials", ignoreCase = true) == true ->
+            "No Google account is available. Add a Google account to this device, then try again."
+
+        else ->
+            "${this::class.simpleName}: ${message ?: "Google sign-in failed."}"
+    }
+}
+//class MainActivity : ComponentActivity() {
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        enableEdgeToEdge(
+//            statusBarStyle = SystemBarStyle.light(
+//                scrim = android.graphics.Color.TRANSPARENT,
+//                darkScrim = android.graphics.Color.TRANSPARENT
+//            ),
+//            navigationBarStyle = SystemBarStyle.light(
+//                scrim = android.graphics.Color.TRANSPARENT,
+//                darkScrim = android.graphics.Color.TRANSPARENT
+//            )
+//        )
+//
+//        super.onCreate(savedInstanceState)
+//
+//        setContent {
+//            var isDarkMode by rememberSaveable {
+//                mutableStateOf(false)
+//            }
+//
+//            var isSignedIn by rememberSaveable {
+//                mutableStateOf(false)
+//            }
+//
+//            var isSigningIn by rememberSaveable {
+//                mutableStateOf(false)
+//            }
+//
+//            var loginErrorMessage by rememberSaveable {
+//                mutableStateOf<String?>(null)
+//            }
+//
+//            var currentUserEmail by rememberSaveable {
+//                mutableStateOf<String?>(null)
+//            }
+//
+//            var currentUserDisplayName by rememberSaveable {
+//                mutableStateOf<String?>(null)
+//            }
+//
+//            var currentUserPhotoUrl by rememberSaveable {
+//                mutableStateOf<String?>(null)
+//            }
+//
+//            var currentUserReviewsCount by rememberSaveable {
+//                mutableStateOf(0)
+//            }
+//
+//            var currentUserEventsVisitedCount by rememberSaveable {
+//                mutableStateOf(0)
+//            }
+//
+//            VenuTheme(
+//                darkTheme = isDarkMode,
+//                dynamicColor = false,
+//            ) {
+//                val context = LocalContext.current
+//                val scope = rememberCoroutineScope()
+//
+//                val googleAuthClient = remember {
+//                    GoogleAuthClient(context)
+//                }
+//
+//                val firebaseAuthClient = remember {
+//                    FirebaseAuthClient()
+//                }
+//
+//                val userFirestoreRepository = remember {
+//                    UserFirestoreRepository()
+//                }
+//
+//                val reviewFireStoreRepository = remember {
+//                    ReviewFireStoreRepository()
+//                }
+//
+//                val navController = rememberNavController()
+//
+//                NavHost(
+//                    navController = navController,
+//                    startDestination = "login"
+//                ) {
+//                    composable("login") {
+//                        LoginScreen(
+//                            isSigningIn = isSigningIn,
+//                            errorMessage = loginErrorMessage,
+//                            onLoginClick = {
+//                                if (isSigningIn) {
+//                                    return@LoginScreen
+//                                }
+//
+//                                isSigningIn = true
+//                                loginErrorMessage = null
+//
+//                                scope.launch {
+//                                    val googleResult = googleAuthClient.signIn()
+//
+//                                    googleResult
+//                                        .onSuccess { googleUser ->
+//                                            try {
+//                                                val firebaseUser =
+//                                                    firebaseAuthClient.signInWithGoogleIdToken(
+//                                                        idToken = googleUser.idToken
+//                                                    )
+//
+//                                                userFirestoreRepository.createUserIfMissing(
+//                                                    uid = firebaseUser.uid,
+//                                                    email = firebaseUser.email,
+//                                                    displayName = null,
+//                                                    photoUrl = firebaseUser.photoUrl
+//                                                )
+//
+//                                                val firestoreUser =
+//                                                    userFirestoreRepository.getUser(firebaseUser.uid)
+//
+//                                                currentUserEmail = firebaseUser.email
+//                                                currentUserDisplayName = firestoreUser?.displayName
+//                                                currentUserPhotoUrl = firebaseUser.photoUrl
+//                                                currentUserReviewsCount =
+//                                                    reviewFireStoreRepository.getReviewCountForCurrentUser()
+//                                                currentUserEventsVisitedCount = 0
+//
+//                                                isSignedIn = true
+//                                                isSigningIn = false
+//
+//                                                if (firestoreUser?.displayName.isNullOrBlank()) {
+//                                                    navController.navigate("complete_profile") {
+//                                                        popUpTo("login") {
+//                                                            inclusive = true
+//                                                        }
+//                                                        launchSingleTop = true
+//                                                    }
+//                                                } else {
+//                                                    navController.navigate("app") {
+//                                                        popUpTo("login") {
+//                                                            inclusive = true
+//                                                        }
+//                                                        launchSingleTop = true
+//                                                    }
+//                                                }
+//                                            } catch (error: Exception) {
+//                                                isSigningIn = false
+//                                                loginErrorMessage =
+//                                                    "${error::class.simpleName}: ${error.message ?: "Firebase sign-in failed."}"
+//                                            }
+//                                        }
+//                                        .onFailure { error ->
+//                                            isSigningIn = false
+//
+//                                            loginErrorMessage = when {
+//                                                error.message?.contains(
+//                                                    "Account reauth failed",
+//                                                    ignoreCase = true
+//                                                ) == true ->
+//                                                    "Google account re-auth failed. Remove and re-add the Google account on this device, then try again."
+//
+//                                                error.message?.contains(
+//                                                    "No credentials",
+//                                                    ignoreCase = true
+//                                                ) == true ->
+//                                                    "No Google account is available. Add a Google account to this device, then try again."
+//
+//                                                else ->
+//                                                    "${error::class.simpleName}: ${error.message ?: "Google sign-in failed."}"
+//                                            }
+//                                        }
+//                                }
+//                            },
+//                            onContinueAsGuestClick = {
+//                                isSignedIn = false
+//                                currentUserEmail = null
+//                                currentUserDisplayName = null
+//                                currentUserPhotoUrl = null
+//                                currentUserReviewsCount = 0
+//                                currentUserEventsVisitedCount = 0
+//                                loginErrorMessage = null
+//
+//                                navController.navigate("app") {
+//                                    popUpTo("login") {
+//                                        inclusive = true
+//                                    }
+//                                    launchSingleTop = true
+//                                }
+//                            }
+//                        )
+//                    }
+//
+//                    composable("complete_profile") {
+//                        CompleteProfileScreen(
+//                            suggestedDisplayName = currentUserDisplayName,
+//                            onContinueClick = { displayName ->
+//                                scope.launch {
+//                                    try {
+//                                        val firebaseUser = firebaseAuthClient.currentUser()
+//
+//                                        if (firebaseUser != null) {
+//                                            userFirestoreRepository.updateDisplayName(
+//                                                uid = firebaseUser.uid,
+//                                                displayName = displayName
+//                                            )
+//                                        }
+//
+//                                        currentUserDisplayName = displayName
+//
+//                                        navController.navigate("app") {
+//                                            popUpTo("complete_profile") {
+//                                                inclusive = true
+//                                            }
+//                                            launchSingleTop = true
+//                                        }
+//                                    } catch (error: Exception) {
+//                                        loginErrorMessage =
+//                                            "${error::class.simpleName}: ${error.message ?: "Failed to save display name."}"
+//                                    }
+//                                }
+//                            },
+//                            onSkipClick = {
+//                                navController.navigate("app") {
+//                                    popUpTo("complete_profile") {
+//                                        inclusive = true
+//                                    }
+//                                    launchSingleTop = true
+//                                }
+//                            }
+//                        )
+//                    }
+//
+//                    composable("app") {
+//                        AppScaffold(
+//                            isSignedIn = isSignedIn,
+//                            isDarkMode = isDarkMode,
+//                            currentUserDisplayName = currentUserDisplayName,
+//                            currentUserPhotoUrl = currentUserPhotoUrl,
+//                            currentUserEmail = currentUserEmail,
+//                            currentUserReviewsCount = currentUserReviewsCount,
+//                            currentUserEventsVisitedCount = currentUserEventsVisitedCount,
+//                            onDarkModeChange = { darkMode ->
+//                                isDarkMode = darkMode
+//                            },
+//                            onSignInClick = {
+//                                navController.navigate("login") {
+//                                    popUpTo("app") {
+//                                        inclusive = true
+//                                    }
+//                                    launchSingleTop = true
+//                                }
+//                            },
+//                            onEditProfileSave = { newDisplayName ->
+//                                scope.launch {
+//                                    try {
+//                                        val firebaseUser = firebaseAuthClient.currentUser()
+//
+//                                        if (firebaseUser != null) {
+//                                            userFirestoreRepository.updateDisplayName(
+//                                                uid = firebaseUser.uid,
+//                                                displayName = newDisplayName
+//                                            )
+//                                        }
+//
+//                                        currentUserDisplayName = newDisplayName
+//                                    } catch (error: Exception) {
+//                                        loginErrorMessage =
+//                                            "${error::class.simpleName}: ${error.message ?: "Failed to update display name."}"
+//                                    }
+//                                }
+//                            },
+//                            onSignOutClick = {
+//                                scope.launch {
+//                                    firebaseAuthClient.signOut()
+//                                    googleAuthClient.signOut()
+//
+//                                    isSignedIn = false
+//                                    currentUserEmail = null
+//                                    currentUserDisplayName = null
+//                                    currentUserPhotoUrl = null
+//                                    currentUserReviewsCount = 0
+//                                    currentUserEventsVisitedCount = 0
+//                                    loginErrorMessage = null
+//
+//                                    navController.navigate("login") {
+//                                        popUpTo("app") {
+//                                            inclusive = true
+//                                        }
+//                                        launchSingleTop = true
+//                                    }
+//                                }
+//                            }
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
+//
 @Preview(showBackground = true, name = "App Nav Preview")
 @Composable
 fun AppNavPreview() {
