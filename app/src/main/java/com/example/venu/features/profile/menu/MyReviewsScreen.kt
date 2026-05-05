@@ -1,5 +1,6 @@
 package com.example.venu.features.profile.menu
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,25 +9,71 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_common.core_ui.components.ReviewCard
 import com.example.venu.core.core_common.core_ui.theme.VenuColors
+import com.example.venu.core.core_data.remote.firestore.ReviewFireStoreRepository
+import com.example.venu.core.core_domain.model.Review
 import com.example.venu.core.core_presentation.ReviewUi
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun MyReviewsScreen(
     onBackClick: () -> Unit
 ) {
+    val reviewRepository = remember {
+        ReviewFireStoreRepository()
+    }
+
+    var reviews by remember {
+        mutableStateOf<List<ReviewUi>>(emptyList())
+    }
+
+    var isLoading by remember {
+        mutableStateOf(true)
+    }
+
+    var errorMessage by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    LaunchedEffect(Unit) {
+        try {
+            isLoading = true
+            errorMessage = null
+
+            reviews = reviewRepository
+                .getReviewsForCurrentUser()
+                .map { review ->
+                    review.toReviewUi()
+                }
+        } catch (error: Exception) {
+            errorMessage = error.message ?: "Failed to load reviews."
+        } finally {
+            isLoading = false
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,30 +114,65 @@ fun MyReviewsScreen(
 
         Spacer(modifier = Modifier.height(22.dp))
 
-        ReviewCard(
-            review = ReviewUi(
-                authorInitial = "B",
-                displayName = "Blue Bottle Coffee",
-                photoUrl = "",
-                rating = 5,
-                comment = "Great coffee and a really nice atmosphere.",
-                timeAgo = "Apr 19, 2026",
-                id = "a"
-            )
-        )
+        when {
+            isLoading -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 36.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
 
-        Spacer(modifier = Modifier.height(18.dp))
+            errorMessage != null -> {
+                Text(
+                    text = errorMessage ?: "Something went wrong.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
-        ReviewCard(
-            review = ReviewUi(
-                authorInitial = "M",
-                displayName = "Madison Square Park",
-                photoUrl = "",
-                rating = 4,
-                comment = "Nice place to walk around and relax in the afternoon.",
-                timeAgo = "Apr 12, 2026",
-                id = "b"
-            )
-        )
+            reviews.isEmpty() -> {
+                Text(
+                    text = "You have not written any reviews yet.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = VenuColors.TextSecondary
+                )
+            }
+
+            else -> {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(18.dp)
+                ) {
+                    items(
+                        items = reviews,
+                        key = { review -> review.id }
+                    ) { review ->
+                        ReviewCard(review = review)
+                    }
+                }
+            }
+        }
     }
+}
+
+private fun Review.toReviewUi(): ReviewUi {
+    return ReviewUi(
+        authorInitial = displayName.firstOrNull()?.uppercase() ?: "?",
+        displayName = displayName,
+        photoUrl = photoUrl.orEmpty(),
+        rating = rating,
+        comment = comment,
+        timeAgo = createdAt.toDateLabel(),
+        id = id
+    )
+}
+
+private fun Long.toDateLabel(): String {
+    return SimpleDateFormat(
+        "MMM d, yyyy",
+        Locale.getDefault()
+    ).format(Date(this))
 }

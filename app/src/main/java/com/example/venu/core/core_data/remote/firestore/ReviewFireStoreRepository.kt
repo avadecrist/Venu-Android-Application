@@ -131,4 +131,17 @@ class ReviewFireStoreRepository(
 
         return snapshot.size()
     }
+
+    suspend fun getReviewsForCurrentUser(): List<Review> {
+        val user = auth.currentUser ?: return emptyList()
+
+        val snapshot = reviewsCollection
+            .whereEqualTo("uid", user.uid)
+            .get()
+            .await()
+
+        return snapshot.documents.mapNotNull { doc ->
+            doc.toObject(ReviewFireStoreDto::class.java)?.toDomain()
+        }
+    }
 }
