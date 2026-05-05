@@ -262,20 +262,14 @@ private fun ActivityCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 StatItem(
-                    value = state.eventsCount.toString(),
-                    label = "Events",
-                    modifier = Modifier.weight(1f)
-                )
-
-                StatItem(
                     value = state.reviewsCount.toString(),
                     label = "Reviews",
                     modifier = Modifier.weight(1f)
                 )
 
                 StatItem(
-                    value = state.streakCount.toString(),
-                    label = "Streak",
+                    value = state.eventsVisitedCount.toString(),
+                    label = "Events Visited",
                     modifier = Modifier.weight(1f)
                 )
             }
