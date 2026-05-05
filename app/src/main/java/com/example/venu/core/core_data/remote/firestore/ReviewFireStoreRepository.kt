@@ -18,16 +18,31 @@ class ReviewFireStoreRepository(
 
     private val reviewsCollection = firestore.collection("reviews")
 
-    override suspend fun getReviewsForEvent(eventId: String): List<Review> {
-        val snapshot = reviewsCollection
-            .whereEqualTo("eventId", eventId)
+override suspend fun getReviewsForEvent(eventId: String): List<Review> {
+    val snapshot = reviewsCollection
+        .whereEqualTo("eventId", eventId)
+        .get()
+        .await()
+
+    return snapshot.documents.mapNotNull { doc ->
+        val dto = doc.toObject(ReviewFireStoreDto::class.java) ?: return@mapNotNull null
+        Log.d("ReviewDebug", "Firestore raw displayName=${doc.getString("displayName")}")
+        val userDoc = firestore.collection("users")
+            .document(dto.uid)
             .get()
             .await()
 
-        return snapshot.documents.mapNotNull { doc ->
-            doc.toObject(ReviewFireStoreDto::class.java)?.toDomain()
-        }
+        val correctDisplayName = userDoc.getString("displayName")
+        val correctPhotoUrl = userDoc.getString("photoUrl")
+
+        val fixedDto = dto.copy(
+            displayName = correctDisplayName ?: dto.displayName,
+            photoUrl = correctPhotoUrl ?: dto.photoUrl
+        )
+
+        fixedDto.toDomain()
     }
+}
 
     override suspend fun getRatingSummary(eventId: String): RatingSummary {
         val reviews = getReviewsForEvent(eventId)
