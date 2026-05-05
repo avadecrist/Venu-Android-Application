@@ -1,6 +1,7 @@
 package com.example.venu.core.core_data.places
 
 import android.content.Context
+import com.example.venu.core.core_domain.model.PriceTier
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
@@ -55,7 +56,9 @@ class GooglePlacesRepository(
             Place.Field.FORMATTED_ADDRESS,
             Place.Field.LOCATION,
             Place.Field.RATING,
-            Place.Field.PHOTO_METADATAS
+            Place.Field.PHOTO_METADATAS,
+            Place.Field.OPENING_HOURS,
+            Place.Field.PRICE_LEVEL
         )
 
         val request = FetchPlaceRequest.builder(placeId, fields).build()
@@ -65,6 +68,10 @@ class GooglePlacesRepository(
         val location = place.location ?: return null
         val resolvedPhotoUrl = resolvePhotoUrl(place)
 
+        val hours = place.openingHours
+            ?.weekdayText
+            ?.joinToString("\n")
+
         return GooglePlaceResult(
             placeId = place.id ?: placeId,
             name = place.displayName ?: "Unknown place",
@@ -72,8 +79,21 @@ class GooglePlacesRepository(
             latitude = location.latitude,
             longitude = location.longitude,
             rating = place.rating,
-            photoUrl = resolvedPhotoUrl
+            photoUrl = resolvedPhotoUrl,
+            hours = hours,
+            priceTier = mapGooglePriceLevelToPriceTier(place.priceLevel)
         )
+    }
+
+    private fun mapGooglePriceLevelToPriceTier(priceLevel: Int?): PriceTier {
+        return when (priceLevel) {
+            0 -> PriceTier.FREE
+            1 -> PriceTier.ONE
+            2 -> PriceTier.TWO
+            3 -> PriceTier.THREE
+            4 -> PriceTier.FOUR
+            else -> PriceTier.UNKNOWN
+        }
     }
 
     private suspend fun resolvePhotoUrl(place: Place): String? {

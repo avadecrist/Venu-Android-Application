@@ -8,9 +8,9 @@ import java.util.UUID
 fun GooglePlaceEventDraft.toUserCreatedEvent(): Event {
     return Event(
         id = "user-${UUID.randomUUID()}",
-        name = eventName.trim(),
+        name = location.trim(),
         subtitle = description.trim(),
-        genre = genre,
+        genre = category,
         locationName = location.trim(),
         googlePlaceId = googlePlaceId,
         googlePlaceAddress = address.trim().ifBlank { null },
@@ -18,13 +18,13 @@ fun GooglePlaceEventDraft.toUserCreatedEvent(): Event {
         longitude = longitude,
         distanceKm = null,
         priceTier = priceTier,
-        startTimeLabel = startTimeLabel.trim(),
+        startTimeLabel = hours?.trim().orEmpty(),
         imageUrl = imageUrl,
         credibilityScore = 0,
         reviewCount = 0,
         isVerifiedVenue = true,
-        averageRating = rating ?: 0.0,
-        attendeeCount = 0,
+        averageRating = googleRating ?: 0.0,
+        attendeeCount = interestLevel,
         crowdLevel = CrowdLevel.UNKNOWN
     )
 }

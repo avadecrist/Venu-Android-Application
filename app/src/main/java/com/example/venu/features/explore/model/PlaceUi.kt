@@ -15,5 +15,7 @@ data class PlaceUi(
     val isVerified: Boolean,
     val isSaved: Boolean,
     val savedLabel: String?,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val priceText: String,
+    val hours: String
 )

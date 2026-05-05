@@ -6,15 +6,6 @@ import com.example.venu.core.core_domain.model.PriceTier
 import com.example.venu.core.core_domain.model.Review
 import com.example.venu.core.core_domain.model.CrowdLevel
 
-// Temporary Database
-/* ???
-    suspend fun seedIfEmpty() {
-        if (eventDao.getCount() == 0) {
-            eventDao.insertEvents(FakeSeed.events.map { it.toEntity() })
-        }
-    }
- */
-
 object FakeSeed {
 
     val events = listOf(
@@ -30,7 +21,7 @@ object FakeSeed {
             latitude = 40.4251,
             longitude = -3.7047,
             distanceKm = 0.2,
-            priceTier = PriceTier.UNDER_10,
+            priceTier = PriceTier.ONE,
             startTimeLabel = "Tonight 11 PM",
             imageUrl = null,
             credibilityScore = 91,
@@ -50,7 +41,7 @@ object FakeSeed {
             latitude = 40.4256,
             longitude = -3.7041,
             distanceKm = 0.1,
-            priceTier = PriceTier.UNDER_10,
+            priceTier = PriceTier.ONE,
             startTimeLabel = "Tonight 9 PM",
             credibilityScore = 88,
             reviewCount = 5,
@@ -68,7 +59,7 @@ object FakeSeed {
             latitude = 40.4257,
             longitude = -3.7056,
             distanceKm = 0.3,
-            priceTier = PriceTier.UNDER_10,
+            priceTier = PriceTier.ONE,
             startTimeLabel = "Fri 10 PM",
             credibilityScore = 83,
             reviewCount = 7,
@@ -86,7 +77,7 @@ object FakeSeed {
             latitude = 40.4265,
             longitude = -3.7040,
             distanceKm = 0.2,
-            priceTier = PriceTier.UNDER_20,
+            priceTier = PriceTier.TWO,
             startTimeLabel = "Tonight 8 PM",
             credibilityScore = 87,
             reviewCount = 6,
@@ -122,7 +113,7 @@ object FakeSeed {
             latitude = 40.4246,
             longitude = -3.7039,
             distanceKm = 0.3,
-            priceTier = PriceTier.UNDER_10,
+            priceTier = PriceTier.ONE,
             startTimeLabel = "Sat 10 AM",
             credibilityScore = 89,
             reviewCount = 6,
@@ -140,7 +131,7 @@ object FakeSeed {
             latitude = 40.4260,
             longitude = -3.7051,
             distanceKm = 0.3,
-            priceTier = PriceTier.UNDER_20,
+            priceTier = PriceTier.TWO,
             startTimeLabel = "Sat 11 PM",
             credibilityScore = 84,
             reviewCount = 7,
@@ -158,7 +149,7 @@ object FakeSeed {
             latitude = 40.4194,
             longitude = -3.7032,
             distanceKm = 1.0,
-            priceTier = PriceTier.UNDER_10,
+            priceTier = PriceTier.ONE,
             startTimeLabel = "Open now",
             credibilityScore = 83,
             reviewCount = 70,
@@ -194,7 +185,7 @@ object FakeSeed {
             latitude = 40.4211,
             longitude = -3.7075,
             distanceKm = 1.8,
-            priceTier = PriceTier.UNDER_10,
+            priceTier = PriceTier.ONE,
             startTimeLabel = "Tonight 10 PM",
             credibilityScore = 89,
             reviewCount = 63,
@@ -230,7 +221,7 @@ object FakeSeed {
             latitude = 40.4175,
             longitude = -3.7050,
             distanceKm = 1.2,
-            priceTier = PriceTier.UNDER_10,
+            priceTier = PriceTier.ONE,
             startTimeLabel = "Dinner hours",
             credibilityScore = 95,
             reviewCount = 210,
@@ -248,7 +239,7 @@ object FakeSeed {
             latitude = 40.4162,
             longitude = -3.7044,
             distanceKm = 0.4,
-            priceTier = PriceTier.UNDER_10,
+            priceTier = PriceTier.ONE,
             startTimeLabel = "Open now",
             credibilityScore = 90,
             reviewCount = 165,
@@ -266,7 +257,7 @@ object FakeSeed {
             latitude = 40.4226,
             longitude = -3.7068,
             distanceKm = 2.9,
-            priceTier = PriceTier.UNDER_20,
+            priceTier = PriceTier.TWO,
             startTimeLabel = "Tonight 11 PM",
             credibilityScore = 88,
             reviewCount = 76,
@@ -295,11 +286,11 @@ object FakeSeed {
     )
 
     val reviews = listOf(
-        Review("r1","e1",null,"user_2","Alex","",5,"Great DJ set.",9,"2d ago"),
-        Review("r2","e1",null,"user_3","Jordan","",4,"Fun crowd.",9,"3d ago"),
-        Review("r3","e1",null,"user_4","Maya","",5,"One of the best nights out.",9,"4d ago"),
-        Review("r4","e1",null,"user_5","Chris","",4,"Packed but worth it.",9,"5d ago"),
-        Review("r5","e1",null,"user_6","Sam","",5,"Love this place.",9,"1w ago"),
-        Review("r6","e1",null,"user_7","Taylor","",4,"Great indie music.",9,"1w ago")
+        Review("r1", "e1", null, "user_2", "Alex", "", 5, "Great DJ set.", 9, "2d ago"),
+        Review("r2", "e1", null, "user_3", "Jordan", "", 4, "Fun crowd.", 9, "3d ago"),
+        Review("r3", "e1", null, "user_4", "Maya", "", 5, "One of the best nights out.", 9, "4d ago"),
+        Review("r4", "e1", null, "user_5", "Chris", "", 4, "Packed but worth it.", 9, "5d ago"),
+        Review("r5", "e1", null, "user_6", "Sam", "", 5, "Love this place.", 9, "1w ago"),
+        Review("r6", "e1", null, "user_7", "Taylor", "", 4, "Great indie music.", 9, "1w ago")
     )
 }

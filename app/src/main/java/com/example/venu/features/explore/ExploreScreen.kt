@@ -1,5 +1,11 @@
 package com.example.venu.features.explore
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,8 +32,13 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import com.example.venu.core.core_domain.model.PriceTier
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
@@ -44,6 +55,8 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,10 +64,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_common.eventdetails.EventDetailsSheet
 import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import com.example.venu.core.core_domain.model.Genre
@@ -62,24 +78,11 @@ import com.example.venu.core.core_domain.model.label
 import com.example.venu.core.core_presentation.toEventDetailsUi
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
+import com.example.venu.features.explore.model.GooglePlaceEventDraft
 import com.example.venu.features.explore.model.GooglePlaceSuggestionUi
 import com.example.venu.features.explore.model.PlaceUi
-import kotlinx.coroutines.launch
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationManager
-import android.util.Log
-import androidx.compose.runtime.DisposableEffect
-import androidx.core.content.ContextCompat
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.LaunchedEffect
-import com.example.venu.core.core_common.AppGraph
 import com.example.venu.features.reviews.viewmodel.ReviewsViewModel
-import androidx.compose.material3.Button
-import com.example.venu.features.explore.model.GooglePlaceEventDraft
-
+import kotlinx.coroutines.launch
 
 private val ExploreSheetPeekHeight = 120.dp
 private const val ExploreSheetExpandedFraction = 0.86f
@@ -115,7 +118,6 @@ fun ExploreScreen(
     }
 
     val scope = rememberCoroutineScope()
-
     val context = LocalContext.current
 
     var userLocation by remember {
@@ -281,7 +283,9 @@ fun ExploreScreen(
                 sortOption = sortOption,
                 hasLocationPermission = hasLocationPermission,
                 onAction = onAction,
-                onOpenFilterSort = { showFilterSortDialog = true },
+                onOpenFilterSort = {
+                    showFilterSortDialog = true
+                },
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -357,12 +361,6 @@ fun ExploreScreen(
                     Log.d("DirectionsDebug", "userLocation = $location")
                     Log.d("DirectionsDebug", "selectedEventDetails = $selectedEventDetails")
 
-                    if (location == null) {
-                        Log.d("DirectionsDebug", "No user location yet")
-                        return@EventDetailsSheet
-                    }
-
-
                     scope.launch {
                         sheetState.hide()
 
@@ -374,10 +372,11 @@ fun ExploreScreen(
                             )
                         )
                     }
-                },
+                }
             )
         }
     }
+
     state.selectedGooglePlacePreview?.let { draft ->
         ModalBottomSheet(
             sheetState = sheetState,
@@ -403,6 +402,7 @@ fun ExploreScreen(
             )
         }
     }
+
     state.pendingGooglePlaceDraft?.let { draft ->
         ModalBottomSheet(
             sheetState = sheetState,
@@ -699,6 +699,16 @@ private fun GooglePlacePreviewSheet(
             )
         }
 
+        draft.hours?.takeIf { it.isNotBlank() }?.let { hours ->
+            Text(
+                text = hours,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
         Text(
             text = "Create a custom event from this Google verified venue.",
             style = MaterialTheme.typography.bodySmall,
@@ -708,12 +718,17 @@ private fun GooglePlacePreviewSheet(
         Text(
             text = buildString {
                 append("Google verified venue")
-                draft.rating?.let { rating ->
-                    append(" • Rating: ")
+
+                draft.googleRating?.let { rating ->
+                    append(" • Google rating: ")
                     append(String.format("%.1f", rating))
                 }
-                append(" • Price tier: ")
-                append(draft.priceTier.name.replace("_", " "))
+
+                append(" • Price: ")
+                append(draft.priceTier.label)
+
+                append(" • Interest level: ")
+                append(draft.interestLevel)
             },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -760,17 +775,15 @@ private fun GooglePlaceEventDraftSheet(
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text(
-            text = "Draft event",
+            text = "Create event",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
 
         OutlinedTextField(
-            value = draft.eventName,
+            value = draft.name,
             onValueChange = { value ->
-                onDraftChange(
-                    draft.copy(eventName = value)
-                )
+                onDraftChange(draft.copy(name = value))
             },
             modifier = Modifier.fillMaxWidth(),
             label = {
@@ -780,26 +793,9 @@ private fun GooglePlaceEventDraftSheet(
         )
 
         OutlinedTextField(
-            value = draft.description,
-            onValueChange = { value ->
-                onDraftChange(
-                    draft.copy(description = value)
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text("Description")
-            },
-            minLines = 2,
-            maxLines = 4
-        )
-
-        OutlinedTextField(
             value = draft.location,
             onValueChange = { value ->
-                onDraftChange(
-                    draft.copy(location = value)
-                )
+                onDraftChange(draft.copy(location = value))
             },
             modifier = Modifier.fillMaxWidth(),
             label = {
@@ -811,9 +807,7 @@ private fun GooglePlaceEventDraftSheet(
         OutlinedTextField(
             value = draft.address,
             onValueChange = { value ->
-                onDraftChange(
-                    draft.copy(address = value)
-                )
+                onDraftChange(draft.copy(address = value))
             },
             modifier = Modifier.fillMaxWidth(),
             label = {
@@ -824,43 +818,49 @@ private fun GooglePlaceEventDraftSheet(
         )
 
         OutlinedTextField(
-            value = draft.startTimeLabel,
+            value = draft.description,
             onValueChange = { value ->
-                onDraftChange(
-                    draft.copy(startTimeLabel = value)
-                )
+                onDraftChange(draft.copy(description = value))
             },
             modifier = Modifier.fillMaxWidth(),
             label = {
-                Text("Time label")
+                Text("Description")
             },
-            singleLine = true
+            minLines = 2,
+            maxLines = 4
         )
 
-        Text(
-            text = "Category",
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold
+        OutlinedTextField(
+            value = draft.hours.orEmpty(),
+            onValueChange = { value ->
+                onDraftChange(draft.copy(hours = value.ifBlank { null }))
+            },
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text("Hours")
+            },
+            minLines = 1,
+            maxLines = 4
         )
 
-        GenreSelectionRows(
-            selectedGenre = draft.genre,
+        GenreDropdown(
+            selectedGenre = draft.category,
             onGenreSelected = { genre ->
-                onDraftChange(
-                    draft.copy(genre = genre)
-                )
+                onDraftChange(draft.copy(category = genre))
             }
         )
 
         Text(
             text = buildString {
                 append("Google verified venue")
-                draft.rating?.let { rating ->
-                    append(" • Rating: ")
+
+                draft.googleRating?.let { rating ->
+                    append(" • Google rating: ")
                     append(String.format("%.1f", rating))
                 }
-                append(" • Price tier: ")
-                append(draft.priceTier.name.replace("_", " "))
+
+                append(" • Interest level: ")
+                append(draft.interestLevel)
             },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -883,11 +883,10 @@ private fun GooglePlaceEventDraftSheet(
             Button(
                 onClick = onCreateEvent,
                 enabled = !isCreating &&
-                        draft.eventName.isNotBlank() &&
-                        draft.description.isNotBlank() &&
+                        draft.name.isNotBlank() &&
                         draft.location.isNotBlank() &&
                         draft.address.isNotBlank() &&
-                        draft.startTimeLabel.isNotBlank()
+                        draft.description.isNotBlank()
             ) {
                 Text(
                     text = if (isCreating) {
@@ -902,37 +901,53 @@ private fun GooglePlaceEventDraftSheet(
 }
 
 @Composable
-private fun GenreSelectionRows(
+private fun GenreDropdown(
     selectedGenre: Genre,
     onGenreSelected: (Genre) -> Unit
 ) {
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
     Column(
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Genre.entries.forEach { genre ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onGenreSelected(genre)
-                    }
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+        Text(
+            text = "Genre",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Box {
+            OutlinedButton(
+                onClick = {
+                    expanded = true
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
-                RadioButton(
-                    selected = selectedGenre == genre,
-                    onClick = {
-                        onGenreSelected(genre)
-                    }
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
                 Text(
-                    text = genre.label,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium
+                    text = selectedGenre.label,
+                    modifier = Modifier.weight(1f)
                 )
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                }
+            ) {
+                Genre.entries.forEach { genre ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(genre.label)
+                        },
+                        onClick = {
+                            onGenreSelected(genre)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
@@ -1208,18 +1223,20 @@ private const val GOOGLE_PREVIEW_PLACE_ID_PREFIX = "google-preview-"
 private fun GooglePlaceEventDraft.toPreviewPlaceUi(): PlaceUi {
     return PlaceUi(
         id = toPreviewPlaceId(),
-        name = eventName.ifBlank { location },
+        name = name.ifBlank { location },
         subtitle = address.ifBlank { description },
         locationName = location,
         latitude = latitude,
         longitude = longitude,
         distanceKm = null,
-        rating = rating ?: 0.0,
-        genre = genre,
+        rating = googleRating ?: 0.0,
+        genre = category,
         isVerified = true,
         isSaved = false,
         savedLabel = null,
-        imageUrl = imageUrl
+        imageUrl = imageUrl,
+        priceText = priceTier.label,
+        hours = hours.orEmpty()
     )
 }
 
@@ -1244,12 +1261,15 @@ private fun filterAndSortPlaces(
 
     return when (sortOption) {
         ExploreSortOption.FEATURED -> filtered
+
         ExploreSortOption.DISTANCE -> filtered.sortedBy { place ->
             place.distanceKm ?: Double.MAX_VALUE
         }
+
         ExploreSortOption.RATING -> filtered.sortedByDescending { place ->
             place.rating
         }
+
         ExploreSortOption.NAME -> filtered.sortedBy { place ->
             place.name.lowercase()
         }

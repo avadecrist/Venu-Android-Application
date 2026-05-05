@@ -7,11 +7,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.venu.core.core_common.AppGraph
+import com.example.venu.core.core_data.location.DirectionsService
 import com.example.venu.core.core_data.places.GooglePlacesRepository
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.core.core_domain.repository.ListsRepository
+import com.example.venu.core.core_presentation.EventDetailsUi
 import com.example.venu.features.explore.mappers.toEventDraft
 import com.example.venu.features.explore.mappers.toPlaceUi
 import com.example.venu.features.explore.mappers.toUi
@@ -20,9 +22,6 @@ import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
 import com.example.venu.features.explore.model.GooglePlaceEventDraft
 import com.example.venu.features.explore.model.PlaceUi
-import androidx.lifecycle.viewModelScope
-import com.example.venu.core.core_data.location.DirectionsService
-import com.example.venu.core.core_presentation.EventDetailsUi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,7 +41,7 @@ class ExploreViewModel(
     var uiState by mutableStateOf(
         ExploreUiState(
             places = emptyList(),
-            availableLists = listsRepository.getAllLists()
+            availableLists = emptyList()
         )
     )
         private set
@@ -69,16 +68,20 @@ class ExploreViewModel(
             }
 
             is ExploreAction.ToggleWantToGo -> {
-                listsRepository.toggleWantToGo(action.id)
-                applyFilters()
+                viewModelScope.launch {
+                    listsRepository.toggleWantToGo(action.id)
+                    applyFilters()
+                }
             }
 
             is ExploreAction.SaveClicked -> {
-                uiState = uiState.copy(
-                    showSaveSheet = true,
-                    pendingSaveEventId = action.id,
-                    availableLists = listsRepository.getAllLists()
-                )
+                viewModelScope.launch {
+                    uiState = uiState.copy(
+                        showSaveSheet = true,
+                        pendingSaveEventId = action.id,
+                        availableLists = listsRepository.getAllLists()
+                    )
+                }
             }
 
             is ExploreAction.SaveToList -> {
@@ -128,6 +131,7 @@ class ExploreViewModel(
 
             is ExploreAction.GetDirectionsClicked -> {
                 Log.d("DirectionsDebug", "GetDirectionsClicked received")
+
                 getDirections(
                     event = action.event,
                     userLat = action.userLat,
@@ -289,54 +293,58 @@ class ExploreViewModel(
         eventId: String,
         listType: ListType
     ) {
-        listsRepository.addToList(
-            type = listType,
-            eventId = eventId
-        )
+        viewModelScope.launch {
+            listsRepository.addToList(
+                type = listType,
+                eventId = eventId
+            )
 
-        uiState = uiState.copy(
-            showSaveSheet = false,
-            pendingSaveEventId = null,
-            availableLists = listsRepository.getAllLists()
-        )
+            uiState = uiState.copy(
+                showSaveSheet = false,
+                pendingSaveEventId = null,
+                availableLists = listsRepository.getAllLists()
+            )
 
-        applyFilters()
+            applyFilters()
+        }
     }
 
-    private fun buildPlaces(): List<PlaceUi> {
+    private suspend fun buildPlaces(): List<PlaceUi> {
         return events.map { event ->
             event.toPlaceUi(listsRepository)
         }
     }
 
     private fun applyFilters() {
-        val q = uiState.query.trim().lowercase()
-        val g = uiState.selectedGenre
-        val allPlaces = buildPlaces()
+        viewModelScope.launch {
+            val q = uiState.query.trim().lowercase()
+            val g = uiState.selectedGenre
+            val allPlaces = buildPlaces()
 
-        val filtered = allPlaces.filter { place ->
-            val matchesQuery = q.isBlank() ||
-                    place.name.lowercase().contains(q) ||
-                    place.subtitle.lowercase().contains(q)
+            val filtered = allPlaces.filter { place ->
+                val matchesQuery = q.isBlank() ||
+                        place.name.lowercase().contains(q) ||
+                        place.subtitle.lowercase().contains(q)
 
-            val matchesGenre = g == null || place.genre == g
+                val matchesGenre = g == null || place.genre == g
 
-            matchesQuery && matchesGenre
+                matchesQuery && matchesGenre
+            }
+
+            val selectedStillVisible = uiState.selectedPlaceId?.let { id ->
+                filtered.any { place -> place.id == id }
+            } == true
+
+            uiState = uiState.copy(
+                places = filtered,
+                selectedPlaceId = if (selectedStillVisible) {
+                    uiState.selectedPlaceId
+                } else {
+                    null
+                },
+                availableLists = listsRepository.getAllLists()
+            )
         }
-
-        val selectedStillVisible = uiState.selectedPlaceId?.let { id ->
-            filtered.any { place -> place.id == id }
-        } == true
-
-        uiState = uiState.copy(
-            places = filtered,
-            selectedPlaceId = if (selectedStillVisible) {
-                uiState.selectedPlaceId
-            } else {
-                null
-            },
-            availableLists = listsRepository.getAllLists()
-        )
     }
 
     fun getDirections(
@@ -394,5 +402,3 @@ class ExploreViewModel(
         private const val GOOGLE_PLACES_SEARCH_DEBOUNCE_MS = 350L
     }
 }
-
-
