@@ -9,43 +9,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 
-//class ReviewFireStoreRepository : ReviewRepository {
-//    val db = FirebaseFirestore.getInstance()
-//    val reviewsCollection = db.collection("reviews")
-//
-//    fun addReview(
-//        review: ReviewDto,
-//        onSuccess: () -> Unit,
-//        onError: (Exception) -> Unit
-//    ) {
-//        val docRef = reviewsCollection.document()
-//
-//        val reviewWithId = review.copy(reviewId = docRef.id)
-//
-//        docRef.set(reviewWithId)
-//            .addOnSuccessListener { onSuccess() }
-//            .addOnFailureListener { onError(it) }
-//    }
-//
-//    fun getReviewsForEvent(
-//        eventId: String,
-//        onResult: (List<ReviewDto>) -> Unit
-//    ) {
-//        reviewsCollection
-//            .whereEqualTo("eventId", eventId)
-//            .get()
-//            .addOnSuccessListener { snapshot ->
-//                val reviews = snapshot.toObjects(ReviewDto::class.java)
-//                onResult(reviews)
-//            }
-//    }
 
 class ReviewFireStoreRepository(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) : ReviewRepository {
 
-    private val reviewsCollection = db.collection("reviews")
+    private val reviewsCollection = firestore.collection("reviews")
 
     override suspend fun getReviewsForEvent(eventId: String): List<Review> {
         val snapshot = reviewsCollection
@@ -72,10 +42,16 @@ class ReviewFireStoreRepository(
         rating: Int,
         comment: String
     ) {
-        Log.d("ReviewDebug", "Repository addReview called")
-        Log.d("ReviewDebug", "Current user = ${auth.currentUser?.uid}")
         val user = auth.currentUser
-            ?: throw IllegalStateException("User must be signed in to add a review")
+            ?: throw IllegalStateException("User must be signed in")
+
+        val userDoc = firestore.collection("users")
+            .document(user.uid)
+            .get()
+            .await()
+
+        val displayName = userDoc.getString("displayName") ?: "Anonymous"
+        val photoUrl = userDoc.getString("photoUrl")
 
         val docRef = reviewsCollection.document()
 
@@ -84,8 +60,8 @@ class ReviewFireStoreRepository(
             eventId = eventId,
             googlePlaceId = null,
             uid = user.uid,
-            displayName = user.displayName ?: "Anonymous",
-            photoUrl = user.photoUrl?.toString(),
+            displayName = displayName,
+            photoUrl = photoUrl,
             rating = rating,
             comment = comment,
             createdAt = System.currentTimeMillis()
