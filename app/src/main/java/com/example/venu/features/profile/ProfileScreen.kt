@@ -45,6 +45,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun ProfileScreen(
@@ -180,12 +182,23 @@ private fun ProfileHeader(
                 .background(VenuColors.AvatarBg),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = null,
-                modifier = Modifier.size(44.dp),
-                tint = VenuColors.AccentBlue
-            )
+            if (state.isSignedIn && !state.photoUrl.isNullOrBlank()) {
+                AsyncImage(
+                    model = state.photoUrl,
+                    contentDescription = "Profile picture",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = null,
+                    modifier = Modifier.size(44.dp),
+                    tint = VenuColors.AccentBlue
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(18.dp))

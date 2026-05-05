@@ -46,6 +46,7 @@ fun AppScaffold(
     isSignedIn: Boolean,
     isDarkMode: Boolean,
     currentUserDisplayName: String?,
+    currentUserPhotoUrl: String?,
     currentUserEmail: String?,
     onDarkModeChange: (Boolean) -> Unit,
     onSignInClick: () -> Unit,
@@ -244,6 +245,7 @@ fun AppScaffold(
                 ProfileRoute(
                     isSignedIn = isSignedIn,
                     displayName = currentUserDisplayName,
+                    photoUrl = currentUserPhotoUrl,
                     email = currentUserEmail,
                     reviewsCount = currentUserReviewsCount,
                     eventsVisitedCount = currentUserEventsVisitedCount,

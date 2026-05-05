@@ -67,6 +67,10 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf<String?>(null)
             }
 
+            var currentUserPhotoUrl by rememberSaveable {
+                mutableStateOf<String?>(null)
+            }
+
             var currentUserReviewsCount by rememberSaveable {
                 mutableStateOf(0)
             }
@@ -139,6 +143,7 @@ class MainActivity : ComponentActivity() {
 
                                                 currentUserEmail = firebaseUser.email
                                                 currentUserDisplayName = firestoreUser?.displayName
+                                                currentUserPhotoUrl = firebaseUser.photoUrl
                                                 currentUserReviewsCount =
                                                     reviewFireStoreRepository.getReviewCountForCurrentUser()
                                                 currentUserEventsVisitedCount = 0
@@ -193,6 +198,7 @@ class MainActivity : ComponentActivity() {
                                 isSignedIn = false
                                 currentUserEmail = null
                                 currentUserDisplayName = null
+                                currentUserPhotoUrl = null
                                 currentUserReviewsCount = 0
                                 currentUserEventsVisitedCount = 0
                                 loginErrorMessage = null
@@ -252,6 +258,7 @@ class MainActivity : ComponentActivity() {
                             isSignedIn = isSignedIn,
                             isDarkMode = isDarkMode,
                             currentUserDisplayName = currentUserDisplayName,
+                            currentUserPhotoUrl = currentUserPhotoUrl,
                             currentUserEmail = currentUserEmail,
                             currentUserReviewsCount = currentUserReviewsCount,
                             currentUserEventsVisitedCount = currentUserEventsVisitedCount,
@@ -293,6 +300,7 @@ class MainActivity : ComponentActivity() {
                                     isSignedIn = false
                                     currentUserEmail = null
                                     currentUserDisplayName = null
+                                    currentUserPhotoUrl = null
                                     currentUserReviewsCount = 0
                                     currentUserEventsVisitedCount = 0
                                     loginErrorMessage = null

@@ -7,6 +7,7 @@ import com.example.venu.features.profile.model.ProfileUiState
 fun ProfileRoute(
     isSignedIn: Boolean,
     displayName: String?,
+    photoUrl: String?,
     email: String?,
     reviewsCount: Int,
     eventsVisitedCount: Int,
@@ -19,6 +20,7 @@ fun ProfileRoute(
         state = ProfileUiState(
             isSignedIn = isSignedIn,
             displayName = displayName ?: email ?: "Explorer",
+            photoUrl = photoUrl,
             reviewsCount = reviewsCount,
             eventsVisitedCount = eventsVisitedCount
         ),
