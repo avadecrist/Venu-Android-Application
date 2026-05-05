@@ -1202,8 +1202,9 @@ private const val GOOGLE_PREVIEW_PLACE_ID_PREFIX = "google-preview-"
 private fun GooglePlaceEventDraft.toPreviewPlaceUi(): PlaceUi {
     return PlaceUi(
         id = toPreviewPlaceId(),
-        name = location,
-        subtitle = address ?: description,
+        name = eventName.ifBlank { location },
+        subtitle = address.ifBlank { description },
+        locationName = location,
         latitude = latitude,
         longitude = longitude,
         distanceKm = null,

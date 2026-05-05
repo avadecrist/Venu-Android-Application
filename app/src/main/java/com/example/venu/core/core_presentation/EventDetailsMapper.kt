@@ -10,25 +10,21 @@ fun PlaceUi.toEventDetailsUi(): EventDetailsUi {
         name = name,
         subtitle = subtitle,
         genre = genre,
-        locationName = name,
-
+        locationName = locationName,
         latitude = latitude,
         longitude = longitude,
-
         distanceKm = distanceKm,
         priceText = "$",
         startTimeLabel = "Open now",
-        imageUrl = null,
-        credibilityScore = 85, //temporary or default value
-        reviewCount = 0, //temporary or default value
+        imageUrl = imageUrl,
+        credibilityScore = if (isVerified) 85 else 60,
+        reviewCount = 0,
         isVerifiedVenue = isVerified,
-
         averageRating = rating,
         googleRating = rating,
-        userRating = rating,
-
-        attendeeCount = 0, //temporary or default value
-        crowdLevel = CrowdLevel.UNKNOWN, //temporary or default value
+        userRating = 0.0,
+        attendeeCount = 0,
+        crowdLevel = CrowdLevel.UNKNOWN,
         reviews = emptyList(),
         isSaved = isSaved || savedLabel != null
     )

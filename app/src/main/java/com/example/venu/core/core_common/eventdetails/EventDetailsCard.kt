@@ -58,6 +58,8 @@ import com.example.venu.core.core_common.util.formatOneDecimal
 import com.example.venu.core.core_domain.model.CrowdLevel
 import com.example.venu.core.core_presentation.EventDetailsUi
 import com.example.venu.core.core_presentation.ReviewUi
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 
 
 @Composable
@@ -93,15 +95,13 @@ fun EventDetailsSheet(
         item {
             TitleSection(
                 title = event.name,
-                subtitle = event.subtitle,
-                locationName = event.locationName,
-                distanceKm = event.distanceKm,
-                priceText = event.priceText
+                subtitle = event.subtitle
             )
         }
 
         item {
-            HeroImagePlaceholder(
+            EventHeroImage(
+                imageUrl = event.imageUrl,
                 isVerifiedVenue = event.isVerifiedVenue
             )
         }
@@ -215,52 +215,31 @@ private fun CircleActionButton(
 @Composable
 private fun TitleSection(
     title: String,
-    subtitle: String,
-    locationName: String,
-    distanceKm: Double?,
-    priceText: String
+    subtitle: String
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.Start
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = VenuColors.TextPrimary
+            style = MaterialTheme.typography.headlineSmall,
+            color = VenuColors.TextPrimary,
+            fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.bodyLarge,
-            color = VenuColors.TextSecondary
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        val meta = buildString {
-            append(locationName)
-            distanceKm?.let {
-                append(" • ")
-                append(formatDistance(it))
-            }
-            append(" • ")
-            append(priceText)
+        if (subtitle.isNotBlank()) {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyLarge,
+                color = VenuColors.TextSecondary
+            )
         }
-
-        Text(
-            text = meta,
-            style = MaterialTheme.typography.bodyMedium,
-            color = VenuColors.TextMuted
-        )
     }
 }
 
 @Composable
-private fun HeroImagePlaceholder(
+private fun EventHeroImage(
+    imageUrl: String?,
     isVerifiedVenue: Boolean
 ) {
     Box(
@@ -270,22 +249,49 @@ private fun HeroImagePlaceholder(
             .clip(RoundedCornerShape(24.dp))
             .background(VenuColors.SurfaceMuted)
     ) {
-        Column(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.LocationOn,
-                contentDescription = null,
-                tint = VenuColors.TextMuted,
-                modifier = Modifier.size(42.dp)
+        if (!imageUrl.isNullOrBlank()) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "Event location image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Event image via Google Maps",
-                color = VenuColors.TextMuted,
-                style = MaterialTheme.typography.bodyMedium
-            )
+
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(12.dp),
+                shape = RoundedCornerShape(999.dp),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f)
+            ) {
+                Text(
+                    text = "Image via Google Maps",
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = VenuColors.TextSecondary
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.LocationOn,
+                    contentDescription = null,
+                    tint = VenuColors.TextMuted,
+                    modifier = Modifier.size(42.dp)
+                )
+
+                Text(
+                    text = "Event image via Google Maps",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = VenuColors.TextMuted
+                )
+            }
         }
 
         if (isVerifiedVenue) {
@@ -306,7 +312,9 @@ private fun HeroImagePlaceholder(
                         tint = VenuColors.VerifiedText,
                         modifier = Modifier.size(16.dp)
                     )
+
                     Spacer(modifier = Modifier.width(6.dp))
+
                     Text(
                         text = "Verified",
                         style = MaterialTheme.typography.bodyMedium,
