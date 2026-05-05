@@ -1,5 +1,6 @@
 package com.example.venu.core.core_data.remote.firestore
 
+import android.util.Log
 import com.example.venu.core.core_data.mapper.toDomain
 import com.example.venu.core.core_domain.repository.ReviewRepository
 import com.example.venu.core.core_domain.model.Review
@@ -71,6 +72,8 @@ class ReviewFireStoreRepository(
         rating: Int,
         comment: String
     ) {
+        Log.d("ReviewDebug", "Repository addReview called")
+        Log.d("ReviewDebug", "Current user = ${auth.currentUser?.uid}")
         val user = auth.currentUser
             ?: throw IllegalStateException("User must be signed in to add a review")
 

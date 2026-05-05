@@ -1,5 +1,6 @@
 package com.example.venu.features.reviews.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.venu.core.core_domain.repository.ReviewRepository
@@ -76,8 +77,15 @@ class ReviewsViewModel(
     }
 
     private fun submitReview() {
-        val draft = _state.value.draft ?: return
+        Log.d("ReviewDebug", "submitReview() called")
 
+        val draft = _state.value.draft ?: return
+        Log.d("ReviewDebug", "Current draft = $draft")
+
+        if (draft == null) {
+            Log.d("ReviewDebug", "Stopping: draft is null")
+            return
+        }
         if (draft.rating !in 1..5) {
             _state.value = _state.value.copy(
                 errorMessage = "Please select a rating."
@@ -87,16 +95,19 @@ class ReviewsViewModel(
 
         viewModelScope.launch {
             try {
+                Log.d("ReviewDebug", "Coroutine started")
                 _state.value = _state.value.copy(
                     isSubmitting = true,
                     errorMessage = null
                 )
 
+                Log.d("ReviewDebug", "Calling repository.addReview")
                 reviewRepository.addReview(
                     eventId = draft.eventId,
                     rating = draft.rating,
                     comment = draft.comment
                 )
+                Log.d("ReviewDebug", "Firestore addReview completed")
 
                 val reviews = reviewRepository.getReviewsForEvent(draft.eventId)
                 val summary = reviewRepository.getRatingSummary(draft.eventId)
@@ -111,6 +122,7 @@ class ReviewsViewModel(
                     errorMessage = null
                 )
             } catch (e: Exception) {
+                Log.e("ReviewDebug", "Submit failed", e)
                 _state.value = _state.value.copy(
                     isSubmitting = false,
                     errorMessage = e.message ?: "Could not submit review."
