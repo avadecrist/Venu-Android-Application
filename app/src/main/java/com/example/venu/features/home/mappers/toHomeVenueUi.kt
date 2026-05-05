@@ -17,6 +17,7 @@ suspend fun Event.toHomeVenueUi(
         id = id,
         title = name,
         subtitle = "$locationName • $startTimeLabel",
+        locationName = this.locationName,
         latitude = latitude,
         longitude = longitude,
         ratingLabel = if (summary.count > 0) {
@@ -28,7 +29,8 @@ suspend fun Event.toHomeVenueUi(
             "${it.roundTo1Decimal()} km"
         },
         genre = genre,
-        isSaved = listsRepo.isInList(ListType.WantToGo, id)
+        isSaved = listsRepo.isInList(ListType.WantToGo, id),
+        imageUrl = imageUrl
     )
 }
 
