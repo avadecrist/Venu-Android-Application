@@ -43,6 +43,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.venu.core.core_common.core_ui.theme.VenuTheme
+import com.example.venu.core.core_domain.model.Genre
+import com.example.venu.core.core_domain.model.PriceTier
 
 @Composable
 fun ListsScreen(
@@ -55,15 +59,34 @@ fun ListsScreen(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+//        Column(
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            Text(
+//                text = "Lists",
+//                color = MaterialTheme.colorScheme.onBackground,
+//                style = MaterialTheme.typography.headlineLarge,
+//                modifier = Modifier.padding(16.dp)
+//            )
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 18.dp)
         ) {
             Text(
-                text = "Lists",
+                text = "Your Lists",
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(16.dp)
+                style = MaterialTheme.typography.headlineLarge
             )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Save, organize, and revisit your favorite events.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium
+            )
+
             val selectedIndex =
                 state.tabs.indexOfFirst { it == state.selectedTab }
                     .let { if (it >= 0) it else 0 }
@@ -76,9 +99,6 @@ fun ListsScreen(
                     ListType.ToReview -> "review"
                 }
             }) {
-                println("UI tabs.size = ${state.tabs.size}")
-                println("UI selectedIndex = $selectedIndex")
-                println("UI tabs = ${state.tabs}")
                 ScrollableTabRow(
                     selectedTabIndex = selectedIndex
                 ) {
@@ -383,5 +403,60 @@ private fun AddListFab(
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
+    }
+}
+
+@Preview(showBackground = false)
+@Composable
+private fun ListsScreenPreview() {
+    VenuTheme {
+        ListsScreen(
+            state = ListsUiState(
+                tabs = listOf(
+                    ListType.WantToGo,
+                    ListType.AlreadyWent,
+                    ListType.ToReview,
+                    ListType.Custom(id = "custom-1", name = "Date Night")
+                ),
+                selectedTab = ListType.WantToGo,
+                events = listOf(
+                    Event(
+                        id = "1",
+                        name = "Beach Bonfire",
+                        subtitle = "Live music and food trucks",
+                        genre = Genre.MUSIC,
+                        locationName = "Newport Beach",
+                        latitude = 33.6189,
+                        longitude = -117.9298,
+                        distanceKm = 4.2,
+                        priceTier = PriceTier.UNDER_20,
+                        startTimeLabel = "Tonight • 7:00 PM",
+                        imageUrl = null,
+                        credibilityScore = 92,
+                        reviewCount = 18,
+                        isVerifiedVenue = true,
+                        averageRating = 4.6
+                    ),
+                    Event(
+                        id = "2",
+                        name = "Coffee Pop-Up",
+                        subtitle = "Local vendors and outdoor seating",
+                        genre = Genre.FOOD,
+                        locationName = "Costa Mesa",
+                        latitude = 33.6411,
+                        longitude = -117.9187,
+                        distanceKm = 7.8,
+                        priceTier = PriceTier.FREE,
+                        startTimeLabel = "Tomorrow • 10:00 AM",
+                        imageUrl = null,
+                        credibilityScore = 85,
+                        reviewCount = 9,
+                        isVerifiedVenue = false,
+                        averageRating = 4.2
+                    )
+                )
+            ),
+            onEvent = {}
+        )
     }
 }
