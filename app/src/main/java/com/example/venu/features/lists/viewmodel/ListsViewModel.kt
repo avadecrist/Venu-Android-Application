@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_domain.repository.ListType
-import com.example.venu.features.lists.model.ListsUiEvent
+import com.example.venu.features.lists.model.ListsAction
 import com.example.venu.features.lists.model.ListsUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,32 +21,32 @@ class ListsViewModel(): ViewModel() {
     }
 
 
-    fun onEvent(event: ListsUiEvent) {
+    fun onAction(event: ListsAction) {
         when (event) {
-            ListsUiEvent.Refresh -> {
+            ListsAction.Refresh -> {
                 refresh()
             }
 
-            is ListsUiEvent.SelectTab -> {
+            is ListsAction.SelectTab -> {
                 refresh(event.tab)
             }
 
-            is ListsUiEvent.ToggleWantToGo -> {
+            is ListsAction.ToggleWantToGo -> {
                 listsRepo.toggleWantToGo(event.eventId)
                 refresh()
             }
 
-            is ListsUiEvent.RemoveFromList -> {
+            is ListsAction.RemoveFromList -> {
                 listsRepo.removeFromList(event.tab, event.eventId)
                 refresh(event.tab)
             }
 
-            is ListsUiEvent.MoveEvent -> {
+            is ListsAction.MoveEvent -> {
                 listsRepo.moveEvent(event.eventId, event.from, event.to)
                 refresh(event.to)
             }
 
-            is ListsUiEvent.CreateCustomList -> {
+            is ListsAction.CreateCustomList -> {
                 if (event.name.isNotBlank()) {
                     val newList = listsRepo.createCustomList(event.name.trim())
 

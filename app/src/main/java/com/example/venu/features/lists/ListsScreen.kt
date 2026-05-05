@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
@@ -28,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.ListType
-import com.example.venu.features.lists.model.ListsUiEvent
+import com.example.venu.features.lists.model.ListsAction
 import com.example.venu.features.lists.model.ListsUiState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -39,6 +37,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -52,7 +52,7 @@ import com.example.venu.core.core_domain.model.PriceTier
 @Composable
 fun ListsScreen(
     state: ListsUiState,
-    onEvent: (ListsUiEvent) -> Unit
+    onEvent: (ListsAction) -> Unit
 ) {
     var showAddListDialog by remember { mutableStateOf(false) }
     var newListName by remember { mutableStateOf("") }
@@ -60,15 +60,6 @@ fun ListsScreen(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-//        Column(
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//            Text(
-//                text = "Lists",
-//                color = MaterialTheme.colorScheme.onBackground,
-//                style = MaterialTheme.typography.headlineLarge,
-//                modifier = Modifier.padding(16.dp)
-//            )
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -121,7 +112,7 @@ fun ListsScreen(
                         ) {
                             Tab(
                                 selected = tab == state.selectedTab,
-                                onClick = { onEvent(ListsUiEvent.SelectTab(tab)) },
+                                onClick = { onEvent(ListsAction.SelectTab(tab)) },
                                 selectedContentColor = MaterialTheme.colorScheme.onBackground,
                                 unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 text = { Text(tabLabel(tab)) }
@@ -187,7 +178,7 @@ fun ListsScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        onEvent(ListsUiEvent.CreateCustomList(newListName))
+                        onEvent(ListsAction.CreateCustomList(newListName))
                         showAddListDialog = false
                         newListName = ""
                     },
@@ -215,7 +206,7 @@ fun ListsScreen(
 private fun ListEventCard(
     event: Event,
     selectedTab: ListType,
-    onEvent: (ListsUiEvent) -> Unit
+    onEvent: (ListsAction) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -270,11 +261,12 @@ private fun ListEventCard(
     }
 }
 
+
 @Composable
 private fun ActionRow(
     event: Event,
     selectedTab: ListType,
-    onEvent: (ListsUiEvent) -> Unit
+    onEvent: (ListsAction) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -285,7 +277,7 @@ private fun ActionRow(
                 TextButton(
                     onClick = {
                         onEvent(
-                            ListsUiEvent.MoveEvent(
+                            ListsAction.MoveEvent(
                                 eventId = event.id,
                                 from = ListType.WantToGo,
                                 to = ListType.AlreadyWent
@@ -300,7 +292,7 @@ private fun ActionRow(
 
                 TextButton(
                     onClick = {
-                        onEvent(ListsUiEvent.ToggleWantToGo(event.id))
+                        onEvent(ListsAction.ToggleWantToGo(event.id))
                     }
                 ) {
                     Text("Remove")
@@ -311,7 +303,7 @@ private fun ActionRow(
                 TextButton(
                     onClick = {
                         onEvent(
-                            ListsUiEvent.MoveEvent(
+                            ListsAction.MoveEvent(
                                 eventId = event.id,
                                 from = ListType.AlreadyWent,
                                 to = ListType.ToReview
@@ -327,7 +319,7 @@ private fun ActionRow(
                 TextButton(
                     onClick = {
                         onEvent(
-                            ListsUiEvent.RemoveFromList(
+                            ListsAction.RemoveFromList(
                                 tab = ListType.AlreadyWent,
                                 eventId = event.id
                             )
@@ -342,7 +334,7 @@ private fun ActionRow(
                 TextButton(
                     onClick = {
                         onEvent(
-                            ListsUiEvent.RemoveFromList(
+                            ListsAction.RemoveFromList(
                                 tab = ListType.ToReview,
                                 eventId = event.id
                             )
@@ -358,7 +350,7 @@ private fun ActionRow(
                 TextButton(
                     onClick = {
                         onEvent(
-                            ListsUiEvent.RemoveFromList(
+                            ListsAction.RemoveFromList(
                                 tab = selectedTab, // this is the Custom list instance
                                 eventId = event.id
                             )

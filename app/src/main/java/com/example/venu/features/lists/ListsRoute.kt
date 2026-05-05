@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.venu.features.lists.model.ListsUiEvent
+import com.example.venu.features.lists.model.ListsAction
 import com.example.venu.features.lists.viewmodel.ListsViewModel
 
 @Composable
@@ -16,11 +16,11 @@ fun ListsRoute(
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.onEvent(ListsUiEvent.Refresh)
+        viewModel.onAction(ListsAction.Refresh)
     }
 
     ListsScreen(
         state = state,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onAction
     )
 }
