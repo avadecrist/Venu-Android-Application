@@ -1,25 +1,28 @@
 package com.example.venu.features.explore.mappers
 
 import com.example.venu.core.core_domain.model.Event
+import com.example.venu.core.core_domain.model.label
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.core.core_domain.repository.ListsRepository
 import com.example.venu.features.explore.model.PlaceUi
 
-fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
-    val listsContainingEvent = listsRepository
-        .getAllLists()
-        .filter { listType ->
-            listsRepository.isInList(listType, id)
-        }
+suspend fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
+    val allLists = listsRepository.getAllLists()
+
+    val listsContainingEvent = allLists.filter { listType ->
+        listsRepository.isInList(listType, id)
+    }
 
     val savedLabel = when (listsContainingEvent.size) {
         0 -> null
+
         1 -> when (val list = listsContainingEvent.first()) {
             ListType.WantToGo -> "Want to Go"
             ListType.AlreadyWent -> "Already Went"
             ListType.ToReview -> "To Review"
             is ListType.Custom -> list.name
         }
+
         else -> "${listsContainingEvent.size} lists"
     }
 
@@ -34,8 +37,10 @@ fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
         rating = averageRating,
         genre = genre,
         isVerified = isVerifiedVenue,
-        isSaved = listsRepository.isSaved(id),
+        isSaved = listsContainingEvent.isNotEmpty(),
         savedLabel = savedLabel,
-        imageUrl = imageUrl
+        imageUrl = imageUrl,
+        priceText = priceTier.label,
+        hours = startTimeLabel
     )
 }

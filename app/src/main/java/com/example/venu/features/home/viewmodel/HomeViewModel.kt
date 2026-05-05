@@ -36,23 +36,30 @@ class HomeViewModel : ViewModel() {
             }
 
             is HomeAction.SaveClicked -> {
-                uiState = uiState.copy(
-                    showSaveSheet = true,
-                    pendingSaveEventId = action.eventId,
-                    availableLists = listsRepo.getAllLists()
-                )
+                viewModelScope.launch {
+                    uiState = uiState.copy(
+                        showSaveSheet = true,
+                        pendingSaveEventId = action.eventId,
+                        availableLists = listsRepo.getAllLists()
+                    )
+                }
             }
 
             is HomeAction.SaveToList -> {
-                listsRepo.addToList(action.listType, action.eventId)
+                viewModelScope.launch {
+                    listsRepo.addToList(
+                        type = action.listType,
+                        eventId = action.eventId
+                    )
 
-                uiState = uiState.copy(
-                    showSaveSheet = false,
-                    pendingSaveEventId = null,
-                    availableLists = listsRepo.getAllLists()
-                )
+                    uiState = uiState.copy(
+                        showSaveSheet = false,
+                        pendingSaveEventId = null,
+                        availableLists = listsRepo.getAllLists()
+                    )
 
-                loadHome() // or applyFilters()
+                    loadHome()
+                }
             }
 
             is HomeAction.DismissSaveSheet -> {
@@ -65,7 +72,6 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun loadHome() {
-
         viewModelScope.launch {
             allFeatured = eventRepo
                 .getTrendingEvents()
@@ -84,6 +90,10 @@ class HomeViewModel : ViewModel() {
                         listsRepo = listsRepo
                     )
                 }
+
+            uiState = uiState.copy(
+                availableLists = listsRepo.getAllLists()
+            )
 
             applyFilters()
         }

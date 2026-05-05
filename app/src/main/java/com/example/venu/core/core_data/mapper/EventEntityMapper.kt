@@ -40,7 +40,7 @@ fun EventEntity.toDomain(): Event {
         latitude = latitude,
         longitude = longitude,
         distanceKm = distanceKm,
-        priceTier = PriceTier.valueOf(priceTier),
+        priceTier = priceTier.toPriceTier(),
         startTimeLabel = startTimeLabel,
         imageUrl = imageUrl,
         credibilityScore = credibilityScore,
@@ -52,4 +52,22 @@ fun EventEntity.toDomain(): Event {
         attendeeCount = 0,
         crowdLevel = CrowdLevel.UNKNOWN
     )
+}
+
+private fun String.toPriceTier(): PriceTier {
+    return when (this) {
+        // Current values
+        "FREE" -> PriceTier.FREE
+        "ONE" -> PriceTier.ONE
+        "TWO" -> PriceTier.TWO
+        "THREE" -> PriceTier.THREE
+        "FOUR" -> PriceTier.FOUR
+        "UNKNOWN" -> PriceTier.UNKNOWN
+
+        // Legacy Room values from old enum
+        "UNDER_10" -> PriceTier.ONE
+        "UNDER_20" -> PriceTier.TWO
+
+        else -> PriceTier.UNKNOWN
+    }
 }
