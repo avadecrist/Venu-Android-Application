@@ -1,5 +1,6 @@
 package com.example.venu.core.core_common.core_ui.components
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,13 +34,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_common.core_ui.theme.VenuColors
+import com.example.venu.features.reviews.model.ReviewDraft
 
 @Composable
 fun LeaveReviewCard(
-    onSubmitReview: (Int, String) -> Unit
+    draft: ReviewDraft?,
+    isSubmitting: Boolean,
+    onRatingChange: (Int) -> Unit,
+    onCommentChange: (String) -> Unit,
+    onSubmit: () -> Unit
 ) {
-    var selectedRating by remember { mutableIntStateOf(0) }
-    var reviewText by remember { mutableStateOf("") }
+    val rating = draft?.rating ?: 0
+    val comment = draft?.comment.orEmpty()
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -47,9 +53,7 @@ fun LeaveReviewCard(
         color = Color.White,
         border = BorderStroke(1.dp, VenuColors.Border)
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 text = "Leave a review",
                 style = MaterialTheme.typography.titleLarge,
@@ -59,13 +63,12 @@ fun LeaveReviewCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 repeat(5) { index ->
-                    val filled = index < selectedRating
+                    val filled = index < rating
+
                     TextButton(
-                        onClick = { selectedRating = index + 1 },
+                        onClick = { onRatingChange(index + 1) },
                         contentPadding = PaddingValues(0.dp)
                     ) {
                         Text(
@@ -85,34 +88,24 @@ fun LeaveReviewCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    value = reviewText,
-                    onValueChange = { reviewText = it },
+                    value = comment,
+                    onValueChange = onCommentChange,
                     modifier = Modifier.weight(1f),
-                    placeholder = {
-                        Text("Share your experience...")
-                    },
+                    placeholder = { Text("Share your experience...") },
                     shape = RoundedCornerShape(18.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        disabledContainerColor = Color.White,
-                        focusedIndicatorColor = VenuColors.Border,
-                        unfocusedIndicatorColor = VenuColors.Border,
-                        focusedTextColor = VenuColors.TextPrimary,
-                        unfocusedTextColor = VenuColors.TextPrimary,
-                        focusedPlaceholderColor = VenuColors.TextMuted,
-                        unfocusedPlaceholderColor = VenuColors.TextMuted
-                    ),
+                    enabled = !isSubmitting,
                     singleLine = false,
                     maxLines = 3
                 )
 
                 Surface(
                     onClick = {
-                        if (selectedRating > 0 && reviewText.isNotBlank()) {
-                            onSubmitReview(selectedRating, reviewText.trim())
-                            selectedRating = 0
-                            reviewText = ""
+                        Log.d("ReviewDebug", "Send clicked: isSubmitting=$isSubmitting, rating=$rating, comment='$comment'")
+                        if (!isSubmitting && rating > 0 && comment.isNotBlank()) {
+                            Log.d("ReviewDebug", "Calling onSubmit()")
+                            onSubmit()
+                        } else {
+                            Log.d("ReviewDebug", "Blocked submit")
                         }
                     },
                     shape = RoundedCornerShape(18.dp),

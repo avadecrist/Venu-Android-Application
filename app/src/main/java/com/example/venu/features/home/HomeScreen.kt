@@ -28,12 +28,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.venu.core.core_common.core_ui.theme.VenuTheme
 import androidx.compose.ui.platform.LocalContext
+import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import com.example.venu.core.core_common.eventdetails.genreEmoji
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_presentation.genreColor
 import com.example.venu.features.home.model.HomeVenueUi
+import com.example.venu.features.reviews.viewmodel.ReviewsViewModel
 import kotlinx.coroutines.launch
 
 
@@ -52,6 +54,10 @@ fun HomeScreen(
     )
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    val reviewsViewModel = remember {
+        ReviewsViewModel(AppGraph.reviewRepo)
+    }
 
     Column(
         modifier = Modifier
@@ -201,6 +207,7 @@ fun HomeScreen(
         ) {
             EventDetailsSheet(
                 event = event,
+                reviewsViewModel = reviewsViewModel,
                 onBack = {
                     scope.launch {
                         sheetState.hide()
@@ -217,7 +224,6 @@ fun HomeScreen(
 
                     }
                 },
-                onSubmitReview = { _, _ -> }
             )
         }
     }

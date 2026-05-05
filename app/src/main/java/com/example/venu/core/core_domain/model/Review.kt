@@ -3,9 +3,12 @@ package com.example.venu.core.core_domain.model
 data class Review(
     val id: String,
     val eventId: String,
-    val displayName: String, // displayName of User
+    val googlePlaceId: String?,
     val userId: String,
-    val rating: Int,          // 1-5
+    val displayName: String,
+    val photoUrl: String?,
+    val rating: Int, // from 1-5
     val comment: String,
-    val createdAtLabel: String // simple for now ("2d ago")
+    val createdAt: Long,
+    val createdAtLabel: String
 )

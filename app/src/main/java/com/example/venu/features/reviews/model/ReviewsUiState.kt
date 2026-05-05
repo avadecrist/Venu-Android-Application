@@ -8,7 +8,8 @@ data class ReviewsUiState(
     val reviews: List<Review> = emptyList(), // list to render
     val summary: RatingSummary = RatingSummary(average = 0.0, count = 0),
     val myReview: Review? = null, // if the user already reviewed, show it (and allow edits)
-    val draft: ReviewDraft? = null, // if user is writing/editing?
+    val draft: ReviewDraft? = null,
     val isLoading: Boolean = false,
+    val isSubmitting: Boolean = false,
     val errorMessage: String? = null
 )
