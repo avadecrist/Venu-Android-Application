@@ -35,30 +35,27 @@ fun HomeVenueUi.toEventDetailsUi(): EventDetailsUi {
         id = id,
         name = title,
         subtitle = subtitle,
-        locationName = title,
-
+        genre = genre,
+        locationName = locationName,
         latitude = latitude,
         longitude = longitude,
-
         distanceKm = distanceLabel
             ?.removeSuffix(" km")
             ?.toDoubleOrNull(),
+        priceText = "$$",
+        startTimeLabel = "Today",
+        imageUrl = imageUrl,
+        credibilityScore = 85,
+        reviewCount = 0,
+        isVerifiedVenue = false,
         averageRating = ratingLabel
             ?.removePrefix("★ ")
             ?.toDoubleOrNull(),
-        isSaved = isSaved,
-
-        // Temporary defaults until HomeVenueUi has richer data
-        genre = genre,
-        startTimeLabel = "Today",
-        priceText = "$$",
-        isVerifiedVenue = false,
-        credibilityScore = 85,
         googleRating = null,
         userRating = null,
-        reviewCount = 0,
         attendeeCount = 0,
         crowdLevel = CrowdLevel.QUIET,
-        reviews = emptyList()
+        reviews = emptyList(),
+        isSaved = isSaved
     )
 }
