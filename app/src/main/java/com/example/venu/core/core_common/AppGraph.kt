@@ -10,6 +10,7 @@ import com.example.venu.core.core_data.repository.RoomEventRepository
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListsRepository
 import com.example.venu.core.core_domain.repository.ReviewRepository
+import com.example.venu.core.core_data.repository.FirestoreListsRepository
 
 // Tiny TEMPORARY dependency container so screens can access repos.
 // Use this in ViewModels.
@@ -46,7 +47,9 @@ object AppGraph {
 
         eventRepo = roomEventRepository
 
-        listsRepo = InMemoryListsRepository(eventRepo)
+        listsRepo = FirestoreListsRepository(
+            eventRepo = eventRepo
+        )
 
         googlePlacesRepo = GooglePlacesRepository(
             context = context,

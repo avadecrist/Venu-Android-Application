@@ -34,7 +34,42 @@ class UserFirestoreRepository(
                 updatedAt = now
             )
 
-            userRef.set(user).await()
+            val listsCollection = userRef.collection("lists")
+
+            val defaultLists = listOf(
+                UserListFirestoreDto(
+                    id = "want_to_go",
+                    name = "Want to Go",
+                    type = "want_to_go",
+                    ownerId = uid,
+                    createdAt = now,
+                    updatedAt = now
+                ),
+                UserListFirestoreDto(
+                    id = "visited",
+                    name = "Visited",
+                    type = "visited",
+                    ownerId = uid,
+                    createdAt = now,
+                    updatedAt = now
+                ),
+                UserListFirestoreDto(
+                    id = "to_review",
+                    name = "To Review",
+                    type = "to_review",
+                    ownerId = uid,
+                    createdAt = now,
+                    updatedAt = now
+                )
+            )
+
+            firestore.runBatch { batch ->
+                batch.set(userRef, user)
+
+                defaultLists.forEach { list ->
+                    batch.set(listsCollection.document(list.id), list)
+                }
+            }.await()
         }
     }
 
