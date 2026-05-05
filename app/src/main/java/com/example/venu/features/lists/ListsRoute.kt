@@ -16,11 +16,11 @@ fun ListsRoute(
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.onAction(ListsAction.Refresh)
+        viewModel.onEvent(ListsAction.Refresh)
     }
 
     ListsScreen(
         state = state,
-        onEvent = viewModel::onAction
+        onEvent = viewModel::onEvent
     )
 }

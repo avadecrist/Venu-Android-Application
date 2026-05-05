@@ -21,7 +21,7 @@ class ListsViewModel(): ViewModel() {
     }
 
 
-    fun onAction(event: ListsAction) {
+    fun onEvent(event: ListsAction) {
         when (event) {
             ListsAction.Refresh -> {
                 refresh()
