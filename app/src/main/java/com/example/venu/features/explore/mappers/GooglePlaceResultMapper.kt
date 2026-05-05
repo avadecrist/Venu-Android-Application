@@ -17,17 +17,17 @@ fun GooglePlaceSuggestion.toUi(): GooglePlaceSuggestionUi {
 
 fun GooglePlaceResult.toEventDraft(): GooglePlaceEventDraft {
     return GooglePlaceEventDraft(
-        eventName = name,
-        eventSubtitle = address ?: "Google Places venue",
+        eventName = "",
+        description = "",
+        location = name,
+        address = address.orEmpty(),
         genre = Genre.MUSIC,
         startTimeLabel = "Plan a visit",
         googlePlaceId = placeId,
-        venueName = name,
-        googlePlaceAddress = address,
         latitude = latitude,
         longitude = longitude,
         imageUrl = photoUrl,
-        rating = rating,
+        rating = null,
         priceTier = PriceTier.FREE
     )
 }

@@ -10,25 +10,21 @@ fun PlaceUi.toEventDetailsUi(): EventDetailsUi {
         name = name,
         subtitle = subtitle,
         genre = genre,
-        locationName = name,
-
+        locationName = locationName,
         latitude = latitude,
         longitude = longitude,
-
         distanceKm = distanceKm,
         priceText = "$",
         startTimeLabel = "Open now",
-        imageUrl = null,
-        credibilityScore = 85, //temporary or default value
-        reviewCount = 0, //temporary or default value
+        imageUrl = imageUrl,
+        credibilityScore = if (isVerified) 85 else 60,
+        reviewCount = 0,
         isVerifiedVenue = isVerified,
-
         averageRating = rating,
         googleRating = rating,
-        userRating = rating,
-
-        attendeeCount = 0, //temporary or default value
-        crowdLevel = CrowdLevel.UNKNOWN, //temporary or default value
+        userRating = 0.0,
+        attendeeCount = 0,
+        crowdLevel = CrowdLevel.UNKNOWN,
         reviews = emptyList(),
         isSaved = isSaved || savedLabel != null
     )
@@ -39,30 +35,27 @@ fun HomeVenueUi.toEventDetailsUi(): EventDetailsUi {
         id = id,
         name = title,
         subtitle = subtitle,
-        locationName = title,
-
+        genre = genre,
+        locationName = locationName,
         latitude = latitude,
         longitude = longitude,
-
         distanceKm = distanceLabel
             ?.removeSuffix(" km")
             ?.toDoubleOrNull(),
+        priceText = "$$",
+        startTimeLabel = "Today",
+        imageUrl = imageUrl,
+        credibilityScore = 85,
+        reviewCount = 0,
+        isVerifiedVenue = false,
         averageRating = ratingLabel
             ?.removePrefix("★ ")
             ?.toDoubleOrNull(),
-        isSaved = isSaved,
-
-        // Temporary defaults until HomeVenueUi has richer data
-        genre = genre,
-        startTimeLabel = "Today",
-        priceText = "$$",
-        isVerifiedVenue = false,
-        credibilityScore = 85,
         googleRating = null,
         userRating = null,
-        reviewCount = 0,
         attendeeCount = 0,
         crowdLevel = CrowdLevel.QUIET,
-        reviews = emptyList()
+        reviews = emptyList(),
+        isSaved = isSaved
     )
 }

@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     state: HomeUiState,
+    displayName: String?,
     onAction: (HomeAction) -> Unit,
     onNavigateToExploreDirections: (eventId: String) -> Unit
 ) {
@@ -85,7 +86,7 @@ fun HomeScreen(
             Spacer(Modifier.height(24.dp))
 
             Text(
-                text = "Welcome, Explorer",
+                text = timeBasedGreeting(displayName),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold
@@ -416,8 +417,27 @@ private fun HomeScreenPreview() {
                     )
                 )
             ),
+            displayName = "Explorer",
             onAction = {},
             onNavigateToExploreDirections = {}
         )
     }
+}
+
+private fun timeBasedGreeting(displayName: String?): String {
+    val hour = java.util.Calendar.getInstance()
+        .get(java.util.Calendar.HOUR_OF_DAY)
+
+    val greeting = when (hour) {
+        in 5..11 -> "Good morning"
+        in 12..16 -> "Good afternoon"
+        in 17..21 -> "Good evening"
+        else -> "Good night"
+    }
+
+    val name = displayName
+        ?.takeIf { it.isNotBlank() }
+        ?: "Explorer"
+
+    return "$greeting, $name"
 }

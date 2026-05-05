@@ -27,6 +27,7 @@ fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
         id = id,
         name = name,
         subtitle = subtitle,
+        locationName = locationName,
         latitude = latitude,
         longitude = longitude,
         distanceKm = distanceKm,

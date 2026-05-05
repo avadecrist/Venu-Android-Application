@@ -29,5 +29,11 @@ data class ExploreUiState(
     val googlePlaceSuggestions: List<GooglePlaceSuggestionUi> = emptyList(),
     val isSearchingGooglePlaces: Boolean = false,
     val isCreatingGooglePlaceEvent: Boolean = false,
-    val googlePlacesError: String? = null
+    val googlePlacesError: String? = null,
+
+    // Temporary Google Place preview shown on the map before the user creates an event.
+    val selectedGooglePlacePreview: GooglePlaceEventDraft? = null,
+
+    // Editable event draft shown only after the user presses "Create event".
+    val pendingGooglePlaceDraft: GooglePlaceEventDraft? = null
 )
