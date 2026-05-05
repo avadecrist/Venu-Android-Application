@@ -1,8 +1,6 @@
 package com.example.venu.core.core_domain.repository
 
-// INTERFACE FOR METHODS
 import com.example.venu.core.core_domain.model.Event
-
 
 sealed class ListType {
     data object WantToGo : ListType()
@@ -10,27 +8,22 @@ sealed class ListType {
     data object ToReview : ListType()
 
     data class Custom(val id: String, val name: String) : ListType()
-    /* example usage:
-     *  val customList = ListType.Custom("date_night", "Date Night")
-     *  listsRepository.addToList(customList, eventId)
-     */
 }
-
 
 interface ListsRepository {
     suspend fun getList(type: ListType): List<Event>
-    fun addToList(type: ListType, eventId: String)
-    fun removeFromList(type: ListType, eventId: String)
-    fun moveEvent(eventId: String, from: ListType, to: ListType)
 
-    fun isInList(type: ListType, eventId: String): Boolean // so cards can show “saved” state to specific list
-    fun isSaved(eventId: String): Boolean // if a list is saved in general
+    suspend fun addToList(type: ListType, eventId: String)
+    suspend fun removeFromList(type: ListType, eventId: String)
+    suspend fun moveEvent(eventId: String, from: ListType, to: ListType)
 
-    fun toggleWantToGo(eventId: String) // quick way to save to "Want to go" list
+    suspend fun isInList(type: ListType, eventId: String): Boolean
+    suspend fun isSaved(eventId: String): Boolean
 
-    // to edit custom lists:
-    fun createCustomList(name: String): ListType.Custom
-    fun deleteCustomList(listId: String)
-    fun getAllLists(): List<ListType> // doesn't need to be suspend yet bc it's not reading from Room
+    suspend fun toggleWantToGo(eventId: String)
+
+    suspend fun createCustomList(name: String): ListType.Custom
+    suspend fun deleteCustomList(listId: String)
+
+    suspend fun getAllLists(): List<ListType>
 }
-

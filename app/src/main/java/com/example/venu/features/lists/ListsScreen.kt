@@ -429,7 +429,7 @@ private fun ListsScreenPreview() {
                         latitude = 33.6189,
                         longitude = -117.9298,
                         distanceKm = 4.2,
-                        priceTier = PriceTier.UNDER_20,
+                        priceTier = PriceTier.FREE,
                         startTimeLabel = "Tonight • 7:00 PM",
                         imageUrl = null,
                         credibilityScore = 92,
