@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 import kotlin.text.get
+import com.google.firebase.firestore.ListenerRegistration
 
 
 class ReviewFireStoreRepository(
@@ -136,4 +137,21 @@ class ReviewFireStoreRepository(
         }
     }
 
+    fun observeReviewCountForCurrentUser(
+        onCountChanged: (Int) -> Unit
+    ): ListenerRegistration? {
+        val user = auth.currentUser ?: return null
+
+        return reviewsCollection
+            .whereEqualTo("uid", user.uid)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("ReviewDebug", "Failed to observe review count", error)
+                    onCountChanged(0)
+                    return@addSnapshotListener
+                }
+
+                onCountChanged(snapshot?.size() ?: 0)
+            }
+    }
 }
