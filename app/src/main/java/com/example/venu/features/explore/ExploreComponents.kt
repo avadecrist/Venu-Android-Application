@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_common.core_ui.components.BaseEventCard
+import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.core.core_common.eventdetails.genreChipText
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.label
@@ -56,8 +57,7 @@ fun PlaceCard(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 GenreTag(genre = place.genre)
-                if (place.isVerified) Tag(label = "Verified")
-                if (place.savedLabel != null) Tag(label = "Saved")
+                if (place.isVerified) Tag(label = "Verified", color = VenuColors.VerifiedBg)
             }
 
             Spacer(Modifier.height(10.dp))
