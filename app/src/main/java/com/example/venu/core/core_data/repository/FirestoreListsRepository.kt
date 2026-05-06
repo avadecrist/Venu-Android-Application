@@ -1,11 +1,13 @@
 package com.example.venu.core.core_data.repository
 
+import android.util.Log
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.core.core_domain.repository.ListsRepository
 import com.example.venu.core.core_data.remote.firestore.UserListFirestoreDto
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -116,12 +118,106 @@ class FirestoreListsRepository(
     }
 
     override suspend fun toggleWantToGo(eventId: String) {
-        if (isInList(ListType.WantToGo, eventId)) {
+        val uid = firebaseAuth.currentUser?.uid
+            ?: error("No logged in user")
+
+        val eventRef = firestore.collection("events").document(eventId)
+
+        Log.d("WantToGoDebug", "uid=$uid")
+        Log.d("WantToGoDebug", "eventId=$eventId")
+        Log.d("WantToGoDebug", "eventRefPath=${eventRef.path}")
+
+        val eventSnapshot = eventRef.get().await()
+        val currentInterest = eventSnapshot.getLong("interestLevel") ?: 0L
+
+        Log.d("WantToGoDebug", "eventExists=${eventSnapshot.exists()}")
+        Log.d("WantToGoDebug", "currentInterest=$currentInterest")
+
+        val alreadyInWantToGo = isInList(ListType.WantToGo, eventId)
+
+        Log.d("WantToGoDebug", "alreadyInWantToGo=$alreadyInWantToGo")
+
+        if (alreadyInWantToGo) {
             removeFromList(ListType.WantToGo, eventId)
+
+            if (currentInterest > 0) {
+                eventRef
+                    .update("interestLevel", FieldValue.increment(-1))
+                    .await()
+
+                Log.d("WantToGoDebug", "Decremented interestLevel")
+            } else {
+                eventRef
+                    .update("interestLevel", 0)
+                    .await()
+
+                Log.d("WantToGoDebug", "Interest already 0, reset to 0")
+            }
         } else {
             addToList(ListType.WantToGo, eventId)
+
+            eventRef
+                .update("interestLevel", FieldValue.increment(1))
+                .await()
+
+            Log.d("WantToGoDebug", "Incremented interestLevel")
         }
+
+        val afterSnapshot = eventRef.get().await()
+        Log.d(
+            "WantToGoDebug",
+            "afterInterest=${afterSnapshot.getLong("interestLevel")}"
+        )
     }
+/*
+    override suspend fun toggleWantToGo(eventId: String) {
+        val uid = firebaseAuth.currentUser?.uid
+            ?: error("No logged in user")
+
+        val eventRef = firestore.collection("events").document(eventId)
+
+        Log.d("WantToGoDebug", "uid=$uid")
+        Log.d("WantToGoDebug", "eventId=$eventId")
+        Log.d("WantToGoDebug", "eventRefPath=${eventRef.path}")
+
+        val eventSnapshot = eventRef.get().await()
+        Log.d("WantToGoDebug", "eventExists=${eventSnapshot.exists()}")
+        Log.d("WantToGoDebug", "currentInterest=${eventSnapshot.getLong("interestLevel")}")
+
+        val alreadyInWantToGo = isInList(ListType.WantToGo, eventId)
+        Log.d("WantToGoDebug", "alreadyInWantToGo=$alreadyInWantToGo")
+
+        if (alreadyInWantToGo) {
+            removeFromList(ListType.WantToGo, eventId)
+
+            runCatching {
+                eventRef
+                    .update("interestLevel", FieldValue.increment(-1))
+                    .await()
+            }.onFailure { error ->
+                Log.e("WantToGoDebug", "Failed to update interestLevel", error)
+            }
+
+            Log.d("WantToGoDebug", "Decrement success")
+        } else {
+            addToList(ListType.WantToGo, eventId)
+
+            runCatching {
+                eventRef
+                    .update("interestLevel", FieldValue.increment(1))
+                    .await()
+            }.onFailure { error ->
+                Log.e("WantToGoDebug", "Failed to update interestLevel", error)
+            }
+
+            Log.d("WantToGoDebug", "Increment success")
+        }
+
+        val afterSnapshot = eventRef.get().await()
+        Log.d("WantToGoDebug", "afterInterest=${afterSnapshot.getLong("interestLevel")}")
+    }
+
+ */
 
     override suspend fun createCustomList(name: String): ListType.Custom {
         val now = System.currentTimeMillis()

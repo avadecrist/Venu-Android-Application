@@ -4,6 +4,7 @@ import com.example.venu.core.core_data.fake.FakeSeed
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.repository.EventRepository
+import com.google.firebase.firestore.ListenerRegistration
 
 class FakeEventRepository : EventRepository {
 
@@ -73,5 +74,20 @@ class FakeEventRepository : EventRepository {
 
     override suspend fun createEvent(event: Event) {
         events.add(event)
+    }
+
+    override fun observeEventInterestLevel(
+        eventId: String,
+        onInterestLevelChanged: (Int) -> Unit
+    ): ListenerRegistration {
+        val event = events.find { it.id == eventId }
+
+        if (event != null) {
+            onInterestLevelChanged(event.interestLevel)
+        }
+
+        return ListenerRegistration {
+            // No real listener to remove in fake repository
+        }
     }
 }

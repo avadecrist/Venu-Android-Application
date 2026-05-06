@@ -1,5 +1,6 @@
 package com.example.venu.features.explore.mappers
 
+import android.util.Log
 import com.example.venu.core.core_common.util.toCrowdLevel
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.label
@@ -26,6 +27,10 @@ suspend fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
 
         else -> "${listsContainingEvent.size} lists"
     }
+    Log.d(
+        "AttendeeDebug",
+        "Event ${eventName} mapped with interestLevel=$interestLevel"
+    )
 
     return PlaceUi(
         id = id,

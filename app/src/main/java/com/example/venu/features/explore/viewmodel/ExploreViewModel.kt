@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_data.location.DirectionsService
 import com.example.venu.core.core_data.places.GooglePlacesRepository
-//import com.example.venu.core.core_data.remote.firestore.EventFirestoreRepository
+import com.example.venu.core.core_data.remote.firestore.EventFirestoreRepository
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListType
@@ -70,8 +70,10 @@ class ExploreViewModel(
             }
 
             is ExploreAction.ToggleWantToGo -> {
+                Log.d("WantToGoDebug", "ViewModel received ToggleWantToGo for id=${action.id}")
                 viewModelScope.launch {
                     listsRepository.toggleWantToGo(action.id)
+                    Log.d("WantToGoDebug", "Finished toggleWantToGo")
                     applyFilters()
                 }
             }
@@ -302,10 +304,14 @@ class ExploreViewModel(
         listType: ListType
     ) {
         viewModelScope.launch {
-            listsRepository.addToList(
-                type = listType,
-                eventId = eventId
-            )
+            if (listType == ListType.WantToGo) {
+                listsRepository.toggleWantToGo(eventId)
+            } else {
+                listsRepository.addToList(
+                    type = listType,
+                    eventId = eventId
+                )
+            }
 
             uiState = uiState.copy(
                 showSaveSheet = false,

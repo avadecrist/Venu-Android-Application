@@ -1,5 +1,6 @@
 package com.example.venu.core.core_common.eventdetails
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,10 @@ fun AttendeesInfoCard(
     crowdLevel: CrowdLevel,
     modifier: Modifier = Modifier
 ) {
+    Log.d(
+        "AttendeeDebug",
+        "AttendeesInfoCard attendeeCount=$attendeeCount crowdLevel=$crowdLevel"
+    )
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(22.dp),
@@ -83,23 +88,6 @@ fun AttendeesInfoCard(
                 Text(
                     text = crowdLevelLabel(crowdLevel),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.Medium
-                )
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Text(
-                    text = "•",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f)
-                )
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Text(
-                    text = "$attendeeCount going",
-                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Medium
                 )
