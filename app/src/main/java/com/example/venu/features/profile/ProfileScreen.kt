@@ -47,6 +47,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.venu.core.core_common.core_ui.theme.VenuTheme
 
 @Composable
 fun ProfileScreen(
@@ -63,6 +65,7 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 22.dp, vertical = 22.dp)
     ) {
         Spacer(modifier = Modifier.height(4.dp))
@@ -130,7 +133,7 @@ private fun EditProfileDialog(
                 Text(
                     text = "Update your display name or nickname.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = VenuColors.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -196,7 +199,7 @@ private fun ProfileHeader(
                     imageVector = Icons.Filled.Person,
                     contentDescription = null,
                     modifier = Modifier.size(44.dp),
-                    tint = VenuColors.AccentBlue
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -207,7 +210,7 @@ private fun ProfileHeader(
             text = if (state.isSignedIn) state.displayName else "Explorer",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = VenuColors.TextPrimary
+            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -220,7 +223,7 @@ private fun ProfileHeader(
             },
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
-            color = VenuColors.TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -265,7 +268,7 @@ private fun ActivityCard(
                 text = "Your Activity",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = VenuColors.TextPrimary
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -304,7 +307,7 @@ private fun StatItem(
             text = value,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            color = VenuColors.TextPrimary
+            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -312,7 +315,7 @@ private fun StatItem(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
-            color = VenuColors.TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -330,7 +333,7 @@ private fun MenuSection(
             text = "Account",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = VenuColors.TextPrimary
+            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -344,7 +347,7 @@ private fun MenuSection(
                     onClick = onMyReviewsClick
                 )
 
-                HorizontalDivider(color = VenuColors.Border)
+                HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
 
                 MenuRow(
                     leading = Icons.Filled.Settings,
@@ -364,7 +367,7 @@ private fun SettingsLikeCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, VenuColors.Border)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer)
     ) {
         content()
     }
@@ -388,7 +391,7 @@ private fun MenuRow(
             imageVector = leading,
             contentDescription = title,
             modifier = Modifier.size(22.dp),
-            tint = VenuColors.TextSecondary
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.size(18.dp))
@@ -397,7 +400,7 @@ private fun MenuRow(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
-            color = VenuColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.weight(1f)
         )
 
@@ -406,7 +409,7 @@ private fun MenuRow(
                 text = trailingText,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium,
-                color = VenuColors.TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.size(10.dp))
@@ -416,7 +419,53 @@ private fun MenuRow(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
             modifier = Modifier.size(22.dp),
-            tint = VenuColors.TextSecondary
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Preview(
+    name = "Profile - Light Mode",
+    showBackground = true
+)
+@Composable
+private fun ProfileScreenLightPreview() {
+    VenuTheme(darkTheme = false) {
+        ProfileScreen(
+            state = ProfileUiState(
+                isSignedIn = true,
+                displayName = "Dominic Hurtado",
+                photoUrl = null,
+                reviewsCount = 4,
+                eventsVisitedCount = 12
+            ),
+            onSignInClick = {},
+            onEditProfileSave = {},
+            onMyReviewsClick = {},
+            onSettingsClick = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Profile - Dark Mode",
+    showBackground = true
+)
+@Composable
+private fun ProfileScreenDarkPreview() {
+    VenuTheme(darkTheme = true) {
+        ProfileScreen(
+            state = ProfileUiState(
+                isSignedIn = true,
+                displayName = "Dominic Hurtado",
+                photoUrl = null,
+                reviewsCount = 4,
+                eventsVisitedCount = 12
+            ),
+            onSignInClick = {},
+            onEditProfileSave = {},
+            onMyReviewsClick = {},
+            onSettingsClick = {}
         )
     }
 }

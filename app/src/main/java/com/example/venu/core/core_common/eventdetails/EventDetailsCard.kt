@@ -616,7 +616,6 @@ private val PreviewEvent = EventDetailsUi(
         ReviewUi(
             id = "r1",
             displayName = "Avery C.",
-            authorInitial = "A",
             photoUrl = "",
             rating = 5,
             comment = "Best ramen I've had on campus. The broth was perfect.",
@@ -625,7 +624,6 @@ private val PreviewEvent = EventDetailsUi(
         ReviewUi(
             id = "r2",
             displayName = "Jordan M.",
-            authorInitial = "J",
             photoUrl = "",
             rating = 4,
             comment = "Really good and worth the wait. Noodles were great, line moved a little slow.",
@@ -634,7 +632,6 @@ private val PreviewEvent = EventDetailsUi(
         ReviewUi(
             id = "r3",
             displayName = "Sophia T.",
-            authorInitial = "S",
             photoUrl = "",
             rating = 5,
             comment = "Would absolutely go again. Super fun atmosphere and quality food.",

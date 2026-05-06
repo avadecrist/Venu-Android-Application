@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,7 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.venu.core.core_common.core_ui.theme.VenuTheme
 private const val VENU_NOTIFICATION_CHANNEL_ID = "venu_test_notifications_v2"
 
 @Composable
@@ -105,7 +108,8 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 22.dp, vertical = 22.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 22.dp, vertical = 24.dp)
     ) {
         Row(
             modifier = Modifier
@@ -336,7 +340,14 @@ private fun SettingsSwitchRow(
 
         Switch(
             checked = checked,
-            onCheckedChange = null
+            onCheckedChange = null,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.inverseOnSurface,
+                checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+
+                uncheckedThumbColor = MaterialTheme.colorScheme.outlineVariant,
+                uncheckedTrackColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
     }
 }
@@ -375,6 +386,42 @@ private fun SettingsActionRow(
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             color = contentColor
+        )
+    }
+}
+
+@Preview(
+    name = "Settings - Light Mode",
+    showBackground = true
+)
+@Composable
+private fun SettingsScreenLightPreview() {
+    VenuTheme(
+        darkTheme = false
+    ) {
+        SettingsScreen(
+            isDarkMode = false,
+            onDarkModeChange = {},
+            onBackClick = {},
+            onSignOutClick = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Settings - Dark Mode",
+    showBackground = true
+)
+@Composable
+private fun SettingsScreenDarkPreview() {
+    VenuTheme(
+        darkTheme = true
+    ) {
+        SettingsScreen(
+            isDarkMode = true,
+            onDarkModeChange = {},
+            onBackClick = {},
+            onSignOutClick = {}
         )
     }
 }

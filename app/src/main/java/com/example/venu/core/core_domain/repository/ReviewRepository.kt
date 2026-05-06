@@ -16,4 +16,6 @@ interface ReviewRepository {
 
     // helper function
     suspend fun getUserReviewForEvent(eventId: String): Review? // will show user their existing review
+
+    suspend fun getReviewCountForCurrentUser(): Int // used in MyReviews page
 }
