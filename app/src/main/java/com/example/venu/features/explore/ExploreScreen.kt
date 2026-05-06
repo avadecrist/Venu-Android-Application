@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Slider
 import kotlin.math.roundToInt
 import androidx.compose.foundation.clickable
@@ -36,6 +37,7 @@ import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -43,11 +45,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -251,9 +255,12 @@ fun ExploreScreen(
         scaffoldState = scaffoldState,
         modifier = Modifier.fillMaxSize(),
         sheetPeekHeight = ExploreSheetPeekHeight,
+        sheetContainerColor = MaterialTheme.colorScheme.background,
+        sheetContentColor = MaterialTheme.colorScheme.onBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         sheetDragHandle = {
-            BottomSheetDefaults.DragHandle()
+            BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.outlineVariant)
         },
         sheetContent = {
             ExploreResultsSheet(
@@ -523,33 +530,47 @@ private fun ExploreTopControls(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Explore",
-                style = MaterialTheme.typography.headlineLarge
-            )
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                FilledTonalIconButton(onClick = onZoomOut) {
+                FilledTonalIconButton(
+                    onClick = onZoomOut,
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
                     Icon(
                         imageVector = Icons.Default.Remove,
                         contentDescription = "Zoom out"
                     )
                 }
 
-                FilledTonalIconButton(onClick = onZoomIn) {
+                FilledTonalIconButton(
+                    onClick = onZoomIn,
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Zoom in"
                     )
                 }
 
-                FilledTonalIconButton(onClick = onOpenFilterSort) {
+                FilledTonalIconButton(
+                    onClick = onOpenFilterSort,
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
                     Icon(
                         imageVector = Icons.Default.FilterList,
                         contentDescription = "Open filter and sort"
@@ -558,19 +579,48 @@ private fun ExploreTopControls(
             }
         }
 
-        Card {
+        Card (
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground
+            ),
+            shape = RoundedCornerShape(18.dp),
+        ){
             Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.padding(4.dp),
+                verticalArrangement = Arrangement.Center
             ) {
+//                OutlinedTextField(
+//                    value = query,
+//                    onValueChange = onQueryChange,
+//                    modifier = Modifier.fillMaxWidth(),
+//                    label = {
+//                        Text("Search events or Google Places")
+//                    },
+//                    singleLine = true
+//                )
                 OutlinedTextField(
                     value = query,
                     onValueChange = onQueryChange,
-                    modifier = Modifier.fillMaxWidth(),
-                    label = {
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    placeholder = {
                         Text("Search events or Google Places")
                     },
-                    singleLine = true
+                    singleLine = true,
+                    shape = RoundedCornerShape(18.dp),
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 )
 
                 if (isSearchingGooglePlaces || isCreatingGooglePlaceEvent) {
