@@ -179,15 +179,29 @@ fun ExploreScreen(
         }
     }
 
-    val displayedPlaces = remember(
+    val placesWithDistance = remember(
         state.places,
+        userLocation
+    ) {
+        state.places.map { place ->
+            place.copy(
+                distanceKm = calculateDistanceKm(
+                    userLocation = userLocation,
+                    place = place
+                )
+            )
+        }
+    }
+
+    val displayedPlaces = remember(
+        placesWithDistance,
         selectedGenres,
         verifiedOnly,
         savedOnly,
         sortOption
     ) {
         filterAndSortPlaces(
-            places = state.places,
+            places = placesWithDistance,
             selectedGenres = selectedGenres,
             verifiedOnly = verifiedOnly,
             savedOnly = savedOnly,
@@ -195,8 +209,20 @@ fun ExploreScreen(
         )
     }
 
-    val googlePreviewPlace: PlaceUi? = remember(state.selectedGooglePlacePreview) {
-        state.selectedGooglePlacePreview?.toPreviewPlaceUi()
+    val googlePreviewPlace: PlaceUi? = remember(
+        state.selectedGooglePlacePreview,
+        userLocation
+    ) {
+        state.selectedGooglePlacePreview
+            ?.toPreviewPlaceUi()
+            ?.let { place ->
+                place.copy(
+                    distanceKm = calculateDistanceKm(
+                        userLocation = userLocation,
+                        place = place
+                    )
+                )
+            }
     }
 
     val displayedMapPlaces: List<PlaceUi> = remember(displayedPlaces, googlePreviewPlace) {
@@ -1400,6 +1426,25 @@ private fun filterAndSortPlaces(
             place.name.lowercase()
         }
     }
+}
+
+private fun calculateDistanceKm(
+    userLocation: Location?,
+    place: PlaceUi
+): Double? {
+    val location = userLocation ?: return place.distanceKm
+
+    val results = FloatArray(1)
+
+    Location.distanceBetween(
+        location.latitude,
+        location.longitude,
+        place.latitude,
+        place.longitude,
+        results
+    )
+
+    return results[0] / 1000.0
 }
 
 @Preview(showBackground = true)
