@@ -3,40 +3,41 @@ package com.example.venu.core.core_domain.model
 data class Event(
     val id: String,
 
-    // User-facing event/place title
-    val name: String,
+    // User-created event title shown on cards/details
+    val eventName: String,
 
-    // Specific event/activity happening at the venue
-    val subtitle: String,
+    // User-created event description
+    val description: String,
 
     val genre: Genre,
 
-    // Current venue/location name
+    // Venue/place name
     val locationName: String,
 
     // Google Places bridge fields
     val googlePlaceId: String? = null,
     val googlePlaceAddress: String? = null,
+    val googleRating: Double? = null,
 
     val latitude: Double,
     val longitude: Double,
 
-    val distanceKm: Double?,
+    // Do not store this in Firestore. It is calculated client-side from user location.
+    val distanceKm: Double? = null,
 
     val priceTier: PriceTier,
 
-    val startTimeLabel: String,
+    // Opening hours / event hours
+    val hours: String,
 
-    // Future source: Google Places photo URL or cached photo URL
     val imageUrl: String? = null,
 
-    // Venu-specific trust/review fields
-    val credibilityScore: Int = 0,
+    // Venu review aggregate fields
+    val venuRating: Double = 0.0,
     val reviewCount: Int = 0,
+
     val isVerifiedVenue: Boolean = false,
-    val averageRating: Double = 0.0,
 
-    val attendeeCount: Int = 0,
-    val crowdLevel: CrowdLevel = CrowdLevel.UNKNOWN
+    // Calculated from users saving this event to Want to Go
+    val interestLevel: Int = 0
 )
-

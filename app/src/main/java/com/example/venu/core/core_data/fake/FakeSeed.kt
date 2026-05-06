@@ -1,10 +1,9 @@
 package com.example.venu.core.core_data.fake
 
-import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.Event
+import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.PriceTier
 import com.example.venu.core.core_domain.model.Review
-import com.example.venu.core.core_domain.model.CrowdLevel
 
 object FakeSeed {
 
@@ -12,276 +11,247 @@ object FakeSeed {
 
         Event(
             id = "e1",
-            name = "Indie Night at Tupperware",
-            subtitle = "Local DJs + indie dance floor",
+            eventName = "Indie Night at Tupperware",
+            description = "Local DJs + indie dance floor",
             genre = Genre.MUSIC,
             locationName = "Tupperware Club",
             googlePlaceId = "TEMP_PLACE_ID_FOR_NOW",
             googlePlaceAddress = "??",
+            googleRating = null,
             latitude = 40.4251,
             longitude = -3.7047,
             distanceKm = 0.2,
             priceTier = PriceTier.ONE,
-            startTimeLabel = "Tonight 11 PM",
+            hours = "Tonight 11 PM",
             imageUrl = null,
-            credibilityScore = 91,
             reviewCount = 6,
-            averageRating = 4.6,
+            venuRating = 4.6,
             isVerifiedVenue = true,
-            crowdLevel = CrowdLevel.PACKED,
-            attendeeCount = 180
+            interestLevel = 180
         ),
 
         Event(
             id = "e2",
-            name = "Late Night Study Session",
-            subtitle = "Coffee + quiet tables",
+            eventName = "Late Night Study Session",
+            description = "Coffee + quiet tables",
             genre = Genre.STUDY,
             locationName = "HanSo Café",
             latitude = 40.4256,
             longitude = -3.7041,
             distanceKm = 0.1,
             priceTier = PriceTier.ONE,
-            startTimeLabel = "Tonight 9 PM",
-            credibilityScore = 88,
+            hours = "Tonight 9 PM",
             reviewCount = 5,
-            averageRating = 4.5,
-            crowdLevel = CrowdLevel.LIGHT,
-            attendeeCount = 18
+            venuRating = 4.5,
+            interestLevel = 18
         ),
 
         Event(
             id = "e3",
-            name = "Open Mic Comedy",
-            subtitle = "Student comedians + improv",
+            eventName = "Open Mic Comedy",
+            description = "Student comedians + improv",
             genre = Genre.MUSIC,
             locationName = "La Vía Láctea",
             latitude = 40.4257,
             longitude = -3.7056,
             distanceKm = 0.3,
             priceTier = PriceTier.ONE,
-            startTimeLabel = "Fri 10 PM",
-            credibilityScore = 83,
+            hours = "Fri 10 PM",
             reviewCount = 7,
-            averageRating = 4.3,
-            crowdLevel = CrowdLevel.BUSY,
-            attendeeCount = 75
+            venuRating = 4.3,
+            interestLevel = 75
         ),
 
         Event(
             id = "e4",
-            name = "Tapas Crawl",
-            subtitle = "Student meet-up hopping tapas bars",
+            eventName = "Tapas Crawl",
+            description = "Student meet-up hopping tapas bars",
             genre = Genre.FOOD,
             locationName = "Plaza del Dos de Mayo",
             latitude = 40.4265,
             longitude = -3.7040,
             distanceKm = 0.2,
             priceTier = PriceTier.TWO,
-            startTimeLabel = "Tonight 8 PM",
-            credibilityScore = 87,
+            hours = "Tonight 8 PM",
             reviewCount = 6,
-            averageRating = 4.5,
-            crowdLevel = CrowdLevel.BUSY,
-            attendeeCount = 95
+            venuRating = 4.5,
+            interestLevel = 95
         ),
 
         Event(
             id = "e5",
-            name = "Pickup Fútbol",
-            subtitle = "Casual street football",
+            eventName = "Pickup Fútbol",
+            description = "Casual street football",
             genre = Genre.SPORTS,
             locationName = "Plaza del Dos de Mayo",
             latitude = 40.4266,
             longitude = -3.7038,
             distanceKm = 0.2,
             priceTier = PriceTier.FREE,
-            startTimeLabel = "Tomorrow 6 PM",
-            credibilityScore = 80,
+            hours = "Tomorrow 6 PM",
             reviewCount = 5,
-            averageRating = 4.2,
-            crowdLevel = CrowdLevel.LIGHT,
-            attendeeCount = 22
+            venuRating = 4.2,
+            interestLevel = 22
         ),
 
         Event(
             id = "e6",
-            name = "Coffee & Coding",
-            subtitle = "Students building side projects",
+            eventName = "Coffee & Coding",
+            description = "Students building side projects",
             genre = Genre.STUDY,
             locationName = "Ruda Café",
             latitude = 40.4246,
             longitude = -3.7039,
             distanceKm = 0.3,
             priceTier = PriceTier.ONE,
-            startTimeLabel = "Sat 10 AM",
-            credibilityScore = 89,
+            hours = "Sat 10 AM",
             reviewCount = 6,
-            averageRating = 4.6,
-            crowdLevel = CrowdLevel.LIGHT,
-            attendeeCount = 15
+            venuRating = 4.6,
+            interestLevel = 15
         ),
 
         Event(
             id = "e7",
-            name = "Underground DJ Set",
-            subtitle = "House + techno night",
+            eventName = "Underground DJ Set",
+            description = "House + techno night",
             genre = Genre.MUSIC,
             locationName = "Sala Maravillas",
             latitude = 40.4260,
             longitude = -3.7051,
             distanceKm = 0.3,
             priceTier = PriceTier.TWO,
-            startTimeLabel = "Sat 11 PM",
-            credibilityScore = 84,
+            hours = "Sat 11 PM",
             reviewCount = 7,
-            averageRating = 4.4,
-            crowdLevel = CrowdLevel.PACKED,
-            attendeeCount = 210
+            venuRating = 4.4,
+            interestLevel = 210
         ),
 
         Event(
             id = "e8",
-            name = "Taco Corner",
-            subtitle = "Quick street tacos",
+            eventName = "Taco Corner",
+            description = "Quick street tacos",
             genre = Genre.FOOD,
             locationName = "Taco Corner",
             latitude = 40.4194,
             longitude = -3.7032,
             distanceKm = 1.0,
             priceTier = PriceTier.ONE,
-            startTimeLabel = "Open now",
-            credibilityScore = 83,
+            hours = "Open now",
             reviewCount = 70,
-            averageRating = 4.2,
-            crowdLevel = CrowdLevel.BUSY,
-            attendeeCount = 65
+            venuRating = 4.2,
+            interestLevel = 65
         ),
 
         Event(
             id = "e9",
-            name = "North Library",
-            subtitle = "Quiet study environment",
+            eventName = "North Library",
+            description = "Quiet study environment",
             genre = Genre.STUDY,
             locationName = "North Library",
             latitude = 40.4240,
             longitude = -3.7021,
             distanceKm = 0.9,
             priceTier = PriceTier.FREE,
-            startTimeLabel = "Open until 10 PM",
-            credibilityScore = 87,
+            hours = "Open until 10 PM",
             reviewCount = 140,
-            averageRating = 4.8,
-            crowdLevel = CrowdLevel.LIGHT,
-            attendeeCount = 40
+            venuRating = 4.8,
+            interestLevel = 40
         ),
 
         Event(
             id = "e10",
-            name = "Vinyl Room",
-            subtitle = "Live DJs and music sets",
+            eventName = "Vinyl Room",
+            description = "Live DJs and music sets",
             genre = Genre.MUSIC,
             locationName = "Vinyl Room",
             latitude = 40.4211,
             longitude = -3.7075,
             distanceKm = 1.8,
             priceTier = PriceTier.ONE,
-            startTimeLabel = "Tonight 10 PM",
-            credibilityScore = 89,
+            hours = "Tonight 10 PM",
             reviewCount = 63,
-            averageRating = 4.5,
-            crowdLevel = CrowdLevel.BUSY,
-            attendeeCount = 120
+            venuRating = 4.5,
+            interestLevel = 120
         ),
 
         Event(
             id = "e11",
-            name = "Bar Atlas",
-            subtitle = "Cocktails and nightlife",
+            eventName = "Bar Atlas",
+            description = "Cocktails and nightlife",
             genre = Genre.NIGHTLIFE,
             locationName = "Bar Atlas",
             latitude = 40.4202,
             longitude = -3.7061,
             distanceKm = 2.4,
             priceTier = PriceTier.FREE,
-            startTimeLabel = "Tonight 9 PM",
-            credibilityScore = 80,
+            hours = "Tonight 9 PM",
             reviewCount = 85,
-            averageRating = 4.4,
-            crowdLevel = CrowdLevel.BUSY,
-            attendeeCount = 140
+            venuRating = 4.4,
+            interestLevel = 140
         ),
 
         Event(
             id = "e12",
-            name = "Sushi Miko",
-            subtitle = "Fresh Japanese cuisine",
+            eventName = "Sushi Miko",
+            description = "Fresh Japanese cuisine",
             genre = Genre.FOOD,
             locationName = "Sushi Miko",
             latitude = 40.4175,
             longitude = -3.7050,
             distanceKm = 1.2,
             priceTier = PriceTier.ONE,
-            startTimeLabel = "Dinner hours",
-            credibilityScore = 95,
+            hours = "Dinner hours",
             reviewCount = 210,
-            averageRating = 4.7,
-            crowdLevel = CrowdLevel.PACKED,
-            attendeeCount = 180
+            venuRating = 4.7,
+            interestLevel = 180
         ),
 
         Event(
             id = "e13",
-            name = "Blue Bottle Corner",
-            subtitle = "Espresso and pour-over",
+            eventName = "Blue Bottle Corner",
+            description = "Espresso and pour-over",
             genre = Genre.COFFEE,
             locationName = "Blue Bottle",
             latitude = 40.4162,
             longitude = -3.7044,
             distanceKm = 0.4,
             priceTier = PriceTier.ONE,
-            startTimeLabel = "Open now",
-            credibilityScore = 90,
+            hours = "Open now",
             reviewCount = 165,
-            averageRating = 4.6,
-            crowdLevel = CrowdLevel.BUSY,
-            attendeeCount = 85
+            venuRating = 4.6,
+            interestLevel = 85
         ),
 
         Event(
             id = "e14",
-            name = "Neon Basement",
-            subtitle = "EDM dance floor",
+            eventName = "Neon Basement",
+            description = "EDM dance floor",
             genre = Genre.NIGHTLIFE,
             locationName = "Neon Basement",
             latitude = 40.4226,
             longitude = -3.7068,
             distanceKm = 2.9,
             priceTier = PriceTier.TWO,
-            startTimeLabel = "Tonight 11 PM",
-            credibilityScore = 88,
+            hours = "Tonight 11 PM",
             reviewCount = 76,
-            averageRating = 4.1,
-            crowdLevel = CrowdLevel.PACKED,
-            attendeeCount = 230
+            venuRating = 4.1,
+            interestLevel = 230
         ),
 
         Event(
             id = "e15",
-            name = "Park Study Pods",
-            subtitle = "Outdoor study tables with Wi-Fi",
+            eventName = "Park Study Pods",
+            description = "Outdoor study tables with Wi-Fi",
             genre = Genre.STUDY,
             locationName = "City Park",
             latitude = 40.4235,
             longitude = -3.7010,
             distanceKm = 1.6,
             priceTier = PriceTier.FREE,
-            startTimeLabel = "Open now",
-            credibilityScore = 82,
+            hours = "Open now",
             reviewCount = 54,
-            averageRating = 4.0,
-            crowdLevel = CrowdLevel.LIGHT,
-            attendeeCount = 28
+            venuRating = 4.0,
+            interestLevel = 28
         )
     )
 

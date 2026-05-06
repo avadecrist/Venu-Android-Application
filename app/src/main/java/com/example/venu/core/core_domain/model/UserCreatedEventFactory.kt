@@ -14,30 +14,33 @@ object UserCreatedEventFactory {
         latitude: Double,
         longitude: Double,
         imageUrl: String? = null,
-        startTimeLabel: String = "User-created event",
-        priceTier: PriceTier = PriceTier.FREE
+        hours: String = "User-created event",
+        priceTier: PriceTier = PriceTier.FREE,
+        googleRating: Double? = null
     ): Event {
         return Event(
             id = UUID.randomUUID().toString(),
-            name = eventName.ifBlank { placeName },
-            subtitle = description.ifBlank { placeAddress ?: placeName },
+            eventName = eventName.ifBlank { placeName },
+            description = description.ifBlank { placeAddress ?: placeName },
             genre = genre,
-
             locationName = placeName,
-            latitude = latitude,
-            longitude = longitude,
+
             googlePlaceId = placeId,
             googlePlaceAddress = placeAddress,
+            googleRating = googleRating,
 
+            latitude = latitude,
+            longitude = longitude,
             distanceKm = null,
+
             priceTier = priceTier,
-            startTimeLabel = startTimeLabel,
+            hours = hours,
             imageUrl = imageUrl,
 
-            credibilityScore = 50,
+            venuRating = 0.0,
             reviewCount = 0,
             isVerifiedVenue = true,
-            averageRating = 0.0
+            interestLevel = 0
         )
     }
 }

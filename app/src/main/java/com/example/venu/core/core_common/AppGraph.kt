@@ -4,13 +4,13 @@ import android.content.Context
 import com.example.venu.BuildConfig
 import com.example.venu.core.core_data.local.db.VenuLocalDatabase
 import com.example.venu.core.core_data.places.GooglePlacesRepository
+import com.example.venu.core.core_data.remote.firestore.EventFirestoreRepository
 import com.example.venu.core.core_data.remote.firestore.ReviewFireStoreRepository
-import com.example.venu.core.core_data.repository.InMemoryListsRepository
+import com.example.venu.core.core_data.repository.FirestoreListsRepository
 import com.example.venu.core.core_data.repository.RoomEventRepository
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListsRepository
 import com.example.venu.core.core_domain.repository.ReviewRepository
-import com.example.venu.core.core_data.repository.FirestoreListsRepository
 
 // Tiny TEMPORARY dependency container so screens can access repos.
 // Use this in ViewModels.
@@ -21,6 +21,9 @@ object AppGraph {
     lateinit var eventRepo: EventRepository
         private set
 
+    lateinit var eventFirestoreRepo: EventFirestoreRepository
+        private set
+
     lateinit var listsRepo: ListsRepository
         private set
 
@@ -28,7 +31,7 @@ object AppGraph {
         private set
 
     val reviewRepo: ReviewRepository by lazy {
-        ReviewFireStoreRepository() // now uses Firestore instead of fake reviews
+        ReviewFireStoreRepository()
     }
 
     suspend fun initialize(context: Context) {
@@ -39,13 +42,14 @@ object AppGraph {
         // database.clearAllTables()
         // Uncomment only if we want to test reseeding again.
 
-        //roomEventRepository.seedIfEmpty()
+        // roomEventRepository.seedIfEmpty()
 
-        // Temp test to confirm Room is initialized.
         val events = roomEventRepository.getAllEvents()
         println("AppGraph init: Loaded ${events.size} events from Room")
 
         eventRepo = roomEventRepository
+
+        eventFirestoreRepo = EventFirestoreRepository()
 
         listsRepo = FirestoreListsRepository(
             eventRepo = eventRepo

@@ -28,19 +28,19 @@ suspend fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
 
     return PlaceUi(
         id = id,
-        name = name,
-        subtitle = subtitle,
+        name = eventName,
+        subtitle = description,
         locationName = locationName,
         latitude = latitude,
         longitude = longitude,
         distanceKm = distanceKm,
-        rating = averageRating,
+        rating = venuRating,
         genre = genre,
         isVerified = isVerifiedVenue,
         isSaved = listsContainingEvent.isNotEmpty(),
         savedLabel = savedLabel,
         imageUrl = imageUrl,
         priceText = priceTier.label,
-        hours = startTimeLabel
+        hours = hours
     )
 }

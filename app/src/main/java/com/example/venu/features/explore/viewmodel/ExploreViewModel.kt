@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_data.location.DirectionsService
 import com.example.venu.core.core_data.places.GooglePlacesRepository
+import com.example.venu.core.core_data.remote.firestore.EventFirestoreRepository
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListType
@@ -29,7 +30,8 @@ import kotlinx.coroutines.launch
 class ExploreViewModel(
     private val eventRepository: EventRepository = AppGraph.eventRepo,
     private val listsRepository: ListsRepository = AppGraph.listsRepo,
-    private val googlePlacesRepository: GooglePlacesRepository = AppGraph.googlePlacesRepo
+    private val googlePlacesRepository: GooglePlacesRepository = AppGraph.googlePlacesRepo,
+    private val eventFirestoreRepository: EventFirestoreRepository = AppGraph.eventFirestoreRepo
 ) : ViewModel() {
 
     private var events: List<Event> = emptyList()
@@ -173,7 +175,13 @@ class ExploreViewModel(
 
             runCatching {
                 val newEvent = draft.toUserCreatedEvent()
+
+                // Keep local Room working for current screens.
                 eventRepository.createEvent(newEvent)
+
+                // Persist the standardized event globally in Firestore.
+                eventFirestoreRepository.createEvent(newEvent)
+
                 newEvent
             }.onSuccess { newEvent ->
                 events = eventRepository.getTrendingEvents()

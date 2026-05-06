@@ -1,5 +1,6 @@
 package com.example.venu.features.home.mappers
 
+import com.example.venu.core.core_common.util.formatDistance
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.core.core_domain.repository.ListsRepository
@@ -15,9 +16,9 @@ suspend fun Event.toHomeVenueUi(
 
     return HomeVenueUi(
         id = id,
-        title = name,
-        subtitle = "$locationName • $startTimeLabel",
-        locationName = this.locationName,
+        title = eventName,
+        subtitle = "$locationName • $hours",
+        locationName = locationName,
         latitude = latitude,
         longitude = longitude,
         ratingLabel = if (summary.count > 0) {
@@ -25,8 +26,8 @@ suspend fun Event.toHomeVenueUi(
         } else {
             null
         },
-        distanceLabel = distanceKm?.let {
-            "${it.roundTo1Decimal()} km"
+        distanceLabel = distanceKm?.let { distance ->
+            formatDistance(distance)
         },
         genre = genre,
         isSaved = listsRepo.isInList(ListType.WantToGo, id),

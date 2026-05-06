@@ -1,56 +1,56 @@
-package com.example.venu.core.core_data.mapper
+package com.example.venu.core.core_data.remote.firestore
 
-import com.example.venu.core.core_data.local.db.entity.EventEntity
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.PriceTier
 
-fun Event.toEntity(): EventEntity {
-    return EventEntity(
+fun Event.toFirestoreDto(
+    createdAt: Long,
+    updatedAt: Long
+): EventFirestoreDto {
+    return EventFirestoreDto(
         id = id,
-        name = eventName,
-        subtitle = description,
+        eventName = eventName,
+        description = description,
         genre = genre.name,
         locationName = locationName,
         googlePlaceId = googlePlaceId,
         googlePlaceAddress = googlePlaceAddress,
+        googleRating = googleRating,
         latitude = latitude,
         longitude = longitude,
-        distanceKm = distanceKm,
         priceTier = priceTier.name,
-        startTimeLabel = hours,
+        hours = hours,
         imageUrl = imageUrl,
-
-        // Legacy Room fields. Kept for compatibility.
-        credibilityScore = 0,
-        reviewCount = reviewCount,
         isVerifiedVenue = isVerifiedVenue,
-        averageRating = venuRating
+        venuRating = venuRating,
+        reviewCount = reviewCount,
+        interestLevel = interestLevel,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }
 
-fun EventEntity.toDomain(): Event {
+fun EventFirestoreDto.toDomain(): Event {
     return Event(
         id = id,
-        eventName = name,
-        description = subtitle,
+        eventName = eventName,
+        description = description,
         genre = genre.toGenre(),
         locationName = locationName,
         googlePlaceId = googlePlaceId,
         googlePlaceAddress = googlePlaceAddress,
-        googleRating = null,
+        googleRating = googleRating,
         latitude = latitude,
         longitude = longitude,
-        distanceKm = distanceKm,
+        distanceKm = null,
         priceTier = priceTier.toPriceTier(),
-        hours = startTimeLabel,
+        hours = hours,
         imageUrl = imageUrl,
-        venuRating = averageRating,
+        venuRating = venuRating,
         reviewCount = reviewCount,
         isVerifiedVenue = isVerifiedVenue,
-
-        // Legacy Room does not store this yet.
-        interestLevel = 0
+        interestLevel = interestLevel
     )
 }
 
@@ -69,7 +69,7 @@ private fun String.toPriceTier(): PriceTier {
         "FOUR" -> PriceTier.FOUR
         "UNKNOWN" -> PriceTier.UNKNOWN
 
-        // Legacy Room values from old enum.
+        // Legacy compatibility
         "UNDER_10" -> PriceTier.ONE
         "UNDER_20" -> PriceTier.TWO
 
