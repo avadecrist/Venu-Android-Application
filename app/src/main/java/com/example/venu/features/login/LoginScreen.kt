@@ -55,7 +55,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .size(88.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
                 Image(

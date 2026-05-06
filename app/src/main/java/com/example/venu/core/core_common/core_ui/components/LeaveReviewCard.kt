@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -30,10 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_common.core_ui.theme.VenuColors
+import com.example.venu.core.core_common.core_ui.theme.VenuTheme
 import com.example.venu.features.reviews.model.ReviewDraft
 
 @Composable
@@ -47,6 +51,8 @@ fun LeaveReviewCard(
     val rating = draft?.rating ?: 0
     val comment = draft?.comment.orEmpty()
 
+    var isTextFieldFocused by remember { mutableStateOf(false) }
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
@@ -57,7 +63,11 @@ fun LeaveReviewCard(
             Text(
                 text = "Leave a review",
                 style = MaterialTheme.typography.titleLarge,
-                color = VenuColors.TextSecondary,
+                color = if (isTextFieldFocused) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.outlineVariant
+                },
                 fontWeight = FontWeight.SemiBold
             )
 
@@ -90,26 +100,35 @@ fun LeaveReviewCard(
                 OutlinedTextField(
                     value = comment,
                     onValueChange = onCommentChange,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .onFocusChanged {
+                            isTextFieldFocused = it.isFocused
+                        },
                     placeholder = { Text("Share your experience...") },
                     shape = RoundedCornerShape(18.dp),
                     enabled = !isSubmitting,
                     singleLine = false,
-                    maxLines = 3
+                    maxLines = 3,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                    )
                 )
 
                 Surface(
                     onClick = {
-                        Log.d("ReviewDebug", "Send clicked: isSubmitting=$isSubmitting, rating=$rating, comment='$comment'")
+
                         if (!isSubmitting && rating > 0 && comment.isNotBlank()) {
-                            Log.d("ReviewDebug", "Calling onSubmit()")
                             onSubmit()
-                        } else {
-                            Log.d("ReviewDebug", "Blocked submit")
                         }
                     },
                     shape = RoundedCornerShape(18.dp),
-                    color = VenuColors.SendButtonBg
+                    color = if (isTextFieldFocused) {
+                        VenuColors.AccentBlue
+                    } else {
+                        VenuColors.SendButtonBg
+                    },
                 ) {
                     Box(
                         modifier = Modifier.size(56.dp),
@@ -118,11 +137,57 @@ fun LeaveReviewCard(
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.Send,
                             contentDescription = "Submit review",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.primaryContainer
                         )
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview(
+    name = "Leave Review Card - Light",
+    showBackground = true
+)
+@Composable
+private fun LeaveReviewCardLightPreview() {
+    VenuTheme(darkTheme = false) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            LeaveReviewCard(
+                draft = ReviewDraft(
+                    rating = 4,
+                    eventId = "preview",
+                    comment = "Great spot, fun crowd, and good energy."
+                ),
+                isSubmitting = false,
+                onRatingChange = {},
+                onCommentChange = {},
+                onSubmit = {}
+            )
+        }
+    }
+}
+
+@Preview(
+    name = "Leave Review Card - Dark",
+    showBackground = true
+)
+@Composable
+private fun LeaveReviewCardDarkPreview() {
+    VenuTheme(darkTheme = true) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            LeaveReviewCard(
+                draft = ReviewDraft(
+                    rating = 4,
+                    eventId = "preview",
+                    comment = "Great spot, fun crowd, and good energy."
+                ),
+                isSubmitting = false,
+                onRatingChange = {},
+                onCommentChange = {},
+                onSubmit = {}
+            )
         }
     }
 }

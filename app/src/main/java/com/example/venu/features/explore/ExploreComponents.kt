@@ -14,8 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_common.core_ui.components.BaseEventCard
+import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.core.core_common.eventdetails.genreChipText
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.label
@@ -38,7 +40,12 @@ fun PlaceCard(
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = place.name, style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = place.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                     Spacer(Modifier.height(4.dp))
                     Text(text = place.subtitle, style = MaterialTheme.typography.bodyMedium)
                 }
@@ -56,8 +63,13 @@ fun PlaceCard(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 GenreTag(genre = place.genre)
-                if (place.isVerified) Tag(label = "Verified")
-                if (place.savedLabel != null) Tag(label = "Saved")
+                if (place.isVerified) {
+                    Tag(
+                        label = "Verified",
+                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                }
             }
 
             Spacer(Modifier.height(10.dp))

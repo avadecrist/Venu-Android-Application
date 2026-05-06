@@ -262,9 +262,18 @@ private fun ListEventCard(
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GenreTag(genre = event.genre)
-            Tag(label = event.priceTier.label, color = VenuColors.BlueBg)
+            Tag(
+                label = event.priceTier.label,
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+
             if (event.isVerifiedVenue) {
-                Tag(label = "Verified", color = VenuColors.VerifiedBg)
+                Tag(
+                    label = "Verified",
+                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                )
             }
         }
 
