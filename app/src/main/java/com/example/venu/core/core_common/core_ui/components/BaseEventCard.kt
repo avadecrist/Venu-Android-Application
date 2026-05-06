@@ -27,7 +27,7 @@ fun BaseEventCard(
     width: Dp? = null,
     height: Dp? = null,
     contentPadding: Dp = 16.dp,
-    borderColor: Color = MaterialTheme.colorScheme.outline,
+    borderColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     contentColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     content: @Composable ColumnScope.() -> Unit
 ) {
