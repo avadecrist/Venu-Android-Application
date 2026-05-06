@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.util.Log
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.material3.Slider
@@ -486,6 +487,7 @@ private fun ExploreMapContent(
 ) {
     var zoomRequest by remember { mutableStateOf(0) }
     var zoomDelta by remember { mutableStateOf(0f) }
+    var centerOnUserLocationRequest by remember { mutableStateOf(0) }
 
     Box(modifier = modifier) {
         ExploreMap(
@@ -496,6 +498,7 @@ private fun ExploreMapContent(
             hasLocationPermission = hasLocationPermission,
             zoomRequest = zoomRequest,
             zoomDelta = zoomDelta,
+            centerOnUserLocationRequest = centerOnUserLocationRequest,
             onMarkerSelected = { id ->
                 if (!id.startsWith(GOOGLE_PREVIEW_PLACE_ID_PREFIX)) {
                     onAction(ExploreAction.PlaceClicked(id))
@@ -534,6 +537,30 @@ private fun ExploreMapContent(
                 .align(Alignment.TopCenter)
                 .padding(horizontal = 16.dp, vertical = 16.dp)
         )
+
+        FilledTonalIconButton(
+            onClick = {
+                centerOnUserLocationRequest += 1
+            },
+            enabled = hasLocationPermission,
+            colors = IconButtonDefaults.filledTonalIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    end = 16.dp,
+                    bottom = ExploreSheetPeekHeight + 16.dp
+                )
+        ) {
+            Icon(
+                imageVector = Icons.Default.MyLocation,
+                contentDescription = "Center on my location"
+            )
+        }
     }
 }
 

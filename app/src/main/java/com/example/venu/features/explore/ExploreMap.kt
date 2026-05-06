@@ -50,6 +50,7 @@ fun ExploreMap(
     hasLocationPermission: Boolean,
     zoomRequest: Int,
     zoomDelta: Float,
+    centerOnUserLocationRequest: Int,
     onMarkerSelected: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -142,6 +143,21 @@ fun ExploreMap(
         )
     }
 
+    LaunchedEffect(centerOnUserLocationRequest) {
+        if (
+            centerOnUserLocationRequest > 0 &&
+            locationPermissionGranted &&
+            userLocation != null
+        ) {
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngZoom(
+                    userLocation!!,
+                    14f
+                )
+            )
+        }
+    }
+
     GoogleMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
@@ -149,7 +165,7 @@ fun ExploreMap(
             isMyLocationEnabled = locationPermissionGranted
         ),
         uiSettings = MapUiSettings(
-            myLocationButtonEnabled = locationPermissionGranted,
+            myLocationButtonEnabled = false,
             zoomControlsEnabled = false
         )
     ) {
