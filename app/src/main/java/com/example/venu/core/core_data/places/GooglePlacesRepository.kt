@@ -57,8 +57,7 @@ class GooglePlacesRepository(
             Place.Field.LOCATION,
             Place.Field.RATING,
             Place.Field.PHOTO_METADATAS,
-            Place.Field.OPENING_HOURS,
-            Place.Field.PRICE_LEVEL
+            Place.Field.OPENING_HOURS
         )
 
         val request = FetchPlaceRequest.builder(placeId, fields).build()
@@ -81,19 +80,8 @@ class GooglePlacesRepository(
             rating = place.rating,
             photoUrl = resolvedPhotoUrl,
             hours = hours,
-            priceTier = mapGooglePriceLevelToPriceTier(place.priceLevel)
+            priceTier = PriceTier.UNKNOWN
         )
-    }
-
-    private fun mapGooglePriceLevelToPriceTier(priceLevel: Int?): PriceTier {
-        return when (priceLevel) {
-            0 -> PriceTier.FREE
-            1 -> PriceTier.ONE
-            2 -> PriceTier.TWO
-            3 -> PriceTier.THREE
-            4 -> PriceTier.FOUR
-            else -> PriceTier.UNKNOWN
-        }
     }
 
     private suspend fun resolvePhotoUrl(place: Place): String? {
