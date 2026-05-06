@@ -7,6 +7,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.material3.Slider
 import kotlin.math.roundToInt
 import androidx.compose.foundation.clickable
@@ -54,6 +55,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -415,6 +417,7 @@ fun ExploreScreen(
     state.selectedGooglePlacePreview?.let { draft ->
         ModalBottomSheet(
             sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.background,
             onDismissRequest = {
                 scope.launch {
                     sheetState.hide()
@@ -441,6 +444,7 @@ fun ExploreScreen(
     state.pendingGooglePlaceDraft?.let { draft ->
         ModalBottomSheet(
             sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.background,
             onDismissRequest = {
                 scope.launch {
                     sheetState.hide()
@@ -610,21 +614,12 @@ private fun ExploreTopControls(
                 containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.onBackground
             ),
-            shape = RoundedCornerShape(18.dp),
+            shape = RoundedCornerShape(20.dp),
         ){
             Column(
-                modifier = Modifier.padding(4.dp),
+                modifier = Modifier.padding(0.dp),
                 verticalArrangement = Arrangement.Center
             ) {
-//                OutlinedTextField(
-//                    value = query,
-//                    onValueChange = onQueryChange,
-//                    modifier = Modifier.fillMaxWidth(),
-//                    label = {
-//                        Text("Search events or Google Places")
-//                    },
-//                    singleLine = true
-//                )
                 OutlinedTextField(
                     value = query,
                     onValueChange = onQueryChange,
@@ -635,7 +630,7 @@ private fun ExploreTopControls(
                         Text("Search events or Google Places")
                     },
                     singleLine = true,
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(20.dp),
                     textStyle = MaterialTheme.typography.bodyMedium,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.background,
@@ -760,6 +755,7 @@ private fun GooglePlacePreviewSheet(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -843,7 +839,8 @@ private fun GooglePlaceEventDraftSheet(
             .fillMaxWidth()
             .fillMaxHeight(0.92f)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text(
@@ -861,6 +858,16 @@ private fun GooglePlaceEventDraftSheet(
             label = {
                 Text("Event name")
             },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
             singleLine = true
         )
 
@@ -873,6 +880,16 @@ private fun GooglePlaceEventDraftSheet(
             label = {
                 Text("Location")
             },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
             singleLine = true
         )
 
@@ -885,6 +902,16 @@ private fun GooglePlaceEventDraftSheet(
             label = {
                 Text("Address")
             },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
             minLines = 2,
             maxLines = 3
         )
@@ -898,6 +925,16 @@ private fun GooglePlaceEventDraftSheet(
             label = {
                 Text("Description")
             },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
             minLines = 2,
             maxLines = 4
         )
@@ -911,6 +948,16 @@ private fun GooglePlaceEventDraftSheet(
             label = {
                 Text("Hours")
             },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                focusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
             minLines = 1,
             maxLines = 4
         )
@@ -1067,6 +1114,10 @@ private fun PriceTierSlider(
                 onPriceTierSelected(value.roundToInt().toPriceTier())
             },
             valueRange = 0f..4f,
+            colors = SliderDefaults.colors(
+                activeTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
             steps = 3
         )
 
@@ -1215,6 +1266,10 @@ private fun ExploreFilterSortDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.background,
+        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        tonalElevation = 0.dp,
         title = {
             Text("Filter & sort")
         },
