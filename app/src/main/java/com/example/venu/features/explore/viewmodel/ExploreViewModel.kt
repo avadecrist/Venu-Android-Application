@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_data.location.DirectionsService
 import com.example.venu.core.core_data.places.GooglePlacesRepository
-import com.example.venu.core.core_data.remote.firestore.EventFirestoreRepository
+//import com.example.venu.core.core_data.remote.firestore.EventFirestoreRepository
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.example.venu.core.core_domain.repository.ListType
@@ -31,7 +31,7 @@ class ExploreViewModel(
     private val eventRepository: EventRepository = AppGraph.eventRepo,
     private val listsRepository: ListsRepository = AppGraph.listsRepo,
     private val googlePlacesRepository: GooglePlacesRepository = AppGraph.googlePlacesRepo,
-    private val eventFirestoreRepository: EventFirestoreRepository = AppGraph.eventFirestoreRepo
+//    private val eventFirestoreRepository: EventFirestoreRepository = AppGraph.eventFirestoreRepo
 ) : ViewModel() {
 
     private var events: List<Event> = emptyList()
@@ -177,14 +177,14 @@ class ExploreViewModel(
                 val newEvent = draft.toUserCreatedEvent()
 
                 // Keep local Room working for current screens.
-                eventRepository.createEvent(newEvent)
-
+//                eventRepository.createEvent(newEvent)
+//
                 // Persist the standardized event globally in Firestore.
-                eventFirestoreRepository.createEvent(newEvent)
+                eventRepository.createEvent(newEvent)
 
                 newEvent
             }.onSuccess { newEvent ->
-                events = eventRepository.getTrendingEvents()
+                events = eventRepository.getTrendingEvents()//eventRepository.getTrendingEvents()
 
                 uiState = uiState.copy(
                     query = "",
@@ -207,7 +207,7 @@ class ExploreViewModel(
 
     private fun loadInitialEvents() {
         viewModelScope.launch {
-            events = eventRepository.getTrendingEvents()
+            events = eventRepository.getTrendingEvents()//eventRepository.getTrendingEvents()
 
             uiState = uiState.copy(
                 places = buildPlaces(),

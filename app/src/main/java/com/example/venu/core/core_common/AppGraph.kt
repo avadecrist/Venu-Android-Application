@@ -21,8 +21,8 @@ object AppGraph {
     lateinit var eventRepo: EventRepository
         private set
 
-    lateinit var eventFirestoreRepo: EventFirestoreRepository
-        private set
+//    lateinit var eventFirestoreRepo: EventFirestoreRepository
+//        private set
 
     lateinit var listsRepo: ListsRepository
         private set
@@ -36,7 +36,7 @@ object AppGraph {
 
     suspend fun initialize(context: Context) {
         database = VenuLocalDatabase.getDatabase(context)
-
+        val firestoreEventRepository = EventFirestoreRepository()
         val roomEventRepository = RoomEventRepository(database.eventDao())
 
         // database.clearAllTables()
@@ -44,12 +44,12 @@ object AppGraph {
 
         // roomEventRepository.seedIfEmpty()
 
-        val events = roomEventRepository.getAllEvents()
-        println("AppGraph init: Loaded ${events.size} events from Room")
 
-        eventRepo = roomEventRepository
-
-        eventFirestoreRepo = EventFirestoreRepository()
+        eventRepo = firestoreEventRepository
+        val events = eventRepo.getNearbyEvents()
+        println("Firebase test events: $events")
+        println("AppGraph init: Loaded ${events.size} events from Firebase")
+//        eventFirestoreRepo = firestoreEventRepository
 
         listsRepo = FirestoreListsRepository(
             eventRepo = eventRepo
