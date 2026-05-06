@@ -1,8 +1,8 @@
 package com.example.venu.core.core_data.repository
 
 import com.example.venu.core.core_data.fake.FakeSeed
-import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.Event
+import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.repository.EventRepository
 
 class FakeEventRepository : EventRepository {
@@ -12,61 +12,63 @@ class FakeEventRepository : EventRepository {
     override suspend fun getTrendingEvents(): List<Event> {
         return events
             .sortedWith(
-                compareByDescending<Event> { it.credibilityScore } // sort based on credibilityScore
-                    .thenByDescending { it.reviewCount } // if tied, then sort by number of reviews
+                compareByDescending<Event> { it.venuRating }
+                    .thenByDescending { it.reviewCount }
+                    .thenByDescending { it.interestLevel }
             )
-            .take(10) // displays first 10
+            .take(10)
     }
 
-    /* NOTE: when we use user's GPS location later, this method will be tweaked:
-    *   1. We’ll get the user’s lat/lng (FusedLocationProviderClient)
-    *   2. Change the interface to accept location
-    *   ex. declaration: fun getNearbyEvents(userLat: Double, userLng: Double): List<Event>
-    *   3. Compute distance(userLocation, eventLocation) with Location.distanceBetween()
-    */
     override suspend fun getNearbyEvents(): List<Event> {
-        // Explore's default list
-        val hasAnyDistance = events.any { it.distanceKm != null } // true if distanceMiles has a value
+        val hasAnyDistance = events.any { it.distanceKm != null }
 
         return if (hasAnyDistance) {
             events
                 .sortedWith(
-                compareBy<Event> { it.distanceKm ?: Double.MAX_VALUE } // sort by distance
-                    .thenByDescending { it.credibilityScore } // if same distance, then sort by credibility
+                    compareBy<Event> { it.distanceKm ?: Double.MAX_VALUE }
+                        .thenByDescending { it.venuRating }
+                        .thenByDescending { it.interestLevel }
                 )
-                .take(20) // displays first 20 events
+                .take(20)
         } else {
-            // fallback if distances aren’t seeded yet
             getTrendingEvents()
         }
     }
 
     override suspend fun getEventsByCategory(genre: Genre): List<Event> {
-        return events.filter { it.genre == genre }
+        return events.filter { event ->
+            event.genre == genre
+        }
     }
 
-    override suspend fun searchEvents(query: String, categories: Set<Genre>): List<Event> {
+    override suspend fun searchEvents(
+        query: String,
+        categories: Set<Genre>
+    ): List<Event> {
         val q = query.trim().lowercase()
 
-        return events.filter { e ->
-            val matchesQuery = q.isBlank() ||
-                    e.name.lowercase().contains(q) ||
-                    e.subtitle.lowercase().contains(q) ||
-                    e.locationName.lowercase().contains(q)
+        return events
+            .filter { event ->
+                val matchesQuery = q.isBlank() ||
+                        event.eventName.lowercase().contains(q) ||
+                        event.description.lowercase().contains(q) ||
+                        event.locationName.lowercase().contains(q)
 
-            val matchesCategory = categories.isEmpty() || categories.contains(e.genre)
+                val matchesCategory = categories.isEmpty() || event.genre in categories
 
-            matchesQuery && matchesCategory
-        }
-            // SORT results so "best" shows first
+                matchesQuery && matchesCategory
+            }
             .sortedWith(
-                compareByDescending<Event> { it.credibilityScore }
+                compareByDescending<Event> { it.venuRating }
                     .thenByDescending { it.reviewCount }
+                    .thenByDescending { it.interestLevel }
             )
     }
 
     override suspend fun getEventById(id: String): Event? {
-        return events.find { it.id == id }
+        return events.find { event ->
+            event.id == id
+        }
     }
 
     override suspend fun createEvent(event: Event) {

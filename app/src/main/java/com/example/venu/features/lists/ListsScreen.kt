@@ -1,58 +1,58 @@
 package com.example.venu.features.lists
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.venu.core.core_domain.model.Event
-import com.example.venu.core.core_domain.repository.ListType
-import com.example.venu.features.lists.model.ListsAction
-import com.example.venu.features.lists.model.ListsUiState
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_common.core_ui.components.BaseEventCard
 import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.core.core_common.core_ui.theme.VenuTheme
 import com.example.venu.core.core_common.util.formatDistance
+import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.PriceTier
 import com.example.venu.core.core_domain.model.label
+import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.features.explore.GenreTag
 import com.example.venu.features.explore.Tag
+import com.example.venu.features.lists.model.ListsAction
+import com.example.venu.features.lists.model.ListsUiState
 
 @Composable
 fun ListsScreen(
@@ -62,8 +62,10 @@ fun ListsScreen(
 ) {
     var showAddListDialog by remember { mutableStateOf(false) }
     var newListName by remember { mutableStateOf("") }
+
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
@@ -160,6 +162,7 @@ fun ListsScreen(
                 }
             }
         }
+
         AddListFab(
             onClick = { showAddListDialog = true },
             modifier = Modifier
@@ -167,6 +170,7 @@ fun ListsScreen(
                 .padding(end = 20.dp, bottom = 24.dp)
         )
     }
+
     if (showAddListDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -224,7 +228,7 @@ private fun ListEventCard(
         borderColor = MaterialTheme.colorScheme.outlineVariant,
     ) {
         Text(
-            text = event.name,
+            text = event.eventName,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -232,7 +236,7 @@ private fun ListEventCard(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = event.subtitle,
+            text = event.description,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -240,7 +244,7 @@ private fun ListEventCard(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "${event.locationName} • ${event.startTimeLabel}",
+            text = "${event.locationName} • ${event.hours}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -259,7 +263,9 @@ private fun ListEventCard(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             GenreTag(genre = event.genre)
             Tag(label = event.priceTier.label, color = VenuColors.BlueBg)
-            if (event.isVerifiedVenue) Tag(label = "Verified", color = VenuColors.VerifiedBg)
+            if (event.isVerifiedVenue) {
+                Tag(label = "Verified", color = VenuColors.VerifiedBg)
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -281,7 +287,8 @@ private fun ListEventCard(
                 Text(
                     text = "Get Directions",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium)
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
 
             ActionRow(
@@ -292,7 +299,6 @@ private fun ListEventCard(
         }
     }
 }
-
 
 @Composable
 private fun ActionRow(
@@ -320,7 +326,8 @@ private fun ActionRow(
                     Text(
                         text = "Mark Went",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium)
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -333,7 +340,8 @@ private fun ActionRow(
                     Text(
                         text = "Remove",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium)
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 
@@ -352,7 +360,8 @@ private fun ActionRow(
                     Text(
                         text = "To Review",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium)
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -370,7 +379,8 @@ private fun ActionRow(
                     Text(
                         text = "Remove",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium)
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 
@@ -388,7 +398,8 @@ private fun ActionRow(
                     Text(
                         text = "Remove",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium)
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 
@@ -398,7 +409,7 @@ private fun ActionRow(
                     onClick = {
                         onEvent(
                             ListsAction.RemoveFromList(
-                                tab = selectedTab, // this is the Custom list instance
+                                tab = selectedTab,
                                 eventId = event.id
                             )
                         )
@@ -407,7 +418,8 @@ private fun ActionRow(
                     Text(
                         text = "Remove $customListName",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyMedium)
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }
@@ -472,37 +484,37 @@ private fun ListsScreenPreview() {
                 events = listOf(
                     Event(
                         id = "1",
-                        name = "Beach Bonfire",
-                        subtitle = "Live music and food trucks",
+                        eventName = "Beach Bonfire",
+                        description = "Live music and food trucks",
                         genre = Genre.MUSIC,
                         locationName = "Newport Beach",
                         latitude = 33.6189,
                         longitude = -117.9298,
                         distanceKm = 4.2,
                         priceTier = PriceTier.FREE,
-                        startTimeLabel = "Tonight • 7:00 PM",
+                        hours = "Tonight • 7:00 PM",
                         imageUrl = null,
-                        credibilityScore = 92,
                         reviewCount = 18,
                         isVerifiedVenue = true,
-                        averageRating = 4.6
+                        venuRating = 4.6,
+                        interestLevel = 92
                     ),
                     Event(
                         id = "2",
-                        name = "Coffee Pop-Up",
-                        subtitle = "Local vendors and outdoor seating",
+                        eventName = "Coffee Pop-Up",
+                        description = "Local vendors and outdoor seating",
                         genre = Genre.FOOD,
                         locationName = "Costa Mesa",
                         latitude = 33.6411,
                         longitude = -117.9187,
                         distanceKm = 7.8,
                         priceTier = PriceTier.FREE,
-                        startTimeLabel = "Tomorrow • 10:00 AM",
+                        hours = "Tomorrow • 10:00 AM",
                         imageUrl = null,
-                        credibilityScore = 85,
                         reviewCount = 9,
                         isVerifiedVenue = false,
-                        averageRating = 4.2
+                        venuRating = 4.2,
+                        interestLevel = 85
                     )
                 )
             ),
