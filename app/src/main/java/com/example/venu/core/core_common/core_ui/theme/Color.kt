@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 object VenuColors {
     val Background = Color(0xFFFFFFFF)
-    val SurfaceMuted = Color(0xFFFAFAF2)
+    val SurfaceMuted = Color(0xFFF7F8FA)
     val Border = Color(0xFFF9EEE2)
     val BorderDark = Color(0xFFCFCFD7)
     val Handle = Color(0xFFE6E6EA)
