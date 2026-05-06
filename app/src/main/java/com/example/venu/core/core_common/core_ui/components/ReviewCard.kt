@@ -94,8 +94,11 @@ fun ReviewCard(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
@@ -105,7 +108,8 @@ fun ReviewCard(
                 verticalAlignment = Alignment.Top
             ) {
                 ReviewerAvatar(
-                    photoUrl = review.photoUrl
+                    photoUrl = review.photoUrl,
+                    displayName = review.displayName
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -120,7 +124,7 @@ fun ReviewCard(
                         text = review.displayName,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -150,19 +154,36 @@ fun ReviewCard(
     }
 }
 
-// tweak this to use photoUrl from Google Auth
 @Composable
 private fun ReviewerAvatar(
-    photoUrl: String?
+    photoUrl: String?,
+    displayName: String
 ) {
-    AsyncImage(
-        model = photoUrl,
-        contentDescription = "Reviewer profile photo",
-        modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape),
-        contentScale = ContentScale.Crop
-    )
+    if (!photoUrl.isNullOrBlank()) {
+        AsyncImage(
+            model = photoUrl,
+            contentDescription = "Reviewer profile photo",
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+    } else {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
 }
 
 private fun buildStarString(rating: Int): String {
