@@ -45,11 +45,13 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.venu.core.core_common.core_ui.components.BaseEventCard
+import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.core.core_common.core_ui.theme.VenuTheme
 import com.example.venu.core.core_common.util.formatDistance
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.PriceTier
 import com.example.venu.core.core_domain.model.label
+import com.example.venu.features.explore.GenreTag
 import com.example.venu.features.explore.Tag
 
 @Composable
@@ -255,9 +257,9 @@ private fun ListEventCard(
         Spacer(modifier = Modifier.height(10.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Tag(label = event.genre.label)
-            Tag(label = event.priceTier.label)
-            if (event.isVerifiedVenue) Tag(label = "Verified")
+            GenreTag(genre = event.genre)
+            Tag(label = event.priceTier.label, color = VenuColors.BlueBg)
+            if (event.isVerifiedVenue) Tag(label = "Verified", color = VenuColors.VerifiedBg)
         }
 
         Spacer(modifier = Modifier.height(12.dp))

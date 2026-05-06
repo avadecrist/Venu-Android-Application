@@ -63,7 +63,7 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = VenuColors.GenreChipText,
 
     // TERTIARY (optional accent — keep subtle)
-    tertiary = VenuColors.AvatarBg,
+    tertiary = VenuColors.BlueBg,
     onTertiary = VenuColors.TextPrimary,
 
     // BACKGROUNDS

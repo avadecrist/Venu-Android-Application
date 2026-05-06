@@ -13,9 +13,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_common.core_ui.components.BaseEventCard
+import com.example.venu.core.core_common.eventdetails.genreChipText
+import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.label
+import com.example.venu.core.core_presentation.genreColor
 import com.example.venu.features.explore.model.PlaceUi
 
 @Composable
@@ -51,7 +55,7 @@ fun PlaceCard(
             Spacer(Modifier.height(10.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Tag(label = place.genre.label)
+                GenreTag(genre = place.genre)
                 if (place.isVerified) Tag(label = "Verified")
                 if (place.savedLabel != null) Tag(label = "Saved")
             }
@@ -70,10 +74,16 @@ fun PlaceCard(
     }
 }
 
+
 @Composable
-fun Tag(label: String) {
+fun Tag(
+    label: String,
+    color: Color = MaterialTheme.colorScheme.secondaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onSecondaryContainer
+) {
     Surface(
-        color = MaterialTheme.colorScheme.secondaryContainer,
+        color = color,
+        contentColor = contentColor,
         shape = MaterialTheme.shapes.small
     ) {
         Text(
@@ -82,4 +92,15 @@ fun Tag(label: String) {
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
         )
     }
+}
+
+@Composable
+fun GenreTag(genre: Genre) {
+    val baseColor = genreColor(genre)
+
+    Tag(
+        label = genreChipText(genre),
+        color = baseColor.copy(alpha = 0.16f),
+        contentColor = baseColor
+    )
 }
