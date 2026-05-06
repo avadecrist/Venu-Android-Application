@@ -1,10 +1,12 @@
 package com.example.venu.core.core_common.util
+import kotlin.math.floor
 
 fun formatDistance(distanceKm: Double): String {
     return if (distanceKm < 1.0) {
         "${(distanceKm * 1000).toInt()} m away"
     } else {
-        "${String.format("%.1f", distanceKm)} km away"
+        val truncated = floor(distanceKm * 100) / 100
+        "${String.format("%.2f", truncated)} km away"
     }
 }
 
