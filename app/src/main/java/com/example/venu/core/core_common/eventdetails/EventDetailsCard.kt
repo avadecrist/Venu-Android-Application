@@ -178,7 +178,7 @@ private fun TopBar(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = VenuColors.TextPrimary
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -188,7 +188,11 @@ private fun TopBar(
             Icon(
                 imageVector = Icons.Outlined.BookmarkBorder,
                 contentDescription = if (isSaved) "Saved" else "Save",
-                tint = if (isSaved) VenuColors.AccentBlue else VenuColors.TextSecondary
+                tint = if (isSaved) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
             )
         }
     }
@@ -202,8 +206,8 @@ private fun CircleActionButton(
     Surface(
         onClick = onClick,
         shape = CircleShape,
-        color = Color.White,
-        border = BorderStroke(1.dp, VenuColors.Border)
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Box(
             modifier = Modifier.size(48.dp),
@@ -225,7 +229,7 @@ private fun TitleSection(
         Text(
             text = title,
             style = MaterialTheme.typography.headlineSmall,
-            color = VenuColors.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold
         )
 
@@ -233,7 +237,7 @@ private fun TitleSection(
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyLarge,
-                color = VenuColors.TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -249,7 +253,7 @@ private fun EventHeroImage(
             .fillMaxWidth()
             .height(220.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(VenuColors.SurfaceMuted)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
     ) {
         if (!imageUrl.isNullOrBlank()) {
             AsyncImage(
@@ -284,14 +288,14 @@ private fun EventHeroImage(
                 Icon(
                     imageVector = Icons.Outlined.LocationOn,
                     contentDescription = null,
-                    tint = VenuColors.TextMuted,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
                     modifier = Modifier.size(42.dp)
                 )
 
                 Text(
                     text = "Event image via Google Maps",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = VenuColors.TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -354,6 +358,7 @@ private fun ActionButton(
     modifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
@@ -376,9 +381,9 @@ private fun ActionButton(
         onClick = onClick,
         interactionSource = interactionSource,
         shape = RoundedCornerShape(20.dp),
-        color = VenuColors.AccentBlue,
+        color = MaterialTheme.colorScheme.primary,
         shadowElevation = elevation,
-        border = BorderStroke(1.dp, VenuColors.AccentBlue)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
     ) {
         Row(
             modifier = Modifier
@@ -390,14 +395,14 @@ private fun ActionButton(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = VenuColors.Background
+                tint = MaterialTheme.colorScheme.onPrimary
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
                 text = "Get Directions",
-                color = VenuColors.Background,
+                color = MaterialTheme.colorScheme.onPrimary,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -445,15 +450,15 @@ private fun RatingSummarySection(
                 text = "Overall Rating",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = VenuColors.TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "VENU: ${formatOneDecimal(userRating)}   •   Google: ${formatOneDecimal(googleRating)}",
+                text = "VENU: ${formatOneDecimal(userRating)} • Google: ${formatOneDecimal(googleRating)}",
                 style = MaterialTheme.typography.bodyLarge,
-                color = VenuColors.TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(2.dp))
@@ -461,7 +466,7 @@ private fun RatingSummarySection(
             Text(
                 text = "$reviewCount reviews • Avg ${formatOneDecimal(averageRating)}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = VenuColors.TextMuted
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
             )
         }
     }
@@ -526,7 +531,7 @@ private fun PriceAndVerifiedCard(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        color = MaterialTheme.colorScheme.onPrimary,
+        color = MaterialTheme.colorScheme.surfaceVariant,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
     ) {
         Row(

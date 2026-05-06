@@ -27,7 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.venu.core.core_common.core_ui.theme.VenuColors
 import com.example.venu.core.core_domain.model.CrowdLevel
 
 @Composable
@@ -43,8 +42,11 @@ fun AttendeesInfoCard(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(22.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, VenuColors.Border)
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
     ) {
         Column(
             modifier = Modifier
@@ -59,14 +61,16 @@ fun AttendeesInfoCard(
                 Icon(
                     imageVector = Icons.Outlined.Group,
                     contentDescription = null,
-                    tint = VenuColors.TextMuted,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f),
                     modifier = Modifier.size(18.dp)
                 )
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
                     text = "Attendees",
                     style = MaterialTheme.typography.titleMedium,
-                    color = VenuColors.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -84,7 +88,7 @@ fun AttendeesInfoCard(
                 Text(
                     text = crowdLevelLabel(crowdLevel),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = VenuColors.TextMuted,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -100,7 +104,6 @@ private fun CrowdLevelIndicator(
     val filledBars = when (crowdLevel) {
         CrowdLevel.DEAD -> 1
         CrowdLevel.CHILL -> 2
-//        CrowdLevel.BUSY -> 3
         CrowdLevel.PACKED -> 4
         CrowdLevel.UNKNOWN -> 0
     }
@@ -108,10 +111,11 @@ private fun CrowdLevelIndicator(
     val activeColor = when (crowdLevel) {
         CrowdLevel.DEAD -> Color(0xFF60A5FA)
         CrowdLevel.CHILL -> Color(0xFF34D399)
-//        CrowdLevel.BUSY -> Color(0xFFF59E0B)
         CrowdLevel.PACKED -> Color(0xFFEF4444)
-        CrowdLevel.UNKNOWN -> VenuColors.BorderDark
+        CrowdLevel.UNKNOWN -> MaterialTheme.colorScheme.outlineVariant
     }
+
+    val inactiveColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f)
 
     Row(
         modifier = modifier,
@@ -132,7 +136,7 @@ private fun CrowdLevelIndicator(
                     .height(barHeight)
                     .clip(RoundedCornerShape(4.dp))
                     .background(
-                        if (index < filledBars) activeColor else VenuColors.Border
+                        if (index < filledBars) activeColor else inactiveColor
                     )
             )
         }
@@ -144,7 +148,6 @@ private fun crowdLevelLabel(crowdLevel: CrowdLevel): String {
         CrowdLevel.DEAD -> "Dead"
         CrowdLevel.CHILL -> "Chill"
         CrowdLevel.PACKED -> "PACKED"
-//        CrowdLevel.PACKED -> "Packed"
         CrowdLevel.UNKNOWN -> "Unknown"
     }
 }
