@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.util.Log
+import androidx.compose.material3.Slider
+import kotlin.math.roundToInt
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,10 +37,8 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
-import com.example.venu.core.core_domain.model.PriceTier
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
@@ -46,6 +46,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetValue
@@ -74,6 +75,7 @@ import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_common.eventdetails.EventDetailsSheet
 import com.example.venu.core.core_common.eventdetails.SaveToListSheet
 import com.example.venu.core.core_domain.model.Genre
+import com.example.venu.core.core_domain.model.PriceTier
 import com.example.venu.core.core_domain.model.label
 import com.example.venu.core.core_presentation.toEventDetailsUi
 import com.example.venu.features.explore.model.ExploreAction
@@ -723,12 +725,6 @@ private fun GooglePlacePreviewSheet(
                     append(" • Google rating: ")
                     append(String.format("%.1f", rating))
                 }
-
-                append(" • Price: ")
-                append(draft.priceTier.label)
-
-                append(" • Interest level: ")
-                append(draft.interestLevel)
             },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -850,6 +846,13 @@ private fun GooglePlaceEventDraftSheet(
             }
         )
 
+        PriceTierSlider(
+            selectedPriceTier = draft.priceTier,
+            onPriceTierSelected = { priceTier ->
+                onDraftChange(draft.copy(priceTier = priceTier))
+            }
+        )
+
         Text(
             text = buildString {
                 append("Google verified venue")
@@ -886,7 +889,8 @@ private fun GooglePlaceEventDraftSheet(
                         draft.name.isNotBlank() &&
                         draft.location.isNotBlank() &&
                         draft.address.isNotBlank() &&
-                        draft.description.isNotBlank()
+                        draft.description.isNotBlank() &&
+                        draft.priceTier != PriceTier.UNKNOWN
             ) {
                 Text(
                     text = if (isCreating) {
@@ -950,6 +954,78 @@ private fun GenreDropdown(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PriceTierSlider(
+    selectedPriceTier: PriceTier,
+    onPriceTierSelected: (PriceTier) -> Unit
+) {
+    val sliderValue = selectedPriceTier.toSliderValue()
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Price",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Text(
+                text = selectedPriceTier.label,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Slider(
+            value = sliderValue.toFloat(),
+            onValueChange = { value ->
+                onPriceTierSelected(value.roundToInt().toPriceTier())
+            },
+            valueRange = 0f..4f,
+            steps = 3
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Free", style = MaterialTheme.typography.bodySmall)
+            Text("$", style = MaterialTheme.typography.bodySmall)
+            Text("$$", style = MaterialTheme.typography.bodySmall)
+            Text("$$$", style = MaterialTheme.typography.bodySmall)
+            Text("$$$$", style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+private fun PriceTier.toSliderValue(): Int {
+    return when (this) {
+        PriceTier.FREE -> 0
+        PriceTier.ONE -> 1
+        PriceTier.TWO -> 2
+        PriceTier.THREE -> 3
+        PriceTier.FOUR -> 4
+        PriceTier.UNKNOWN -> 0
+    }
+}
+
+private fun Int.toPriceTier(): PriceTier {
+    return when (this) {
+        0 -> PriceTier.FREE
+        1 -> PriceTier.ONE
+        2 -> PriceTier.TWO
+        3 -> PriceTier.THREE
+        4 -> PriceTier.FOUR
+        else -> PriceTier.FREE
     }
 }
 
