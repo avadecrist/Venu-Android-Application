@@ -2,6 +2,7 @@ package com.example.venu.core.core_data.remote.firestore
 
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.ListenerRegistration
 
 class UserListFirestoreRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -83,5 +84,38 @@ class UserListFirestoreRepository(
             .document(listId)
             .delete()
             .await()
+    }
+
+    suspend fun getAlreadyWentCountForUser(userId: String): Int {
+        val snapshot = firestore
+            .collection("users")
+            .document(userId)
+            .collection("lists")
+            .document("visited")
+            .collection("events")
+            .get()
+            .await()
+
+        return snapshot.size()
+    }
+
+    fun observeAlreadyWentCountForUser(
+        userId: String,
+        onCountChanged: (Int) -> Unit
+    ): ListenerRegistration {
+        return firestore
+            .collection("users")
+            .document(userId)
+            .collection("lists")
+            .document("visited")
+            .collection("events")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onCountChanged(0)
+                    return@addSnapshotListener
+                }
+
+                onCountChanged(snapshot?.size() ?: 0)
+            }
     }
 }

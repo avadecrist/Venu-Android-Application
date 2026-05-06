@@ -1,6 +1,7 @@
 package com.example.venu
 
 import android.os.Bundle
+import androidx.compose.runtime.DisposableEffect
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -26,6 +27,7 @@ import com.example.venu.features.home.HomeRoute
 import com.example.venu.features.login.LoginScreen
 import com.example.venu.features.onboarding.CompleteProfileScreen
 import kotlinx.coroutines.launch
+import com.example.venu.core.core_data.remote.firestore.UserListFirestoreRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +88,7 @@ private fun VenuNavHost(
     val firebaseAuthClient = remember { FirebaseAuthClient() }
     val userFirestoreRepository = remember { UserFirestoreRepository() }
     val reviewFireStoreRepository = remember { ReviewFireStoreRepository() }
+    val userListFirestoreRepository = remember { UserListFirestoreRepository() }
 
     fun clearCurrentUser() {
         isSignedIn = false
@@ -137,7 +140,8 @@ private fun VenuNavHost(
                                     currentUserPhotoUrl = firebaseUser.photoUrl
                                     currentUserReviewsCount =
                                         reviewFireStoreRepository.getReviewCountForCurrentUser()
-                                    currentUserEventsVisitedCount = 0
+                                    currentUserEventsVisitedCount =
+                                        userListFirestoreRepository.getAlreadyWentCountForUser(firebaseUser.uid)
                                     isSignedIn = true
                                     isSigningIn = false
 
@@ -210,6 +214,34 @@ private fun VenuNavHost(
         }
 
         composable("app") {
+            val firebaseUser = firebaseAuthClient.currentUser()
+
+            DisposableEffect(isSignedIn, firebaseUser?.uid) {
+                if (!isSignedIn || firebaseUser == null) {
+                    onDispose { }
+                } else {
+                    val visitedRegistration =
+                        userListFirestoreRepository.observeAlreadyWentCountForUser(
+                            userId = firebaseUser.uid,
+                            onCountChanged = { count ->
+                                currentUserEventsVisitedCount = count
+                            }
+                        )
+
+                    val reviewsRegistration =
+                        reviewFireStoreRepository.observeReviewCountForCurrentUser(
+                            onCountChanged = { count ->
+                                currentUserReviewsCount = count
+                            }
+                        )
+
+                    onDispose {
+                        visitedRegistration.remove()
+                        reviewsRegistration?.remove()
+                    }
+                }
+            }
+
             AppScaffold(
                 isSignedIn = isSignedIn,
                 isDarkMode = isDarkMode,
