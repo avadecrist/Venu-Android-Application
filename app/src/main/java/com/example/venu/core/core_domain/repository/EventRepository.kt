@@ -3,6 +3,7 @@ package com.example.venu.core.core_domain.repository
 // INTERFACE FOR METHODS
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.Genre
+import com.google.firebase.firestore.ListenerRegistration
 
 interface EventRepository {
     suspend fun getTrendingEvents(): List<Event>
@@ -13,4 +14,8 @@ interface EventRepository {
     suspend fun getEventById(id: String): Event?
 
     suspend fun createEvent(event: Event)
+    fun observeEventInterestLevel(
+        eventId: String,
+        onInterestLevelChanged: (Int) -> Unit
+    ): ListenerRegistration
 }

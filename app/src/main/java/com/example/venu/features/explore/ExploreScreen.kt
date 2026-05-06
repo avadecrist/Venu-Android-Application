@@ -81,9 +81,11 @@ import androidx.core.content.ContextCompat
 import com.example.venu.core.core_common.AppGraph
 import com.example.venu.core.core_common.eventdetails.EventDetailsSheet
 import com.example.venu.core.core_common.eventdetails.SaveToListSheet
+import com.example.venu.core.core_common.util.toCrowdLevel
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.PriceTier
 import com.example.venu.core.core_domain.model.label
+import com.example.venu.core.core_presentation.EventDetailsUi
 import com.example.venu.core.core_presentation.toEventDetailsUi
 import com.example.venu.features.explore.model.ExploreAction
 import com.example.venu.features.explore.model.ExploreUiState
@@ -244,6 +246,33 @@ fun ExploreScreen(
 
     val selectedEventDetails = selectedPlace?.toEventDetailsUi()
 
+    var liveSelectedEventDetails by remember {
+        mutableStateOf<EventDetailsUi?>(null)
+    }
+
+    DisposableEffect(selectedEventDetails?.id) {
+        val event = selectedEventDetails
+
+        if (event == null) {
+            liveSelectedEventDetails = null
+            onDispose { }
+        } else {
+            liveSelectedEventDetails = event
+
+            val registration =
+                AppGraph.eventRepo.observeEventInterestLevel(event.id) { interestLevel ->
+                    liveSelectedEventDetails = liveSelectedEventDetails?.copy(
+                        attendeeCount = interestLevel,
+                        crowdLevel = interestLevel.toCrowdLevel()
+                    )
+                }
+
+            onDispose {
+                registration.remove()
+            }
+        }
+    }
+
     LaunchedEffect(
         state.selectedPlaceId,
         state.shouldStartDirections,
@@ -364,7 +393,7 @@ fun ExploreScreen(
         )
     }
 
-    if (selectedEventDetails != null) {
+    if (liveSelectedEventDetails != null) {
         ModalBottomSheet(
             sheetState = sheetState,
             onDismissRequest = {
@@ -381,8 +410,10 @@ fun ExploreScreen(
                 )
             }
         ) {
+            val eventDetails = liveSelectedEventDetails!!
+
             EventDetailsSheet(
-                event = selectedEventDetails,
+                event = eventDetails,
                 reviewsViewModel = reviewsViewModel,
                 onBack = {
                     scope.launch {
@@ -391,7 +422,7 @@ fun ExploreScreen(
                     }
                 },
                 onSaveClick = {
-                    onAction(ExploreAction.SaveClicked(selectedEventDetails.id))
+                    onAction(ExploreAction.SaveClicked(eventDetails.id))
                 },
                 onGetDirectionsClick = {
                     val location = userLocation ?: return@EventDetailsSheet
@@ -404,7 +435,7 @@ fun ExploreScreen(
 
                         onAction(
                             ExploreAction.GetDirectionsClicked(
-                                event = selectedEventDetails,
+                                event = eventDetails,
                                 userLat = location.latitude,
                                 userLng = location.longitude
                             )

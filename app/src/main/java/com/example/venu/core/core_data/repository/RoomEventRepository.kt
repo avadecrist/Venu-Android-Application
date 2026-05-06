@@ -7,6 +7,7 @@ import com.example.venu.core.core_data.mapper.toEntity
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.repository.EventRepository
+import com.google.firebase.firestore.ListenerRegistration
 
 class RoomEventRepository(
     private val eventDao: EventDao
@@ -83,5 +84,18 @@ class RoomEventRepository(
 
         val countAfterInsert = eventDao.getCount()
         println("VENU DATA DEBUG: Created real/user event. Room events now = $countAfterInsert")
+    }
+
+    override fun observeEventInterestLevel(
+        eventId: String,
+        onInterestLevelChanged: (Int) -> Unit
+    ): ListenerRegistration {
+
+        // Room version currently does not observe live updates.
+        // This keeps the interface satisfied for now.
+
+        return ListenerRegistration {
+            // No listener to remove
+        }
     }
 }

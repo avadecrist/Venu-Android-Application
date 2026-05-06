@@ -4,6 +4,7 @@ import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.repository.EventRepository
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
 
 class EventFirestoreRepository(
@@ -79,5 +80,26 @@ class EventFirestoreRepository(
         return snapshot.documents.mapNotNull { document ->
             document.toObject(EventFirestoreDto::class.java)?.toDomain()
         }
+    }
+
+    override fun observeEventInterestLevel(
+        eventId: String,
+        onInterestLevelChanged: (Int) -> Unit
+    ): ListenerRegistration {
+        return firestore
+            .collection("events")
+            .document(eventId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onInterestLevelChanged(0)
+                    return@addSnapshotListener
+                }
+
+                val interestLevel = snapshot
+                    ?.getLong("interestLevel")
+                    ?.toInt() ?: 0
+
+                onInterestLevelChanged(interestLevel)
+            }
     }
 }

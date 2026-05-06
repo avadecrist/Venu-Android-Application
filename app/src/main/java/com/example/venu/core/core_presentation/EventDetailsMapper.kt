@@ -1,10 +1,15 @@
 package com.example.venu.core.core_presentation
 
 
+import android.util.Log
 import com.example.venu.features.explore.model.PlaceUi
 import com.example.venu.features.home.model.HomeVenueUi
 
 fun PlaceUi.toEventDetailsUi(): EventDetailsUi {
+    Log.d(
+        "AttendeeDebug",
+        "PlaceUi ${name} -> EventDetailsUi attendeeCount=$attendeeCount"
+    )
     return EventDetailsUi(
         id = id,
         name = name,
