@@ -18,31 +18,31 @@ class ReviewFireStoreRepository(
 
     private val reviewsCollection = firestore.collection("reviews")
 
-override suspend fun getReviewsForEvent(eventId: String): List<Review> {
-    val snapshot = reviewsCollection
-        .whereEqualTo("eventId", eventId)
-        .get()
-        .await()
-
-    return snapshot.documents.mapNotNull { doc ->
-        val dto = doc.toObject(ReviewFireStoreDto::class.java) ?: return@mapNotNull null
-        Log.d("ReviewDebug", "Firestore raw displayName=${doc.getString("displayName")}")
-        val userDoc = firestore.collection("users")
-            .document(dto.uid)
+    override suspend fun getReviewsForEvent(eventId: String): List<Review> {
+        val snapshot = reviewsCollection
+            .whereEqualTo("eventId", eventId)
             .get()
             .await()
 
-        val correctDisplayName = userDoc.getString("displayName")
-        val correctPhotoUrl = userDoc.getString("photoUrl")
+        return snapshot.documents.mapNotNull { doc ->
+            val dto = doc.toObject(ReviewFireStoreDto::class.java) ?: return@mapNotNull null
+            Log.d("ReviewDebug", "Firestore raw displayName=${doc.getString("displayName")}")
+            val userDoc = firestore.collection("users")
+                .document(dto.uid)
+                .get()
+                .await()
 
-        val fixedDto = dto.copy(
-            displayName = correctDisplayName ?: dto.displayName,
-            photoUrl = correctPhotoUrl ?: dto.photoUrl
-        )
+            val correctDisplayName = userDoc.getString("displayName")
+            val correctPhotoUrl = userDoc.getString("photoUrl")
 
-        fixedDto.toDomain()
+            val fixedDto = dto.copy(
+                displayName = correctDisplayName ?: dto.displayName,
+                photoUrl = correctPhotoUrl ?: dto.photoUrl
+            )
+
+            fixedDto.toDomain()
+        }
     }
-}
 
     override suspend fun getRatingSummary(eventId: String): RatingSummary {
         val reviews = getReviewsForEvent(eventId)
@@ -112,7 +112,7 @@ override suspend fun getReviewsForEvent(eventId: String): List<Review> {
             ?.toDomain()
     }
 
-    suspend fun getReviewCountForCurrentUser(): Int {
+    override suspend fun getReviewCountForCurrentUser(): Int {
         val user = auth.currentUser ?: return 0
 
         val snapshot = reviewsCollection
@@ -135,4 +135,5 @@ override suspend fun getReviewsForEvent(eventId: String): List<Review> {
             doc.toObject(ReviewFireStoreDto::class.java)?.toDomain()
         }
     }
+
 }

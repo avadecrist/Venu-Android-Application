@@ -7,7 +7,6 @@ fun Review.toUi(): ReviewUi {
     return ReviewUi(
         id = id,
         displayName = displayName,
-        authorInitial = displayName.firstOrNull()?.uppercase() ?: "?",
         photoUrl = photoUrl,
         rating = rating,
         comment = comment,

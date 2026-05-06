@@ -64,4 +64,8 @@ class FakeReviewRepository : ReviewRepository {
             review.eventId == eventId && review.userId == currentUserId
         }
     }
+
+    override suspend fun getReviewCountForCurrentUser(): Int {
+        return FakeSeed.reviews.size
+    }
 }

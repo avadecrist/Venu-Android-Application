@@ -1,5 +1,6 @@
 package com.example.venu.features.profile.menu
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,70 +20,35 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_common.core_ui.components.ReviewCard
-import com.example.venu.core.core_common.core_ui.theme.VenuColors
-import com.example.venu.core.core_data.remote.firestore.ReviewFireStoreRepository
-import com.example.venu.core.core_domain.model.Review
+import com.example.venu.core.core_common.core_ui.theme.VenuTheme
+import com.example.venu.core.core_data.fake.FakeSeed
 import com.example.venu.core.core_presentation.ReviewUi
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.example.venu.features.reviews.mappers.toReviewUi
 
 @Composable
 fun MyReviewsScreen(
+    reviews: List<ReviewUi>,
+    isLoading: Boolean,
+    errorMessage: String?,
     onBackClick: () -> Unit
 ) {
-    val reviewRepository = remember {
-        ReviewFireStoreRepository()
-    }
-
-    var reviews by remember {
-        mutableStateOf<List<ReviewUi>>(emptyList())
-    }
-
-    var isLoading by remember {
-        mutableStateOf(true)
-    }
-
-    var errorMessage by remember {
-        mutableStateOf<String?>(null)
-    }
-
-    LaunchedEffect(Unit) {
-        try {
-            isLoading = true
-            errorMessage = null
-
-            reviews = reviewRepository
-                .getReviewsForCurrentUser()
-                .map { review ->
-                    review.toReviewUi()
-                }
-        } catch (error: Exception) {
-            errorMessage = error.message ?: "Failed to load reviews."
-        } finally {
-            isLoading = false
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 22.dp, vertical = 22.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 22.dp)
+            .padding(top = 24.dp, bottom = 0.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 18.dp),
+                .padding(bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
@@ -93,7 +59,7 @@ fun MyReviewsScreen(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
                     modifier = Modifier.size(26.dp),
-                    tint = VenuColors.TextPrimary
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
 
@@ -101,7 +67,7 @@ fun MyReviewsScreen(
                 text = "My Reviews",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = VenuColors.TextPrimary
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
 
@@ -109,7 +75,7 @@ fun MyReviewsScreen(
             text = "Your recent reviews",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
-            color = VenuColors.TextSecondary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(22.dp))
@@ -128,7 +94,7 @@ fun MyReviewsScreen(
 
             errorMessage != null -> {
                 Text(
-                    text = errorMessage ?: "Something went wrong.",
+                    text = errorMessage,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error
                 )
@@ -138,7 +104,7 @@ fun MyReviewsScreen(
                 Text(
                     text = "You have not written any reviews yet.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = VenuColors.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -158,21 +124,35 @@ fun MyReviewsScreen(
     }
 }
 
-private fun Review.toReviewUi(): ReviewUi {
-    return ReviewUi(
-        authorInitial = displayName.firstOrNull()?.uppercase() ?: "?",
-        displayName = displayName,
-        photoUrl = photoUrl.orEmpty(),
-        rating = rating,
-        comment = comment,
-        timeAgo = createdAt.toDateLabel(),
-        id = id
-    )
+
+@Preview(
+    name = "My Reviews - Light Mode",
+    showBackground = true
+)
+@Composable
+private fun MyReviewsScreenLightPreview() {
+    VenuTheme(darkTheme = false) {
+        MyReviewsScreen(
+            reviews = FakeSeed.reviews.map { it.toReviewUi() },
+            isLoading = false,
+            errorMessage = null,
+            onBackClick = {}
+        )
+    }
 }
 
-private fun Long.toDateLabel(): String {
-    return SimpleDateFormat(
-        "MMM d, yyyy",
-        Locale.getDefault()
-    ).format(Date(this))
+@Preview(
+    name = "My Reviews - Dark Mode",
+    showBackground = true
+)
+@Composable
+private fun MyReviewsScreenDarkPreview() {
+    VenuTheme(darkTheme = true) {
+        MyReviewsScreen(
+            reviews = FakeSeed.reviews.map { it.toReviewUi() },
+            isLoading = false,
+            errorMessage = null,
+            onBackClick = {}
+        )
+    }
 }
