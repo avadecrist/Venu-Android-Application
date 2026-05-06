@@ -1,6 +1,6 @@
 package com.example.venu.core.core_presentation
 
-import com.example.venu.core.core_domain.model.CrowdLevel
+
 import com.example.venu.features.explore.model.PlaceUi
 import com.example.venu.features.home.model.HomeVenueUi
 
@@ -23,8 +23,8 @@ fun PlaceUi.toEventDetailsUi(): EventDetailsUi {
         averageRating = rating,
         googleRating = rating,
         userRating = 0.0,
-        attendeeCount = 0,
-        crowdLevel = CrowdLevel.UNKNOWN,
+        attendeeCount = attendeeCount,
+        crowdLevel = crowdLevel,
         reviews = emptyList(),
         isSaved = isSaved || savedLabel != null
     )
@@ -53,8 +53,8 @@ fun HomeVenueUi.toEventDetailsUi(): EventDetailsUi {
             ?.toDoubleOrNull(),
         googleRating = null,
         userRating = null,
-        attendeeCount = 0,
-        crowdLevel = CrowdLevel.QUIET,
+        attendeeCount = attendeeCount,
+        crowdLevel = crowdLevel,
         reviews = emptyList(),
         isSaved = isSaved
     )

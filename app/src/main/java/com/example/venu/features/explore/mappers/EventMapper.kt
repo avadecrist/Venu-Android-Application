@@ -1,5 +1,6 @@
 package com.example.venu.features.explore.mappers
 
+import com.example.venu.core.core_common.util.toCrowdLevel
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.model.label
 import com.example.venu.core.core_domain.repository.ListType
@@ -41,6 +42,8 @@ suspend fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
         savedLabel = savedLabel,
         imageUrl = imageUrl,
         priceText = priceTier.label,
-        hours = hours
+        hours = hours,
+        attendeeCount = interestLevel,
+        crowdLevel = interestLevel.toCrowdLevel()
     )
 }

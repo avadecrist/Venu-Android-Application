@@ -110,17 +110,17 @@ private fun CrowdLevelIndicator(
     modifier: Modifier = Modifier
 ) {
     val filledBars = when (crowdLevel) {
-        CrowdLevel.QUIET -> 1
-        CrowdLevel.LIGHT -> 2
-        CrowdLevel.BUSY -> 3
+        CrowdLevel.DEAD -> 1
+        CrowdLevel.CHILL -> 2
+//        CrowdLevel.BUSY -> 3
         CrowdLevel.PACKED -> 4
         CrowdLevel.UNKNOWN -> 0
     }
 
     val activeColor = when (crowdLevel) {
-        CrowdLevel.QUIET -> Color(0xFF60A5FA)
-        CrowdLevel.LIGHT -> Color(0xFF34D399)
-        CrowdLevel.BUSY -> Color(0xFFF59E0B)
+        CrowdLevel.DEAD -> Color(0xFF60A5FA)
+        CrowdLevel.CHILL -> Color(0xFF34D399)
+//        CrowdLevel.BUSY -> Color(0xFFF59E0B)
         CrowdLevel.PACKED -> Color(0xFFEF4444)
         CrowdLevel.UNKNOWN -> VenuColors.BorderDark
     }
@@ -153,10 +153,10 @@ private fun CrowdLevelIndicator(
 
 private fun crowdLevelLabel(crowdLevel: CrowdLevel): String {
     return when (crowdLevel) {
-        CrowdLevel.QUIET -> "Quiet"
-        CrowdLevel.LIGHT -> "Light"
-        CrowdLevel.BUSY -> "Busy"
-        CrowdLevel.PACKED -> "Packed"
+        CrowdLevel.DEAD -> "Dead"
+        CrowdLevel.CHILL -> "Chill"
+        CrowdLevel.PACKED -> "PACKED"
+//        CrowdLevel.PACKED -> "Packed"
         CrowdLevel.UNKNOWN -> "Unknown"
     }
 }

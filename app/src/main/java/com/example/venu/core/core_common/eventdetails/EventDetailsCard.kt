@@ -1,6 +1,6 @@
 package com.example.venu.core.core_common.eventdetails
 
-//import androidx.compose.animation.animateColorAsState
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -43,26 +42,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.venu.core.core_domain.model.Genre
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.graphicsLayer
-import com.example.venu.core.core_common.core_ui.components.LeaveReviewCard
-import com.example.venu.core.core_common.core_ui.components.ReviewCard
-import com.example.venu.core.core_common.core_ui.components.ReviewsCountHeader
 import com.example.venu.core.core_common.core_ui.theme.VenuColors
-import com.example.venu.core.core_common.util.formatDistance
 import com.example.venu.core.core_common.util.formatOneDecimal
-import com.example.venu.core.core_data.repository.FakeReviewRepository
 import com.example.venu.core.core_domain.model.CrowdLevel
-import com.example.venu.core.core_domain.model.Review
 import com.example.venu.core.core_presentation.EventDetailsUi
 import com.example.venu.core.core_presentation.ReviewUi
 import com.example.venu.features.reviews.ReviewsSection
-import com.example.venu.features.reviews.model.ReviewsAction
 import com.example.venu.features.reviews.viewmodel.ReviewsViewModel
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
@@ -590,7 +580,7 @@ private fun PriceAndVerifiedCard(
     }
 }
 
-
+/*
 private val PreviewEvent = EventDetailsUi(
     id = "ramen-popup-001",
     name = "Ramen Pop-Up",
@@ -610,7 +600,7 @@ private val PreviewEvent = EventDetailsUi(
     googleRating = 5.0,
     userRating = 4.9,
     attendeeCount = 95,
-    crowdLevel = CrowdLevel.BUSY,
+    crowdLevel = CrowdLevel.PACKED,
     isSaved = false,
     reviews = listOf(
         ReviewUi(
@@ -639,6 +629,8 @@ private val PreviewEvent = EventDetailsUi(
         )
     )
 )
+
+ */
 
 //@Preview(
 //    name = "Event Details Sheet",

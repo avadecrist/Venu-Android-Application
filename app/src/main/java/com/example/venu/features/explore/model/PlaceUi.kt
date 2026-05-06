@@ -1,5 +1,6 @@
 package com.example.venu.features.explore.model
 
+import com.example.venu.core.core_domain.model.CrowdLevel
 import com.example.venu.core.core_domain.model.Genre
 
 data class PlaceUi(
@@ -17,5 +18,7 @@ data class PlaceUi(
     val savedLabel: String?,
     val imageUrl: String? = null,
     val priceText: String,
-    val hours: String
+    val hours: String,
+    val attendeeCount: Int = 0,
+    val crowdLevel: CrowdLevel = CrowdLevel.UNKNOWN
 )
