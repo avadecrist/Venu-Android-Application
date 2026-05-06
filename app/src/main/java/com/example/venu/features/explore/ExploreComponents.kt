@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import com.example.venu.core.core_common.util.formatDistance
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -40,7 +41,10 @@ fun PlaceCard(
 
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.End) {
                     Text(text = "★ ${place.rating}", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "${place.distanceKm} km", style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = place.distanceKm?.let { formatDistance(it) } ?: "Distance unavailable",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
 
