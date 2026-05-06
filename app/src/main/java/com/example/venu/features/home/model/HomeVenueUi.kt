@@ -1,5 +1,6 @@
 package com.example.venu.features.home.model
 
+import com.example.venu.core.core_domain.model.CrowdLevel
 import com.example.venu.core.core_domain.model.Genre
 
 data class HomeVenueUi(
@@ -13,5 +14,7 @@ data class HomeVenueUi(
     val isSaved: Boolean = false,
     val genre: Genre,
     val locationName: String = title,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val attendeeCount: Int = 0,
+    val crowdLevel: CrowdLevel = CrowdLevel.UNKNOWN
 )

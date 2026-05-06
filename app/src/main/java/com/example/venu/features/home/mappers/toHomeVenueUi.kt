@@ -1,6 +1,7 @@
 package com.example.venu.features.home.mappers
 
 import com.example.venu.core.core_common.util.formatDistance
+import com.example.venu.core.core_common.util.toCrowdLevel
 import com.example.venu.core.core_domain.model.Event
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.core.core_domain.repository.ListsRepository
@@ -31,7 +32,9 @@ suspend fun Event.toHomeVenueUi(
         },
         genre = genre,
         isSaved = listsRepo.isInList(ListType.WantToGo, id),
-        imageUrl = imageUrl
+        imageUrl = imageUrl,
+        attendeeCount = interestLevel,
+        crowdLevel = interestLevel.toCrowdLevel()
     )
 }
 
