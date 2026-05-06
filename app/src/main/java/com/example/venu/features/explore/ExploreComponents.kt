@@ -71,7 +71,7 @@ fun PlaceCard(
 }
 
 @Composable
-private fun Tag(label: String) {
+fun Tag(label: String) {
     Surface(
         color = MaterialTheme.colorScheme.secondaryContainer,
         shape = MaterialTheme.shapes.small

@@ -37,7 +37,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -45,14 +44,19 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.venu.core.core_common.core_ui.components.BaseEventCard
 import com.example.venu.core.core_common.core_ui.theme.VenuTheme
+import com.example.venu.core.core_common.util.formatDistance
 import com.example.venu.core.core_domain.model.Genre
 import com.example.venu.core.core_domain.model.PriceTier
+import com.example.venu.core.core_domain.model.label
+import com.example.venu.features.explore.Tag
 
 @Composable
 fun ListsScreen(
     state: ListsUiState,
-    onEvent: (ListsAction) -> Unit
+    onEvent: (ListsAction) -> Unit,
+    onNavigateToExploreDirections: (String) -> Unit
 ) {
     var showAddListDialog by remember { mutableStateOf(false) }
     var newListName by remember { mutableStateOf("") }
@@ -143,7 +147,8 @@ fun ListsScreen(
                         ListEventCard(
                             event = event,
                             selectedTab = state.selectedTab,
-                            onEvent = onEvent
+                            onEvent = onEvent,
+                            onNavigateToExploreDirections = onNavigateToExploreDirections
                         )
                     }
 
@@ -201,56 +206,81 @@ fun ListsScreen(
     }
 }
 
-
 @Composable
 private fun ListEventCard(
     event: Event,
     selectedTab: ListType,
-    onEvent: (ListsAction) -> Unit
+    onEvent: (ListsAction) -> Unit,
+    onNavigateToExploreDirections: (String) -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
+    BaseEventCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = {
+            onNavigateToExploreDirections(event.id)
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        borderColor = MaterialTheme.colorScheme.outlineVariant,
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = event.name,
-                style = MaterialTheme.typography.titleMedium
-            )
+        Text(
+            text = event.name,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
 
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = event.subtitle,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "${event.locationName} • ${event.startTimeLabel}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        event.distanceKm?.let { km ->
             Spacer(modifier = Modifier.height(4.dp))
-
             Text(
-                text = event.subtitle,
-                style = MaterialTheme.typography.bodyMedium
+                text = formatDistance(km),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
 
-            Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-            Text(
-                text = "${event.locationName} • ${event.startTimeLabel}",
-                style = MaterialTheme.typography.bodySmall
-            )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Tag(label = event.genre.label)
+            Tag(label = event.priceTier.label)
+            if (event.isVerifiedVenue) Tag(label = "Verified")
+        }
 
-            event.distanceKm?.let { km ->
-                Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        HorizontalDivider()
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextButton(
+                onClick = {
+                    onNavigateToExploreDirections(event.id)
+                }
+            ) {
                 Text(
-                    text = "$km km away",
-                    style = MaterialTheme.typography.bodySmall
-                )
+                    text = "Get Directions",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyMedium)
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Category: ${event.genre} • Price: ${event.priceTier}",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider()
-            Spacer(modifier = Modifier.height(8.dp))
 
             ActionRow(
                 event = event,
@@ -283,9 +313,12 @@ private fun ActionRow(
                                 to = ListType.AlreadyWent
                             )
                         )
-                    }
+                    },
                 ) {
-                    Text("Mark Went")
+                    Text(
+                        text = "Mark Went",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -295,7 +328,10 @@ private fun ActionRow(
                         onEvent(ListsAction.ToggleWantToGo(event.id))
                     }
                 ) {
-                    Text("Remove")
+                    Text(
+                        text = "Remove",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
@@ -311,7 +347,10 @@ private fun ActionRow(
                         )
                     }
                 ) {
-                    Text("To Review")
+                    Text(
+                        text = "To Review",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -326,7 +365,10 @@ private fun ActionRow(
                         )
                     }
                 ) {
-                    Text("Remove")
+                    Text(
+                        text = "Remove",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
@@ -341,7 +383,10 @@ private fun ActionRow(
                         )
                     }
                 ) {
-                    Text("Remove")
+                    Text(
+                        text = "Remove",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
@@ -357,7 +402,10 @@ private fun ActionRow(
                         )
                     }
                 ) {
-                    Text("Remove $customListName")
+                    Text(
+                        text = "Remove $customListName",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
@@ -456,7 +504,8 @@ private fun ListsScreenPreview() {
                     )
                 )
             ),
-            onEvent = {}
+            onEvent = {},
+            onNavigateToExploreDirections = {}
         )
     }
 }

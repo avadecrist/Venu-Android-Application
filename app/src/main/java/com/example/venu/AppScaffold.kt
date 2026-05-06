@@ -223,7 +223,17 @@ private fun AppNavHost(
         }
 
         composable("lists") {
-            ListsRoute()
+            ListsRoute(
+                onNavigateToExploreDirections = { eventId ->
+                    navController.navigate("explore?eventId=$eventId&startDirections=true") {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
         }
 
         composable("profile") {

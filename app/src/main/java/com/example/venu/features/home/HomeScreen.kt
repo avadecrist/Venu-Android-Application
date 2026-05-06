@@ -253,7 +253,7 @@ fun FeaturedCard(
             onClick = onClick,
             contentPadding = 18.dp,
             borderColor = baseColor.copy(alpha = 0.35f),
-            contentColor = baseColor.copy(alpha = 0.10f),
+            containerColor = baseColor.copy(alpha = 0.10f),
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -305,7 +305,7 @@ private fun VenueCard(
             .padding(vertical = 7.dp),
         onClick = onClick,
         contentPadding = 18.dp,
-        contentColor = MaterialTheme.colorScheme.surfaceVariant
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
