@@ -16,11 +16,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.venu.core.core_common.core_ui.theme.VenuColors
 
 @Composable
 fun DetailInfoCard(
@@ -33,8 +31,11 @@ fun DetailInfoCard(
     Surface(
         modifier = modifier.height(130.dp),
         shape = RoundedCornerShape(22.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, VenuColors.Border)
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
     ) {
         Column(
             modifier = Modifier.padding(18.dp)
@@ -45,14 +46,16 @@ fun DetailInfoCard(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = VenuColors.TextMuted,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.78f),
                     modifier = Modifier.size(18.dp)
                 )
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
                     text = label,
                     style = MaterialTheme.typography.titleMedium,
-                    color = VenuColors.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -61,13 +64,13 @@ fun DetailInfoCard(
             if (accentChip != null) {
                 Surface(
                     shape = RoundedCornerShape(999.dp),
-                    color = VenuColors.GenreChipBg
+                    color = MaterialTheme.colorScheme.secondary
                 ) {
                     Text(
                         text = accentChip,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = VenuColors.GenreChipText,
+                        color = MaterialTheme.colorScheme.onSecondary,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -75,7 +78,7 @@ fun DetailInfoCard(
                 Text(
                     text = value,
                     style = MaterialTheme.typography.titleLarge,
-                    color = VenuColors.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold
                 )
             }
