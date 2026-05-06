@@ -39,7 +39,7 @@ object AppGraph {
         // database.clearAllTables()
         // Uncomment only if we want to test reseeding again.
 
-        roomEventRepository.seedIfEmpty()
+        //roomEventRepository.seedIfEmpty()
 
         // Temp test to confirm Room is initialized.
         val events = roomEventRepository.getAllEvents()

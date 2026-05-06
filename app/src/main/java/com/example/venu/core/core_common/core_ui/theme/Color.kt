@@ -28,7 +28,7 @@ object VenuColors {
     val ScoreLow = Color(0xFFEF4444)
 
     val Star = Color(0xFFF5A623)
-    val AvatarBg = Color(0xFFEAEFFD)
+    val BlueBg = Color(0xFFEAEFFD)
 
     val CardShadow = Color(0x0A000000)
     val Divider = Color(0xFFEDEDED)

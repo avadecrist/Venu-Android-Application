@@ -10,7 +10,8 @@ import com.example.venu.features.lists.viewmodel.ListsViewModel
 
 @Composable
 fun ListsRoute(
-    viewModel: ListsViewModel = viewModel()
+    viewModel: ListsViewModel = viewModel(),
+    onNavigateToExploreDirections: (eventId: String) -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -21,6 +22,7 @@ fun ListsRoute(
 
     ListsScreen(
         state = state,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        onNavigateToExploreDirections = onNavigateToExploreDirections
     )
 }

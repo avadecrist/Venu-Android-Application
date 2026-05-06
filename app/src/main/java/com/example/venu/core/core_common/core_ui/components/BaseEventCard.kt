@@ -13,11 +13,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.venu.core.core_common.core_ui.theme.VenuColors
 
 @Composable
 fun BaseEventCard(
@@ -28,10 +27,10 @@ fun BaseEventCard(
     height: Dp? = null,
     contentPadding: Dp = 16.dp,
     borderColor: Color = MaterialTheme.colorScheme.surfaceVariant,
-    contentColor: Color = MaterialTheme.colorScheme.surfaceVariant,
-    content: @Composable ColumnScope.() -> Unit
+    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    shape: Shape = RoundedCornerShape(24.dp),
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    val shape = RoundedCornerShape(24.dp)
 
     val border = BorderStroke(
         width = if (selected) 3.dp else 2.dp,
@@ -50,7 +49,7 @@ fun BaseEventCard(
         shape = shape,
         border = border,
         colors = CardDefaults.cardColors(
-            containerColor = contentColor//MaterialTheme.colorScheme.surfaceVariant
+            containerColor = containerColor
         )
     ) {
         Column(
