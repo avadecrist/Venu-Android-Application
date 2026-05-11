@@ -41,6 +41,7 @@ suspend fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
         longitude = longitude,
         distanceKm = distanceKm,
         rating = venuRating,
+        googleRating = googleRating,
         genre = genre,
         isVerified = isVerifiedVenue,
         isSaved = listsContainingEvent.isNotEmpty(),
@@ -48,6 +49,7 @@ suspend fun Event.toPlaceUi(listsRepository: ListsRepository): PlaceUi {
         imageUrl = imageUrl,
         priceText = priceTier.label,
         hours = hours,
+        reviewCount = reviewCount,
         attendeeCount = interestLevel,
         crowdLevel = interestLevel.toCrowdLevel()
     )

@@ -350,7 +350,7 @@ private fun VenueCard(
     }
 }
 
-@Preview(
+/*@Preview(
     name = "Home Screen Preview",
     showBackground = true,
     showSystemUi = true
@@ -423,7 +423,7 @@ private fun HomeScreenPreview() {
         )
     }
 }
-
+*/
 private fun timeBasedGreeting(displayName: String?): String {
     val hour = java.util.Calendar.getInstance()
         .get(java.util.Calendar.HOUR_OF_DAY)

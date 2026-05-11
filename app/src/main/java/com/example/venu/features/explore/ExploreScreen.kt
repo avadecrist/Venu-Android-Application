@@ -278,17 +278,17 @@ fun ExploreScreen(
         state.shouldStartDirections,
         userLocation
     ) {
-        val event = selectedEventDetails
+//        val event = selectedEventDetails
         val location = userLocation
 
         if (
             state.shouldStartDirections &&
-            event != null &&
+            selectedEventDetails != null &&
             location != null
         ) {
             onAction(
                 ExploreAction.GetDirectionsClicked(
-                    event = event,
+                    event = selectedEventDetails,
                     userLat = location.latitude,
                     userLng = location.longitude
                 )
@@ -1501,6 +1501,7 @@ private fun GooglePlaceEventDraft.toPreviewPlaceUi(): PlaceUi {
         savedLabel = null,
         imageUrl = imageUrl,
         priceText = priceTier.label,
+        googleRating = googleRating,
         hours = hours.orEmpty()
     )
 }

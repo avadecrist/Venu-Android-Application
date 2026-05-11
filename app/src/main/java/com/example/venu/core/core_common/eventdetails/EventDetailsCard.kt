@@ -111,7 +111,7 @@ fun EventDetailsSheet(
 
             RatingSummarySection(
                 credibilityScore = event.credibilityScore,
-                averageRating = event.averageRating ?: 0.0,//event.averageRating,
+                averageRating = event.averageRating ?: 0.0,
                 googleRating = event.googleRating ?: 0.0,
                 userRating = event.userRating ?: 0.0,
                 reviewCount = event.reviewCount
@@ -137,17 +137,6 @@ fun EventDetailsSheet(
             )
         }
 
-//        item {
-//            ReviewsCountHeader(reviewCount = event.reviewCount)
-//        }
-//
-//        item {
-//            LeaveReviewCard(onSubmitReview = onSubmitReview)
-//        }
-//
-//        items(event.reviews, key = { it.id }) { review ->
-//            ReviewCard(review = review)
-//        }
         item {
             ReviewsSection(
                 eventId = event.id,

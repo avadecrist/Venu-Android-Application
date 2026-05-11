@@ -6,31 +6,38 @@ import com.example.venu.features.explore.model.PlaceUi
 import com.example.venu.features.home.model.HomeVenueUi
 
 fun PlaceUi.toEventDetailsUi(): EventDetailsUi {
-    Log.d(
-        "AttendeeDebug",
-        "PlaceUi ${name} -> EventDetailsUi attendeeCount=$attendeeCount"
-    )
     return EventDetailsUi(
         id = id,
         name = name,
         subtitle = subtitle,
-        genre = genre,
         locationName = locationName,
         latitude = latitude,
         longitude = longitude,
         distanceKm = distanceKm,
+
+        genre = genre,
         priceText = priceText,
         startTimeLabel = hours,
         imageUrl = imageUrl,
+
         credibilityScore = if (isVerified) 85 else 60,
-        reviewCount = 0,
+        /* credibilityScore = calculateCredibilityScore( // make calculateCredibilityScore helper func
+            googleRating = googleRating,
+            reviewCount = reviewCount,
+            interestLevel = interestLevel
+        ),*/
+
+        reviewCount = reviewCount,
         isVerifiedVenue = isVerified,
+
         averageRating = rating,
-        googleRating = rating,
+        googleRating = googleRating,
         userRating = 0.0,
-        attendeeCount = attendeeCount,
-        crowdLevel = crowdLevel,
+
+        attendeeCount = attendeeCount, //refactor to interestLevel
+        crowdLevel = crowdLevel, // default Unknown value
         reviews = emptyList(),
+
         isSaved = isSaved || savedLabel != null
     )
 }
@@ -40,25 +47,33 @@ fun HomeVenueUi.toEventDetailsUi(): EventDetailsUi {
         id = id,
         name = title,
         subtitle = subtitle,
-        genre = genre,
         locationName = locationName,
         latitude = latitude,
         longitude = longitude,
         distanceKm = distanceLabel
             ?.removeSuffix(" km")
             ?.toDoubleOrNull(),
-        priceText = "$$",
-        startTimeLabel = "Today",
+
+        genre = genre,
+        priceText = priceText,
+        startTimeLabel = startTimeLabel,
         imageUrl = imageUrl,
+
         credibilityScore = 85,
-        reviewCount = 0,
+        /* credibilityScore = calculateCredibilityScore( // make calculateCredibilityScore helper func
+            googleRating = googleRating,
+            reviewCount = reviewCount,
+            interestLevel = interestLevel
+        ),*/
+
+        reviewCount = reviewCount,
         isVerifiedVenue = false,
         averageRating = ratingLabel
             ?.removePrefix("★ ")
             ?.toDoubleOrNull(),
-        googleRating = null,
-        userRating = null,
-        attendeeCount = attendeeCount,
+        googleRating = googleRating,
+        userRating = 0.0,
+        attendeeCount = attendeeCount, // change to interestLevel
         crowdLevel = crowdLevel,
         reviews = emptyList(),
         isSaved = isSaved

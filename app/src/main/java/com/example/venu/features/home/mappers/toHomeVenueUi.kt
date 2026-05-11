@@ -3,6 +3,7 @@ package com.example.venu.features.home.mappers
 import com.example.venu.core.core_common.util.formatDistance
 import com.example.venu.core.core_common.util.toCrowdLevel
 import com.example.venu.core.core_domain.model.Event
+import com.example.venu.core.core_domain.model.label
 import com.example.venu.core.core_domain.repository.ListType
 import com.example.venu.core.core_domain.repository.ListsRepository
 import com.example.venu.core.core_domain.repository.ReviewRepository
@@ -27,12 +28,16 @@ suspend fun Event.toHomeVenueUi(
         } else {
             null
         },
+        googleRating = googleRating,
         distanceLabel = distanceKm?.let { distance ->
             formatDistance(distance)
         },
+        startTimeLabel = hours,
         genre = genre,
+        priceText = priceTier.label,
         isSaved = listsRepo.isInList(ListType.WantToGo, id),
         imageUrl = imageUrl,
+        reviewCount = reviewCount,
         attendeeCount = interestLevel,
         crowdLevel = interestLevel.toCrowdLevel()
     )

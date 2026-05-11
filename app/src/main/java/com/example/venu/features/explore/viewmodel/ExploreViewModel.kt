@@ -31,7 +31,6 @@ class ExploreViewModel(
     private val eventRepository: EventRepository = AppGraph.eventRepo,
     private val listsRepository: ListsRepository = AppGraph.listsRepo,
     private val googlePlacesRepository: GooglePlacesRepository = AppGraph.googlePlacesRepo,
-//    private val eventFirestoreRepository: EventFirestoreRepository = AppGraph.eventFirestoreRepo
 ) : ViewModel() {
 
     private var events: List<Event> = emptyList()
@@ -177,10 +176,6 @@ class ExploreViewModel(
 
             runCatching {
                 val newEvent = draft.toUserCreatedEvent()
-
-                // Keep local Room working for current screens.
-//                eventRepository.createEvent(newEvent)
-//
                 // Persist the standardized event globally in Firestore.
                 eventRepository.createEvent(newEvent)
 

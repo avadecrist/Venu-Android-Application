@@ -12,6 +12,7 @@ data class PlaceUi(
     val longitude: Double,
     val distanceKm: Double?,
     val rating: Double,
+    val googleRating: Double?,
     val genre: Genre,
     val isVerified: Boolean,
     val isSaved: Boolean,
@@ -19,6 +20,7 @@ data class PlaceUi(
     val imageUrl: String? = null,
     val priceText: String,
     val hours: String,
-    val attendeeCount: Int = 0,
+    val reviewCount: Int = 0,
+    val attendeeCount: Int = 0, //refactor to interestLevel
     val crowdLevel: CrowdLevel = CrowdLevel.UNKNOWN
 )
